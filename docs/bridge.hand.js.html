@@ -1,0 +1,423 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>JSDoc: Source: bridge.hand.js</title>
+
+    <script src="scripts/prettify/prettify.js"> </script>
+    <script src="scripts/prettify/lang-css.js"> </script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+
+<body>
+
+<div id="main">
+
+    <h1 class="page-title">Source: bridge.hand.js</h1>
+
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>/**
+ * Defines Hand class and all methods associated with it.
+ */
+ 
+// Check if namespace has been defined.
+if ( !Bridge ) var Bridge = {};
+
+/**
+ * Creates a new Bridge Hand.
+ * @constructor
+ * @memberof Bridge
+ * @param {string} direction - The direction this hand is sitting
+ * @param {object} [deal] - the optional deal that this hand belongs to
+ */
+Bridge.Hand = function( direction, deal ) {
+	Bridge._checkDirection( direction );
+	/**
+	 * The direction of this hand
+	 * @member {string}
+	 */
+	 this.direction = direction;
+	 
+	/**
+	 * The deal that this hand belongs to.
+	 * @member {object}
+	 */
+	 this.deal = deal;	 
+	 
+	/**
+	 * The name of person holding this hand
+	 * @member {string}
+	 */	 
+	 this.name = Bridge.directions[ direction ].name;
+	 
+	/**
+	 * The actual cards in this hand
+	 * @member {object}
+	 */
+	 this.cards = {};
+	 for( var suit in Bridge.suits ) {
+	 	this.cards[ suit ] = {};
+	 	for( var rank in Bridge.ranks ) {
+			this.cards[ suit ][ rank ] = false;
+		}
+	 }
+	 
+	/**
+	 * The number of cards this hand has
+	 * @member {number}
+	 */	 	 
+	 this.numCards = 0;
+};
+
+//
+// Getters and Setters
+//
+
+/**
+ * Get the direction of this hand
+ * @return {string} the direction of this hand
+ */
+Bridge.Hand.prototype.getDirection = function() {
+	return this.direction;
+};
+
+/**
+ * Set the name of the player holding this hand.
+ * @param {string} name - the name of player
+ */
+Bridge.Hand.prototype.setName = function( name ) {
+	Bridge._checkRequiredArgument( name );
+	this.name = name;
+};
+
+/**
+ * Get the name of the player holding this hand.
+ * @return {string} the name of the player
+ */
+Bridge.Hand.prototype.getName = function() {
+	return this.name;
+};
+
+/**
+ * Get the count of number of cards in this hand
+ * @return {number} the number of cards held by this hand
+ */
+Bridge.Hand.prototype.getCount = function() {
+	return this.numCards;
+};
+
+/**
+ * Set the hand from a BBO handviewer style string
+ * @param {string} hand - the hand in string format
+ */
+Bridge.Hand.prototype.setHand = function( hand ) {
+	Bridge._checkRequiredArgument( hand );
+	this.fromString( hand );
+};
+
+/**
+ * Get the hand in BBO handviewer style string format
+ * @return {string} the hand in string format
+ */
+Bridge.Hand.prototype.getHand = function() {
+	return this.toString();
+};
+
+/**
+ * Add a card to this hand.
+ * @param {string} suit - The suit of this card
+ * @param {string} rank - The rank of this card
+ */
+Bridge.Hand.prototype.addCard = function( suit, rank ) {
+	var prefix = "In addCard";
+	Bridge._checkSuit( suit, prefix );
+	Bridge._checkRank( rank, prefix );
+	if ( this.numCards === 13 ) {
+		Bridge._reportError( this.name + "'s Hand : already has 13 cards. Cannot add " + suit + rank, prefix );
+	}
+	if ( this.cards[ suit ][ rank ] ) {
+		Bridge._reportError( suit + rank + " is already assigned to " + this.direction + ". Cannot add again", prefix );
+	} 	
+	// If deal is specified then check if this card has been assigned
+	if ( this.deal ) {
+		var assignedTo = this.deal._cardAssignedTo[ suit ][ rank ];
+		if ( assignedTo ) {
+			Bridge._reportError( suit + rank + " is already assigned to " + assignedTo + ". Cannot add again", prefix );
+		}
+	}
+	this.cards[ suit ][ rank ] = true;
+	if ( this.deal ) this.deal._cardAssignedTo[ suit ][ rank ] = this.direction;
+	this.numCards++;
+};
+
+
+/**
+ * Remove a card from this hand.
+ * @param {string} suit - The suit of this card
+ * @param {string} rank - The rank of this card
+ */
+Bridge.Hand.prototype.removeCard = function( suit, rank ) {
+	var prefix = "In removeCard";
+	Bridge._checkSuit( suit, prefix );
+	Bridge._checkRank( rank, prefix );
+	// If deal is specified then check if this card has been assigned
+	if ( this.deal ) {
+		var assignedTo = this.deal._cardAssignedTo[ suit ][ rank ];
+		if ( assignedTo !== this.direction ) {
+			Bridge._reportError( suit + rank + " is not assigned to " + this.direction + ". Cannot remove", prefix );
+		}
+	}
+	if ( !this.cards[ suit ][ rank ] ) {
+		Bridge._reportError( suit + rank + " is not assigned to " + this.direction + ". Cannot remove", prefix );
+	}
+	this.cards[ suit ][ rank ] = false;
+	this.numCards--;
+	if ( this.deal ) this.deal._cardAssignedTo[ suit ][ rank ] = null;
+};
+
+
+/**
+ * Check if this hand has a card.
+ * @param {string} suit - The suit of this card
+ * @param {string} rank - The rank of this card
+ * @return {boolean} Does this hand have the specified card?
+ */
+Bridge.Hand.prototype.hasCard = function( suit, rank ) {
+	var prefix = "In hasCard"
+	Bridge._checkSuit( suit, prefix );
+	Bridge._checkRank( rank, prefix );
+	return this.cards[ suit ][ rank ];
+};
+
+/**
+ * Remove all cards from this hand
+ */
+Bridge.Hand.prototype.clearCards = function() {
+	 for( var suit in Bridge.suits ) {
+	 	for( var rank in Bridge.ranks ) {
+			if ( this.cards[ suit ][ rank ] ) this.removeCard( suit, rank );
+		}
+	 }
+};
+
+/**
+ * Set a property in this hand.
+ * The properties that can be set are as follows&lt;br/>
+ * name - string - name of player holding this hand&lt;br/>
+ * hand - string - hand in BBO Handviewer string format&lt;br/>
+ * @param {string} property - the property to set
+ * @param {string} value - the value to set the property to
+ */
+Bridge.Hand.prototype.set = function( property, value ) {
+	var prefix = "In Hand.set";
+	Bridge._checkRequiredArgument( property, "Property", prefix );
+	Bridge._checkRequiredArgument( value, "Value for Property " + property, prefix );	
+	switch ( property ) {
+		case "name" :
+			this.setName( value );
+			break;
+		case "hand" :
+			this.setHand( value );
+			break;
+		default :
+			Bridge._reportError( "Unknown property " + property, prefix );
+	}
+};
+
+/**
+ * Get value of a property .
+ * The properties that can be got are as follows&lt;br/>
+ * direction - string - the direction of this hand
+ * name - string - name of player holding this hand&lt;br/>
+ * count - number - the number of cards this hand has&lt;br/>
+ * hand - string - hand in BBO Handviewer string format&lt;br/>
+ * @param {string} property - the property to get
+ * @return {string} the value of requested property
+ * @throws unknown property
+ */
+Bridge.Hand.prototype.get = function( property ) {
+	var prefix = "In Hand.get";
+	Bridge._checkRequiredArgument( property, "Property", prefix );
+	switch ( property ) {
+		case "direction" :
+			return this.getDirection();
+			break;
+		case "name" :
+			return this.getName();
+			break;
+		case "count" :
+			return this.getCount();
+			break;
+		case "hand" :
+			return this.getHand();
+			break;
+		default :
+			Bridge._reportError( "Unknown property " + property, prefix );
+	}
+};
+
+
+/**
+ * Generate a string display of this hand.
+ * @return {string} string representation of this hand.
+ */
+Bridge.Hand.prototype.toString = function() {
+	var output = "";
+	_.each( Bridge.suitOrder, function( suit ) {
+		var item = "";
+		_.each( Bridge.rankOrder, function( rank ) {
+			if ( this.cards[ suit ][ rank ] ) {
+				item += rank;
+			}
+		}, this);	
+		if ( item ) output += suit + item;	
+	}, this);
+	return output;
+};
+
+/**
+ * Parse a hand given as BBO handviewer string format.
+ * @param {string} handString - the hand in string format
+ */
+Bridge.Hand.prototype.fromString = function( handString ) {
+	Bridge._checkRequiredArgument( handString );
+	this.clearCards();
+ 	var seenSuits = {};
+ 	for( var direction in Bridge.directions ) {
+		seenSuits[ direction ] = false;
+	}
+ 	handString = handString.toLowerCase();
+	var currentSuit = '';
+	var currentRank = '';
+	for( var i = 0; i &lt; handString.length; ++i ) {
+		var prefix = 'In hand for ' + this.direction + ' at position ' + (i+1);
+		// Read the next character specified in hand
+		var currentChar = handString.charAt( i );
+		switch( currentChar ) {
+			// Check if it specifies suit
+			case 'c' :				
+			case 'd' :
+			case 'h' :
+			case 's' :	
+				currentSuit = currentChar;
+				if ( seenSuits[ currentSuit ] ) {
+					Bridge._reportError( ' suit ' + currentSuit + ' has already been seen before!', prefix );
+				}
+				seenSuits[ currentSuit ] = true;
+				break;	
+			
+			// Special handing for numeric 10
+			case '1' :
+				if ( currentSuit === '' ) {
+					Bridge._reportError( currentChar + ' was found when a suit was expected!', prefix );
+				}			
+				if ( i &lt; handString.length - 1 &amp;&amp; handString.charAt( i+1 ) === '0') {
+					currentRank = 't';
+					i++;
+				}
+				else {
+					Bridge._reportError( 'a 1 is present without a subsequent 0. Use 10 or t to reprensent the ten.', prefix );
+					continue;
+				}
+				this.addCard( currentSuit, currentRank );
+				break;
+			// All other characters
+			default :
+				if ( currentSuit === '' ) {
+					Bridge._reportError( currentChar + ' was found when a suit was expected!', prefix );
+					continue;
+				}
+				currentRank = currentChar;
+				Bridge._checkRank( currentRank, prefix );
+				this.addCard( currentSuit, currentRank );
+				break;											
+		}	
+	}	
+ };
+ 
+/**
+ * Generate a json format of this hand
+ * @return {object} json representation of this hand.
+ */
+Bridge.Hand.prototype.toJSON= function() { 
+	var output = {};
+	output.direction = this.direction;
+	output.name = this.name;
+	output.hand = this.getHand();
+	return output;
+};
+ 
+ /**
+ * Parse a hand given in json format
+ * @param {object} hand - the hand in json format
+ */
+Bridge.Hand.prototype.fromJSON = function( handString ) {
+	Bridge._checkRequiredArgument( handString );
+	// direction should not be set
+	this.name = handString.name;
+	this.setHand( handString.hand );
+};
+
+/**
+ * Generate a html display of this hand.
+ * @param {boolean} expandedFormat - should exanded format be used
+ * @return {string} HTML representation of this deal.
+ */
+Bridge.Hand.prototype.toHTML = function( expandedFormat ) {
+	expandedFormat = Bridge.assignDefault( expandedFormat, false );
+	var html = "";
+	if ( expandedFormat ) {
+		html += 'Direction : ' + Bridge.directions[ this. direction ].html;
+		html += ', Name : ' + this.name + ' - ';
+	}
+	_.each( Bridge.suitOrder, function( suit ) {
+		var item = "";
+		_.each( Bridge.rankOrder, function( rank ) {
+			if ( this.cards[ suit ][ rank ] ) {
+				item += Bridge.ranks[ rank ].html;
+			}
+		}, this);	
+		if ( item ) html += Bridge.suits[ suit ].html + " " + item + " ";
+		else html += Bridge.suits[ suit ].html + " ";
+	}, this);	
+	return html;
+};
+
+
+
+
+
+
+</code></pre>
+        </article>
+    </section>
+
+
+
+
+</div>
+
+<nav>
+    <h2><a href="index.html">Home</a></h2><h3>Classes</h3><ul><li><a href="Bridge.Auction.html">Auction</a></li><li><a href="Bridge.Call.html">Call</a></li><li><a href="Bridge.Contract.html">Contract</a></li><li><a href="Bridge.Deal.html">Deal</a></li><li><a href="Bridge.Hand.html">Hand</a></li></ul><h3>Namespaces</h3><ul><li><a href="Bridge.html">Bridge</a></li></ul>
+</nav>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.3.0-beta1</a> on Thu Apr 09 2015 23:20:17 GMT-0700 (Pacific Daylight Time)
+</footer>
+
+<script> prettyPrint(); </script>
+<script src="scripts/linenumber.js"> </script>
+</body>
+</html>

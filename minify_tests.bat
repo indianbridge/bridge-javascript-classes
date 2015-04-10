@@ -1,0 +1,1 @@
+java -jar compiler.jar --js=bridge.core.tests.js --js=bridge.deal.tests.js --language_in=ECMASCRIPT5_STRICT --js=bridge.hand.tests.js --js=bridge.call.tests.js --js=bridge.auction.tests.js --js=bridge.contract.tests.js --js_output_file=bridge.tests.min.js

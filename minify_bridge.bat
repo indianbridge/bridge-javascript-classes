@@ -1,0 +1,1 @@
+java -jar compiler.jar --language_in=ECMASCRIPT5_STRICT --js=bridge.core.js --js=bridge.deal.js --js=bridge.hand.js --js=bridge.call.js --js=bridge.auction.js --js=bridge.contract.js --js_output_file=bridge.min.js
