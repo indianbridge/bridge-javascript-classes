@@ -152,19 +152,3 @@ Bridge.Contract.prototype.toString = function() {
 	}
 	return output;
 };
-
-/**
- * Generate a html display of this contract.
- * @return {string} HTML representation of this contract.
- */
-Bridge.Contract.prototype.toHTML = function() {
-	var html = "";
-	if ( this.level ) {
-		html += this.level;
-		html += Bridge.calls[ this.suit ].html;
-		if ( this.redoubled ) html += Bridge.calls[ 'r' ].html;
-		else if ( this.doubled ) html += Bridge.calls[ 'x' ].html;		
-		html += " by " + Bridge.directions[ this.declarer ].html;		
-	}
-	return html;
-};

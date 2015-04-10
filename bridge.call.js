@@ -173,25 +173,3 @@ Bridge.Call.prototype.toString = function() {
 	}		
 	return output;
 };
-
-/**
- * Generate a html display of this call.
- * @param {string} explanationClass - the option class to apply to span that will have explanation as title
- * @return {string} HTML representation of this bid.
- */
-Bridge.Call.prototype.toHTML = function( explanationClass ) {
-	var html = "";
-	if ( this.call.length === 1 ) {
-		html += Bridge.calls[ this.call ].html
-	}
-	else {
-		html += this.call[0] + Bridge.calls[ this.call[1] ].html
-	}
-	if ( this.explanation ) {
-		var spanHTML = "<span";
-		if ( explanationClass ) spanHTML += " class='" + explanationClass + "'";
-		spanHTML += " title='" + this.explanation + "'>" + html + "<span>";
-	}
-
-	return html;
-};

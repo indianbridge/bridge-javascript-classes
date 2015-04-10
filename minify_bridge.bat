@@ -1,1 +1,2 @@
-java -jar compiler.jar --language_in=ECMASCRIPT5_STRICT --js=bridge.core.js --js=bridge.deal.js --js=bridge.hand.js --js=bridge.call.js --js=bridge.auction.js --js=bridge.contract.js --js_output_file=bridge.min.js
+java -jar compiler.jar --language_in=ECMASCRIPT5_STRICT --js=bridge.core.js --js=bridge.deal.js --js=bridge.hand.js --js=bridge.call.js --js=bridge.auction.js --js=bridge.contract.js --js=bridge.ui.js --js_output_file=bridge.min.js
+java -jar compiler.jar --language_in=ECMASCRIPT5_STRICT --js=bridge.core.js --js=bridge.deal.js --js=bridge.hand.js --js=bridge.call.js --js=bridge.auction.js --js=bridge.contract.js --js=bridge.ui.js --js_output_file=C:\Users\snarasim\Documents\bridge\apps\bridgewinners\www\js\bridge.min.js

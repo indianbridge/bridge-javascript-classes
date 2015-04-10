@@ -56,7 +56,7 @@ Bridge.Deal = function() {
 	 * The form of scoring for this deal.
 	 * @member {string}
 	 */
-	this.scoring = "IMP";	
+	this.scoring = "KO";	
 	
 	/**
 	 * Any notes associated with this deal.
@@ -117,6 +117,7 @@ Bridge.Deal.prototype.setDealer = function( dealer ) {
 	dealer = dealer.toLowerCase();
 	Bridge._checkDirection( dealer );
 	this.dealer = dealer;
+	this.getAuction().setDealer( dealer );
 };
 
 /**
@@ -134,6 +135,7 @@ Bridge.Deal.prototype.setVulnerability = function( vulnerability ) {
 	if ( vulnerability === "0" ) vulnerability = "-";
 	Bridge._checkVulnerability( vulnerability );
 	this.vulnerability = vulnerability;
+	this.getAuction().setVulnerability( vulnerability );
 };
 
 /**
@@ -357,6 +359,7 @@ Bridge.Deal.prototype.toString = function( expandedFormat ) {
  */
 Bridge.Deal.prototype.toJSON = function() {
 	var output = {};
+	output.version = "1.0";
 	var fields = [ 'board', 'dealer', 'vulnerability', 'scoring', 'notes' ];
 	_.each( fields, function( field ) {
 		output[ field ] = this.get( field );
@@ -388,25 +391,4 @@ Bridge.Deal.prototype.fromJSON = function( json ) {
 		};
 	}
 	if ( _.has( json, "auction" ) ) this.auction.fromJSON( json.auction );
-};
-
-
-/**
- * Generate a html display of this deal.
- * @return {string} HTML representation of this deal.
- */
-Bridge.Deal.prototype.toHTML = function() {
-	var html = '';
-	html += '<h3>Deal Information</h3>';
-	html += 'Board : ' + this.getBoard() + '<br/>';
-	html += 'Dealer : ' + Bridge.directions[ this.getDealer() ].html + '<br/>';
-	html += 'Vulnerability : ' + Bridge.vulnerabilities[ this.getVulnerability() ].html + '<br/>';
-	html += 'Notes : ' + this.getNotes() + '<br/>';
-	html += '<h3>Hands</h3>';
-	for(var direction in Bridge.directions) {
-		html += this.getHand( direction ).toHTML() + '<br/>';
-	};
-	html += '<h3>Auction</h3>';
-	html += this.getAuction().toHTML();	
-	return html;	
 };

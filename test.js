@@ -1,12 +1,15 @@
 $(function() {
 	try {		
 		var deal = new Bridge.Deal();
+		
 		deal.fromString( "b=4&d=n&v=-&t=test&n=skj976ht62d542c73&s=sq43h3daj9ckjt842&w=st82hak98dt8763cq&a=-6hxe" );
 		var json = deal.toJSON();
 		deal.fromJSON(json);
+		deal.setDealer( "e" );
+		deal.setVulnerability( "n" );
 		//deal.fromString( deal.toString() );
 		//deal.assignRest();
-		$( "#output" ).append( deal.toHTML() );
+		$( "#output" ).append( deal.getAuction().toHTMLTable() );
 		/*Bridge.useContext = true;
 		var dealString;
 		if ( !dealString ) dealString = "{}";

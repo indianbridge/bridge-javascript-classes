@@ -327,16 +327,3 @@ Bridge.Auction.prototype.toJSON = function( ) {
 	return this.toString();
 };
 
-/**
- * Generate a html display of this auction.
- * @return {string} html representation of this auction.
- */
-Bridge.Auction.prototype.toHTML = function( ) {
-	var html = "Auction: ";
-	for( var i = 0; i < this.calls.length; ++i ) {
-		html += this.calls[i].toHTML() + " ";
-	}
-	html += "<br/>Contract: " + this.getContract().toHTML();
-	return html;
-};
-

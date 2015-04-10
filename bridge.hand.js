@@ -340,31 +340,6 @@ Bridge.Hand.prototype.fromJSON = function( handString ) {
 	this.setHand( handString.hand );
 };
 
-/**
- * Generate a html display of this hand.
- * @param {boolean} expandedFormat - should exanded format be used
- * @return {string} HTML representation of this deal.
- */
-Bridge.Hand.prototype.toHTML = function( expandedFormat ) {
-	expandedFormat = Bridge.assignDefault( expandedFormat, false );
-	var html = "";
-	if ( expandedFormat ) {
-		html += 'Direction : ' + Bridge.directions[ this. direction ].html;
-		html += ', Name : ' + this.name + ' - ';
-	}
-	_.each( Bridge.suitOrder, function( suit ) {
-		var item = "";
-		_.each( Bridge.rankOrder, function( rank ) {
-			if ( this.cards[ suit ][ rank ] ) {
-				item += Bridge.ranks[ rank ].html;
-			}
-		}, this);	
-		if ( item ) html += Bridge.suits[ suit ].html + " " + item + " ";
-		else html += Bridge.suits[ suit ].html + " ";
-	}, this);	
-	return html;
-};
-
 
 
 
