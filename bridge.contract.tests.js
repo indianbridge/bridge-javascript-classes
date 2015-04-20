@@ -43,6 +43,7 @@ QUnit.test( "Other methods", function( assert ) {
 	assert.ok( allowedCalls[ "u" ] );
 	assert.ok( allowedCalls[ "1c" ] );
 	assert.ok( allowedCalls[ "7n" ] );
+	assert.equal( allowedCalls[ "minimum_level" ], 1 );
 	
 	var calls = [ "p", "p", "p", "p" ];
 	contract = new Bridge.Contract();
@@ -65,7 +66,8 @@ QUnit.test( "Other methods", function( assert ) {
 	assert.ok( !allowedCalls[ "r" ] );
 	assert.ok( allowedCalls[ "u" ] );
 	assert.ok( !allowedCalls[ "1c" ] );
-	assert.ok( !allowedCalls[ "7n" ] );			
+	assert.ok( !allowedCalls[ "7n" ] );	
+	assert.equal( allowedCalls[ "minimum_level" ], 8 );		
 	
 	calls = [ "1c", "p", "p", "1h", "p" ];
 	contract = new Bridge.Contract();
@@ -92,7 +94,8 @@ QUnit.test( "Other methods", function( assert ) {
 	assert.ok( !allowedCalls[ "r" ] );
 	assert.ok( allowedCalls[ "u" ] );
 	assert.ok( !allowedCalls[ "1h" ] );
-	assert.ok( allowedCalls[ "1s" ] );		
+	assert.ok( allowedCalls[ "1s" ] );	
+	assert.equal( allowedCalls[ "minimum_level" ], 1 );	
 	
 	calls = [ "1c", "p", "p", "1h", "p", "2h" ];
 	contract = new Bridge.Contract();
@@ -120,6 +123,7 @@ QUnit.test( "Other methods", function( assert ) {
 	assert.ok( allowedCalls[ "u" ] );
 	assert.ok( !allowedCalls[ "2h" ] );
 	assert.ok( allowedCalls[ "2s" ] );
+	assert.equal( allowedCalls[ "minimum_level" ], 2 );
 	
 	calls = [ "1h", "p", "p", "2h", "p", "3h", "x", "p", "p", ];
 	contract = new Bridge.Contract();
@@ -146,7 +150,8 @@ QUnit.test( "Other methods", function( assert ) {
 	assert.ok( allowedCalls[ "r" ] );
 	assert.ok( allowedCalls[ "u" ] );
 	assert.ok( !allowedCalls[ "2h" ] );
-	assert.ok( allowedCalls[ "3s" ] );		
+	assert.ok( allowedCalls[ "3s" ] );	
+	assert.equal( allowedCalls[ "minimum_level" ], 3 );	
 		
 	var calls = [ "1c", "p", "p", "1h", "p", "2h", "x", "r", "p", "p", "p" ];
 	contract = new Bridge.Contract();
@@ -174,4 +179,5 @@ QUnit.test( "Other methods", function( assert ) {
 	assert.ok( allowedCalls[ "u" ] );
 	assert.ok( !allowedCalls[ "1c" ] );
 	assert.ok( !allowedCalls[ "7n" ] );	
+	assert.equal( allowedCalls[ "minimum_level" ], 8 );
 });

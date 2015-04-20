@@ -11,10 +11,10 @@
  */
 var Bridge = {
 	directions : { 
-		'n' : { name : 'North', lho: 'e', rho: 'w', cho: 's', index: 0, html: 'North' },
-		'e' : { name : 'East',  lho: 's', rho: 'n', cho: 'w', index: 1, html: 'East' },
-		's' : { name : 'South', lho: 'w', rho: 'e', cho: 'n', index: 2, html: 'South' },
-		'w' : { name : 'West',  lho: 'n', rho: 's', cho: 'e', index: 3, html: 'West' }
+		'n' : { name : 'North', lho: 'e', rho: 'w', cho: 's', index: 1, html: 'North' },
+		'e' : { name : 'East',  lho: 's', rho: 'n', cho: 'w', index: 2, html: 'East' },
+		's' : { name : 'South', lho: 'w', rho: 'e', cho: 'n', index: 3, html: 'South' },
+		'w' : { name : 'West',  lho: 'n', rho: 's', cho: 'e', index: 0, html: 'West' }
 	},
 	directionOrder: [],
 

@@ -1,51 +1,125 @@
 $(function() {
-	try {		
+
+		try {
+
 		var deal = new Bridge.Deal();
-		
-		deal.fromString( "b=4&d=n&v=-&t=test&n=skj976ht62d542c73&s=sq43h3daj9ckjt842&w=st82hak98dt8763cq&a=-6hxe" );
+		deal.fromString( "v=n&d=w&n=sakqjhakqdakqca&a=1cp1sp1nxpprp" );
+		//deal.fromString( "d=n&v=n&n=skj976ht62d542&a=1cp1sp1nxpprp" );
+		var handConfig = {
+			show: {
+				direction: true,
+				name: true,
+				count: true,
+				suit: true,
+				cards: true
+			},
+			tags: {
+			"hand-diagram": "table",
+			"hand-diagram-header": "thead",
+			"hand-diagram-content": "tbody",
+			"hand-diagram-footer": "tfoot",
+			"hand-diagram-row": "tr",
+			"hand-diagram-column": "td",
+			"hand-diagram-field": "span"				
+			},
+			data: {
+			},
+			classes: {
+				"hand-diagram": ["bbo"]
+			},
+			idPrefix: "n",
+			containerID: "hand-n",
+			registerChangeHandler: true
+		};
+		var hand = deal.getHand( 'n' );
+		//hand.toHTML( { containerID: "hand-n", classes: { "hand-diagram": ["plain"] } } );
+		hand.toHTML( handConfig );
+		handConfig.containerID = "hand-s";
+		//handConfig.registerChangeHandler = false;
+		hand.toHTML( handConfig );
+		hand.addCard( 'c', '7' );
+		hand.addCard( 'c', '3' );
+		var auction = deal.getAuction();
+		auction.toHTML( { containerID: "auction", classes: { "auction-diagram": ["bbo"]	}, idPrefix: "a" } );
+		return;
+		//deal.fromString( "d=n&v=n&n=skj976ht62d542c73&a=1cp1sp1nxpprp" );
+		//deal.fromString( "d=w&v=b&n=skqhakqdakqcakqj&a=1cp1sp1nxpprp" );
+		/*deal.fromString( "b=4&d=n&v=-&t=test&n=skj976ht62d542c73&s=sq43h3daj9ckjt842&w=st82hak98dt8763cq&a=-6hxe" );
 		var json = deal.toJSON();
 		deal.fromJSON(json);
 		deal.setDealer( "e" );
-		deal.setVulnerability( "n" );
+		deal.setVulnerability( "n" );*/
 		//deal.fromString( deal.toString() );
 		//deal.assignRest();
-		$( "#output" ).append( deal.getAuction().toHTMLTable() );
-		/*Bridge.useContext = true;
-		var dealString;
-		if ( !dealString ) dealString = "{}";
-		dealString = JSON.parse(dealString);
+		$( document ).on( "deal:changed", function( e, deal, operation ) {
+			$("#deal").empty().append(deal.toString());
+		});
+		var handConfig = { 
+			type: "html",
+			direction: 'n',
+			idPrefix:'a',
+			addQuestionMark: false,
+			showName: true,
+			showCount: true,
+			embed: true,
+			containerID: "hand",
+			registerChangeHandler: true
+		};
+		var auctionConfig = { 
+			type: "BBO",
+			idPrefix:'a',
+			addQuestionMark: false,
+			showName: true,
+			embed: true,
+			containerID: "auction",
+			registerChangeHandler: true
+		};	
+		for( var direction in Bridge.directions ) {
+			var config = _.clone( handConfig );
+			var hand = deal.getHand( direction );
+			config.direction = direction;
+			config.idPrefix = "hand-" + direction;
+			config.containerID = "hand-" + direction;
+			hand.toHTML( config );
+		}
 		
-		_.defaults( dealString, { "dealer": "n" } );
-		alert( JSON.stringify(dealString) );
-		return;
-		var deal = new Bridge.Deal(); 	
-    	//var linString = unescape( "pn|joy79,nsriram,rk5074,sandipdang|st%7C%7Cmd%7C3S23JQAH39AD89JKCA%2CS7KH6D3457TAC238T%2CS459H78TJQKD2QC9K%2C%7Crh%7C%7Cah%7CBoard%201%7Csv%7Co%7Cmb%7C1H%7Cmb%7Cp%7Cmb%7C4N%7Cmb%7Cp%7Cmb%7C5C%7Cmb%7Cp%7Cmb%7C6H%7Cmb%7Cp%7Cmb%7Cp%7Cmb%7Cp%7Cpc%7CD6%7Cpc%7CD8%7Cpc%7CDA%7Cpc%7CD2%7Cpc%7CDT%7Cpc%7CDQ%7Cpc%7CH2%7Cpc%7CD9%7Cpc%7CS6%7Cpc%7CSA%7Cpc%7CS7%7Cpc%7CS5%7Cpc%7CH3%7Cpc%7CH6%7Cpc%7CHQ%7Cpc%7CH4%7Cmc%7C11%7C" );
-    	//deal.loadBBOLinString( linString );
-    	var auctionString = "pp1c{precision}xppp";
-    	auctionString = "pp1cxr";
-    	//var auction = new Bridge.Auction( "Test", "n" );
-    	//auction.set( "auction", auctionString );
-    	//var calls = [ "1c", "1D", "p", "p", "1S", "2C", "p", "3h", "p", "p", "x", "P", "p", "R" ];
-    	//for( var i = 0; i < calls.length; ++i ) {
-			//auction.addCall( calls[i] );
-		//}
-    	//auction.clear();
-    	//var bid = new Bridge.Bid( 1, "t" );
-		deal.set( "hand", "sakqhakqdakqcakqj", "n" );
-		deal.assignRest();
-		//deal.removeCard( "c", "2" );
-		deal.set( "board", "2" );
-		deal.set( "dealer", "w" );
-		deal.set( "vulnerability", "-" );
-		deal.set( "name", "Sriram", "n" );
-		var auctionName = "Default";
-		deal.addAuction( auctionName );
-		deal.set( "auction", auctionString, auctionName );
-		//deal.loadBBOHandviewerString( "b=4&d=n&v=-&t=test&n=saqt97h6dak73ct72&e=s52hjt9754dj2cq96" );
-		$( "#output" ).append( deal.getAuctionTable() );*/	
+		var auction = deal.getAuction();
+		auction.toHTML( auctionConfig );
+		auctionConfig.idPrefix = "a2";
+		auctionConfig.containerID = "auction2";
+		auction.toHTML( auctionConfig );
+		
+		var bbConfig = {
+			type: "full",
+			idPrefix:'a',
+			embed: true,
+			containerID: "bidding-box",
+			registerChangeHandler: true,
+			includeAllPass: true,
+			includeUndo: true,
+			includeReset: true					
+		};
+		
+		var cdConfig = {
+			type: "images",
+			idPrefix:'a',
+			embed: true,
+			containerID: "card-deck",
+			registerChangeHandler: true,
+			imagesPath: "img/cards/",
+			showCardback: true,
+			height: 75			
+		};		
+		auction.toBiddingBox( bbConfig );
+		deal.toCardDeck( cdConfig );
+		$(".hand").click( { deal: deal }, function( e ) {
+			var direction = $(this).data("hand");
+			e.data.deal.setActiveHand( direction );
+		});
 	}
-	catch( err ) {
-		alert( err );
-	}
+	catch ( err ) {
+		alert(err.message);
+	}	
+
 });
 

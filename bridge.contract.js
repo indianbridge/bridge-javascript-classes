@@ -42,6 +42,7 @@ Bridge.Contract.prototype.allowedCalls = function( direction ) {
 	Bridge._checkDirection( direction );
 	var output = {};
 	output[ "p" ] = !this.isComplete;
+	output[ "ap" ] = output[ "p" ];
 	output[ "x" ] = false;
 	output[ "r" ] = false
 	for( var i = 1; i <= 7; ++i ) {
@@ -52,12 +53,18 @@ Bridge.Contract.prototype.allowedCalls = function( direction ) {
 		}
 	}
 	output[ "u" ] = ( ! ( this.suit === null && this.numPasses === 0 ) );
-	if ( this.suit === null || this.isComplete ) return output;
+	output[ "minimum_level" ] = 8;
+	if ( this.suit === null || this.isComplete ) {
+		if ( !this.isComplete ) output[ "minimum_level" ] = 1;
+		return output;
+	}
+	
 	for( var i = 1; i <= 7; ++i ) {
 		for( var call in Bridge.calls ) {
 			if ( Bridge.isBid( call ) ) {
 				if ( i > this.level || ( i === this.level && Bridge.calls[ call ].index < Bridge.calls[ this.suit ].index ) ) {
 					output[ i + call ] = true;
+					if ( i < output[ "minimum_level" ] ) output[ "minimum_level" ] = i;
 				}
 				else {
 					output[ i + call ] = false;

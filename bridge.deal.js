@@ -34,6 +34,9 @@ Bridge.Deal = function() {
 		this.hands[ direction ] = new Bridge.Hand( direction, this );
 	}	
 	
+	/** The currently active hand. */
+	this._activeHand = 'n';
+	
 	/**
 	 * The board number of this deal.
 	 * @member {number}
@@ -86,6 +89,24 @@ Bridge.Deal.prototype.getHand = function( direction ) {
 };
 
 /**
+ * Get the active hand of this deal.
+ * @return {string} the active hand.
+ */
+Bridge.Deal.prototype.getActiveHand = function() { return this._activeHand; }
+
+/**
+ * Set the active hand for this deal.
+ * @param {string} direction - the active hand
+ */
+Bridge.Deal.prototype.setActiveHand = function( direction ) {
+	Bridge._checkDirection( direction );
+	this.getHand( this.getActiveHand() ).makeInactive();
+	this._activeHand = direction;
+	this.getHand( direction ).makeActive();
+	this.onChange( "setActiveHand", direction );
+};
+
+/**
  * Get the board number of this deal.
  * @return {number} the board number.
  */
@@ -101,6 +122,7 @@ Bridge.Deal.prototype.setBoard = function( board ) {
 		Bridge.Utilities.reportError( board + " is not a valid board number", "In setBoard");
 	}
 	this.board = boardNum;
+	this.onChange( "setBoard", this.board );
 };
 
 /**
@@ -118,6 +140,7 @@ Bridge.Deal.prototype.setDealer = function( dealer ) {
 	Bridge._checkDirection( dealer );
 	this.dealer = dealer;
 	this.getAuction().setDealer( dealer );
+	this.onChange( "setDealer", dealer );
 };
 
 /**
@@ -136,6 +159,7 @@ Bridge.Deal.prototype.setVulnerability = function( vulnerability ) {
 	Bridge._checkVulnerability( vulnerability );
 	this.vulnerability = vulnerability;
 	this.getAuction().setVulnerability( vulnerability );
+	this.onChange( "setVulnerability", vulnerability );
 };
 
 /**
@@ -151,6 +175,7 @@ Bridge.Deal.prototype.getScoring = function() { return this.scoring; }
 Bridge.Deal.prototype.setScoring = function( scoring ) {
 	Bridge._checkRequiredArgument( scoring );
 	this.scoring = scoring;
+	this.onChange( "setScoring", scoring );
 };
 
 /**
@@ -166,6 +191,7 @@ Bridge.Deal.prototype.getNotes = function() { return this.notes; }
 Bridge.Deal.prototype.setNotes = function( notes ) {
 	Bridge._checkRequiredArgument( notes );
 	this.notes = notes;
+	this.onChange( "setNotes", notes );
 };
 
 /**
@@ -391,4 +417,13 @@ Bridge.Deal.prototype.fromJSON = function( json ) {
 		};
 	}
 	if ( _.has( json, "auction" ) ) this.auction.fromJSON( json.auction );
+};
+
+/**
+ * Something in this deal has changed.
+ * Raise corresponding events.
+ */
+Bridge.Deal.prototype.onChange = function( operation, parameter ) {
+	console.log("raising deal " + operation + " - " + parameter );
+	$( document ).trigger( "deal:changed",  [ this, operation, parameter ]);	
 };

@@ -20,6 +20,9 @@ Bridge.Auction = function( deal ) {
 	// these two should be in sync
 	this.calls = [];	
 	this.contracts = [];
+	
+	// If the bidding box uses a split level and suit then we select level first
+	this.selectedLevel = 0;
 };
 
 //
@@ -49,6 +52,7 @@ Bridge.Auction.prototype.setDealer = function( dealer ) {
 		direction = Bridge.getLHO( direction );
 	}, this);
 	this.nextToCall = direction;
+	this.onChange( "changed dealer to " + dealer );
 };
 
 /**
@@ -66,6 +70,25 @@ Bridge.Auction.prototype.getVulnerability = function() {
 Bridge.Auction.prototype.setVulnerability = function( vulnerability ) {
 	Bridge._checkVulnerability( vulnerability );
 	this.vulnerability = vulnerability;
+	this.onChange( "setVulnerability", vulnerability );
+};
+
+/**
+ * Get the selected level of this auction
+ * @return {number} the selected level
+ */
+Bridge.Auction.prototype.getSelectedLevel = function() {
+	return this.selectedLevel;
+};
+
+/**
+ * Set the vulnerability for this auction.
+ * @param {string} vulnerability - the new vulnerability
+ */
+Bridge.Auction.prototype.setSelectedLevel = function( level ) {
+	Bridge._checkLevel( level )
+	this.selectedLevel = level;
+	this.onChange( "setSelectedLevel", level );
 };
 
 /**
@@ -147,6 +170,7 @@ Bridge.Auction.prototype.getContract = function() {
  * The properties that can be got are as follows<br/>
  * dealer - character [ n e s w ] - the dealer for this auction<br/>
  * vulnerability - character [ - n e b ] - the vulnerability for this deal<br/>
+ * level - number between 1 and 7 the selected level
  * contract - string - a prespecified contract <br/>
  * auction - string - the auction as a string <br/>
  * @param {string} property - the property to set<br/>
@@ -162,7 +186,10 @@ Bridge.Auction.prototype.get = function( property ) {
 			break;
 		case 'vulnerability' :
 			return this.getVulnerability();
-			break;		
+			break;	
+		case "level" :
+			return this.getSelectedLevel();
+			break;
 		case 'contract' :
 			return this.getContract();
 			break;
@@ -178,6 +205,7 @@ Bridge.Auction.prototype.get = function( property ) {
  * Set a property in this auction.
  * The properties that can be set are as follows<br/>
  * dealer - character [ n e s w ] - the dealer for this auction<br/>
+ * level - number between 1 and 7 the selected level 
  * vulnerability - character [ - n e b ] - the vulnerability for this deal<br/>
  * contract - string - a prespecified contract <br/>
  * auction - string - the auction as a string <br/>
@@ -197,6 +225,8 @@ Bridge.Auction.prototype.set = function( property, value ) {
 		case 'vulnerability' :
 			this.setVulnerability( value );
 			break;
+		case "level" :
+			this.setSelectedLevel( value );
 		case 'contract' :
 			this.setContract( value  );
 			break;
@@ -229,6 +259,11 @@ Bridge.Auction.prototype.addCall = function( call, explanation, annotation ) {
 	this.calls.push( call );
 	this.contracts.push( contract );
 	this.nextToCall = Bridge.getLHO( this.nextToCall );
+	this.selectedLevel = 0;
+	this.onChange( "addCall", call );
+	if ( this.getContract().isComplete ) {
+		$( document ).trigger( "auction:complete",  this);
+	}
 };
 
 /**
@@ -244,9 +279,7 @@ Bridge.Auction.prototype.addAllPass = function() {
  * Clear all calls in this auction
  */
 Bridge.Auction.prototype.clearCalls = function() {
-	this.calls = [];
-	this.contracts = [];
-	this.nextToCall = this.dealer;
+	while ( this.calls.length > 0 ) this.removeCall();
 };
 
 /**
@@ -258,6 +291,8 @@ Bridge.Auction.prototype.removeCall = function() {
 		this.calls.pop();
 		this.contracts.pop();
 		this.nextToCall = Bridge.getRHO( this.nextToCall );
+		this.selectedLevel = 0;
+		this.onChange( "removeCall", call.getCall() );
 	}
 };
 
@@ -325,5 +360,17 @@ Bridge.Auction.prototype.toString = function( ) {
  */
 Bridge.Auction.prototype.toJSON = function( ) {
 	return this.toString();
+};
+
+/**
+ * Something in this auction has changed.
+ * Raise an event
+ */
+Bridge.Auction.prototype.onChange = function( operation, parameter ) {
+	//console.log("raising " + changeType );
+	// Raise the event and pass this object so handler can have access to information.
+	$( document ).trigger( "auction:changed",  [ this, operation, parameter ]);
+	$( document ).trigger( "bidding-box:changed",  [ this, operation, parameter ]);	
+	if ( this.deal ) $( document ).trigger( "deal:changed",  [ this.deal, operation, parameter ]);	
 };
 

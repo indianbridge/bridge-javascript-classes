@@ -49,11 +49,27 @@ Bridge.Hand = function( direction, deal ) {
 	 * @member {number}
 	 */	 	 
 	 this.numCards = 0;
+	 
+	 /** Is this the active hand? */
+	 this._isActive = false;
+
 };
 
 //
 // Getters and Setters
 //
+
+/** Make this the active hand. */
+Bridge.Hand.prototype.makeActive = function() {
+	this._isActive = true;
+	this.onChange( "makeActive" );
+};
+
+/** Make this hand inactive. */
+Bridge.Hand.prototype.makeInactive = function() {
+	this._isActive = false;
+	this.onChange( "makeInactive" );
+};
 
 /**
  * Get the direction of this hand
@@ -70,6 +86,7 @@ Bridge.Hand.prototype.getDirection = function() {
 Bridge.Hand.prototype.setName = function( name ) {
 	Bridge._checkRequiredArgument( name );
 	this.name = name;
+	this.onChange( "setName", name );
 };
 
 /**
@@ -130,6 +147,7 @@ Bridge.Hand.prototype.addCard = function( suit, rank ) {
 	this.cards[ suit ][ rank ] = true;
 	if ( this.deal ) this.deal._cardAssignedTo[ suit ][ rank ] = this.direction;
 	this.numCards++;
+	this.onChange( "addCard", suit + rank );
 };
 
 
@@ -155,6 +173,7 @@ Bridge.Hand.prototype.removeCard = function( suit, rank ) {
 	this.cards[ suit ][ rank ] = false;
 	this.numCards--;
 	if ( this.deal ) this.deal._cardAssignedTo[ suit ][ rank ] = null;
+	this.onChange( "removeCard", suit + rank );
 };
 
 
@@ -338,6 +357,17 @@ Bridge.Hand.prototype.fromJSON = function( handString ) {
 	// direction should not be set
 	this.name = handString.name;
 	this.setHand( handString.hand );
+};
+
+/**
+ * Something in this hand has changed.
+ * Raise an event, call all registered change callbacks etc.
+ */
+Bridge.Hand.prototype.onChange = function( operation, parameter ) {
+	console.log("raising " + operation + " - " + parameter );
+	// Raise the event and pass this object so handler can have access to information.
+	$( document ).trigger( "hand:changed",  [ this, operation, parameter ]);	
+	if ( this.deal ) $( document ).trigger( "deal:changed",  [ this.deal, operation, parameter ]);	
 };
 
 

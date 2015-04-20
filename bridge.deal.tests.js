@@ -9,7 +9,7 @@ QUnit.test( "Constructor", function( assert ) {
 	assert.deepEqual( deal.board, 1, "board is default" );
 	assert.deepEqual( deal.dealer, "n", "dealer is default" );
 	assert.deepEqual( deal.vulnerability, "-", "vulnerability is default" );
-	assert.deepEqual( deal.scoring, "IMP", "vulnerability is default" );
+	assert.deepEqual( deal.scoring, "KO", "vulnerability is default" );
 	assert.deepEqual( deal.notes, "", "notes is default" );
 	
 	for( var direction in Bridge.directions ) {
