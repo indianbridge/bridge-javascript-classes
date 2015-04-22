@@ -27,14 +27,14 @@ var Bridge = {
 	suitOrder: [],
 	
 	calls : {
-		'n' : { name : 'No Trump', index : 0, bid: true, html : '<font color="000000">NT</font>' }, 
-		's' : { name : 'Spades', index : 1, bid: true, html : '<font color="000000">&spades;</font>' }, 
-		'h' : { name : 'Hearts', index : 2, bid: true, html : '<font color="CB0000">&hearts;</font>' }, 
-		'd' : { name : 'Diamonds', index : 3, bid: true, html : '<font color="CB0000">&diams;</font>' }, 
-		'c' : { name : 'Clubs', index : 4, bid: true, html : '<font color="000000">&clubs;</font>' },	
-		'p' : { name : 'Pass', index : 5, bid: false, html : '<font color="green">P</font>' }, 
-		'x' : { name : 'Double', index : 6, bid: false, html : '<font color="red">X</font>' }, 
-		'r' : { name : 'Redouble', index : 7, bid: false, html : '<font color="blue">XX<font>' }
+		'n' : { name : 'No Trump', index : 0, bid: true, text: "NT", html : '<font color="000000">NT</font>' }, 
+		's' : { name : 'Spades', index : 1, bid: true, text: "&spades;", html : '<font color="000000">&spades;</font>' }, 
+		'h' : { name : 'Hearts', index : 2, bid: true, text: "&hearts;", html : '<font color="CB0000">&hearts;</font>' }, 
+		'd' : { name : 'Diamonds', index : 3, bid: true, text: "&diams;", html : '<font color="CB0000">&diams;</font>' }, 
+		'c' : { name : 'Clubs', index : 4, bid: true, text: "&clubs;", html : '<font color="000000">&clubs;</font>' },	
+		'p' : { name : 'Pass', index : 7, bid: false, text: "P", html : '<font color="green">P</font>' }, 
+		'x' : { name : 'Double', index : 6, bid: false, text: "X", html : '<font color="red">X</font>' }, 
+		'r' : { name : 'Redouble', index : 5, bid: false, text: "XX", html : '<font color="blue">XX<font>' }
 	},	
 	callOrder: [],
 
