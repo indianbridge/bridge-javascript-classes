@@ -52,12 +52,25 @@ Bridge.Hand = function( direction, deal ) {
 	 
 	 /** Is this the active hand? */
 	 this._isActive = false;
+	 
+	// Should an event be raised if anything changes.
+	this.triggerEvents = true;		 
 
 };
 
 //
 // Getters and Setters
 //
+
+/**
+ * Enable trigger of events when hand changes.
+ */
+Bridge.Hand.prototype.enableEventTrigger = function() { this.triggerEvents = true; }
+
+/**
+ * Disable trigger of events when hand changes.
+ */
+Bridge.Hand.prototype.disableEventTrigger = function() { this.triggerEvents = false; }
 
 /** Make this the active hand. */
 Bridge.Hand.prototype.makeActive = function() {
@@ -364,10 +377,16 @@ Bridge.Hand.prototype.fromJSON = function( handString ) {
  * Raise an event, call all registered change callbacks etc.
  */
 Bridge.Hand.prototype.onChange = function( operation, parameter ) {
-	console.log("raising " + operation + " - " + parameter );
-	// Raise the event and pass this object so handler can have access to information.
-	$( document ).trigger( "hand:changed",  [ this, operation, parameter ]);	
-	if ( this.deal ) $( document ).trigger( "deal:changed",  [ this.deal, operation, parameter ]);	
+	if ( this.triggerEvents && !this.deal || this.deal.triggerEvents ) {
+		if ( Bridge.options.enableDebug ) console.log( "hand:changed " + operation + " - " + parameter );
+		// Raise the event and pass this object so handler can have access to information.
+		$( document ).trigger( "hand:changed",  [ this, operation, parameter ]);	
+			
+	}
+	if ( this.deal && this.deal.triggerEvents ) {
+		if ( Bridge.options.enableDebug ) console.log( "deal:changed " + operation + " - " + parameter );
+		$( document ).trigger( "deal:changed",  [ this.deal, operation, parameter ]);
+	}
 };
 
 

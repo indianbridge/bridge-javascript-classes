@@ -22,7 +22,7 @@ QUnit.test( "Constructor", function( assert ) {
 	for( var direction in Bridge.directions ) {
 		for( var i = 1; i <= 7; ++i ) {
 			for( var bid in Bridge.calls ) {
-				if ( Bridge.isBid( bid ) ) {
+				if ( Bridge.isStrain( bid ) ) {
 					var call = new Bridge.Call( i + bid, direction );
 					assert.equal( call.get( "direction" ), direction, "Direction matches" );
 					assert.equal( call.get( "call" ), i + bid, "Call matches" );
@@ -40,7 +40,7 @@ QUnit.test( "Constructor", function( assert ) {
 			}
 		}
 		for( var bid in Bridge.calls ) {
-			if ( !Bridge.isBid( bid ) ) {
+			if ( !Bridge.isStrain( bid ) ) {
 				var call = new Bridge.Call( bid, direction );
 				assert.equal( call.get( "direction" ), direction, "Direction matches" );
 				assert.equal( call.get( "call" ), bid, "Call matches" );

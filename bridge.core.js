@@ -19,22 +19,22 @@ var Bridge = {
 	directionOrder: [],
 
 	suits : {
-		's' : { name : 'Spades', index : 0, html : '<font color="000000">&spades;</font>' }, 
-		'h' : { name : 'Hearts', index : 1, html : '<font color="CB0000">&hearts;</font>' }, 
-		'd' : { name : 'Diamonds', index : 2, html : '<font color="CB0000">&diams;</font>' }, 
-		'c' : { name : 'Clubs', index : 3, html : '<font color="000000">&clubs;</font>' }
+		's' : { name : 'Spades', index : 0, html : '<span class="suit-spades">&spades;</span>' }, 
+		'h' : { name : 'Hearts', index : 1, html : '<span class="suit-hearts">&hearts;</span>' }, 
+		'd' : { name : 'Diamonds', index : 2, html : '<span class="suit-diamonds">&diams;</span>' }, 
+		'c' : { name : 'Clubs', index : 3, html : '<span class="suit-clubs">&clubs;</span>' }
 	},
 	suitOrder: [],
 	
 	calls : {
-		'n' : { name : 'No Trump', index : 0, bid: true, text: "NT", html : '<font color="000000">NT</font>' }, 
-		's' : { name : 'Spades', index : 1, bid: true, text: "&spades;", html : '<font color="000000">&spades;</font>' }, 
-		'h' : { name : 'Hearts', index : 2, bid: true, text: "&hearts;", html : '<font color="CB0000">&hearts;</font>' }, 
-		'd' : { name : 'Diamonds', index : 3, bid: true, text: "&diams;", html : '<font color="CB0000">&diams;</font>' }, 
-		'c' : { name : 'Clubs', index : 4, bid: true, text: "&clubs;", html : '<font color="000000">&clubs;</font>' },	
-		'p' : { name : 'Pass', index : 7, bid: false, text: "P", html : '<font color="green">P</font>' }, 
-		'x' : { name : 'Double', index : 6, bid: false, text: "X", html : '<font color="red">X</font>' }, 
-		'r' : { name : 'Redouble', index : 5, bid: false, text: "XX", html : '<font color="blue">XX<font>' }
+		'n' : { name : 'No Trump', index : 0, isStrain: true, bid: true, text: "NT", html : '<span class="suit-NT">NT</span>' }, 
+		's' : { name : 'Spades', index : 1, isStrain: true, bid: true, text: "&spades;", html : '<span class="suit-spades">&spades;</span>' }, 
+		'h' : { name : 'Hearts', index : 2, isStrain: true, bid: true, text: "&hearts;", html : '<span class="suit-hearts">&hearts;</span>' }, 
+		'd' : { name : 'Diamonds', index : 3, isStrain: true, bid: true, text: "&diams;", html : '<span class="suit-diamonds">&diams;</span>' }, 
+		'c' : { name : 'Clubs', index : 4, isStrain: true, bid: true, text: "&clubs;", html : '<span class="suit-clubs">&clubs;</span>' },	
+		'p' : { name : 'Pass', index : 7, isStrain: false, bid: false, text: "P", html : '<span class="bid-pass">P</span>' }, 
+		'x' : { name : 'Double', index : 6, isStrain: false, bid: false, text: "X", html : '<span class="bid-double">X</span>' }, 
+		'r' : { name : 'Redouble', index : 5, isStrain: false, bid: false, text: "XX", html : '<span class="bid-redouble">XX</span>' }
 	},	
 	callOrder: [],
 
@@ -104,6 +104,17 @@ Bridge._checkListMembership = function( element, list, listName, context ) {
 };
 
 /**
+ * Check to see if a symbol belongs to a list and return false if not
+ * @param {string} element - The element whose membership is being checked
+ * @param {string} list - The list whose membership is checked
+ * @private
+ * @return {boolean} true is element belongs, false if not
+ */
+Bridge._belongsTo = function( element, list ) {
+	return _.has( list, element );
+};
+
+/**
  * Check to see if a required argument is provided
  * @param {*} value - The reuired argument
  * @param {string} name - The name of the argument for printing
@@ -135,7 +146,8 @@ Bridge.rankOrder = Bridge._createIndexArray( Bridge.ranks );
  */
 Bridge.options = {
 	// Should error message include context?
-	useContextInErrorMessage: false
+	useContextInErrorMessage: false,
+	enableDebug: false
 };
 
 
@@ -190,9 +202,18 @@ Bridge.arePartners = function( direction1, direction2 ) {
  * @param {string} suit - the suit of the call
  * @return true if it is a bid
  */
-Bridge.isBid = function( suit ) {
+/*Bridge.isBid = function( suit ) {
 	if ( !_.has( Bridge.calls, suit ) ) return false;
 	return Bridge.calls[ suit ].bid;
+};*/
+
+/**
+ * Check if suit is a strain ( not pass double or redouble )
+ * @param {string} suit - the suit of the call
+ * @return true if it is a strain
+ */
+Bridge.isStrain = function( suit ) {
+	return _.has( Bridge.calls, suit ) && Bridge.calls[ suit ].isStrain;
 };
 
 /**
@@ -328,6 +349,15 @@ Bridge._checkDirection = function( direction, context ) {
 };
 
 /**
+ * Check to see if direction is a valid direction
+ * @param {string} direction - The direction to check
+ * @return {boolean} true if valid, false if not
+ */
+Bridge.isDirection = function( direction ) {
+	return Bridge._belongsTo( direction, Bridge.directions );
+};
+
+/**
  * Check to see if suit is a valid suit
  * @param {string} suit - The suit to check
  * @param {string} [context] - The context ( for example the method ) of this call
@@ -338,6 +368,15 @@ Bridge._checkSuit = function( suit, context ) {
 };
 
 /**
+ * Check to see if suit is a valid suit
+ * @param {string} suit - The suit to check
+ * @return {boolean} true if valid, false if not
+ */
+Bridge.isSuit = function( suit ) {
+	return Bridge._belongsTo( suit, Bridge.suits );
+};
+
+/**
  * Check to see if suit of a call is a valid
  * @param {string} call - The call to check
  * @param {string} [context] - The context ( for example the method ) of this call
@@ -345,6 +384,15 @@ Bridge._checkSuit = function( suit, context ) {
  */
 Bridge._checkCall = function( call, context ) {
 	Bridge._checkListMembership( call, Bridge.calls, 'Call', context );
+};
+
+/**
+ * Check to see if suit of a call is a valid
+ * @param {string} call - The call to check
+ * @return {boolean} true if valid, false if not
+ */
+Bridge.isCall = function( call ) {
+	return Bridge._belongsTo( call, Bridge.calls );
 };
 
 /**
@@ -361,6 +409,19 @@ Bridge._checkLevel = function( level, context ) {
 };
 
 /**
+ * Check to see if level of a call is valid
+ * @param {string} level - The level to check
+ * @return {boolean} true if valid, false if not
+ */
+Bridge.isLevel = function( level ) {
+	var levelNum = parseInt( level );
+	if ( isNaN( levelNum ) || String( levelNum ) !== String( level ) || levelNum < 1 || levelNum > 7 ) {
+		return false;
+	}	
+	return true;
+};
+
+/**
  * Check to see if bid is valid
  * @param {string} bid - the bid as single character or 2 characters
  * @param {string} [context] - The context ( for example the method ) of this call
@@ -373,7 +434,7 @@ Bridge._checkBid = function( bid, context ) {
 	if ( bid.length === 1 ) {
 		var suit = bid[0];
 		Bridge._checkCall( suit, context );
-		if ( Bridge.isBid( suit ) ) {
+		if ( Bridge.isStrain( suit ) ) {
 			Bridge._reportError( "Invalid bid " + bid, context );			
 		}
 		return;
@@ -381,10 +442,28 @@ Bridge._checkBid = function( bid, context ) {
 	var level = bid[0];
 	var suit = bid[1];
 	Bridge._checkCall( suit, context );
-	if ( !Bridge.isBid( suit ) ) {
+	if ( !Bridge.isStrain( suit ) ) {
 		Bridge._reportError( "Invalid bid " + bid, context );
 	}
 	Bridge._checkLevel( level, context );
+};
+
+/**
+ * Check to see if bid is valid
+ * @param {string} bid - the bid as single character or 2 characters
+ * @return {boolean} true if valid, false if not
+ */
+Bridge.isBid = function( bid ) {
+	if ( bid.length < 1 || bid.length > 2 ) {
+		return false;
+	}
+	if ( bid.length === 1 ) {
+		var suit = bid[0];
+		return Bridge.isCall( suit ) && !Bridge.isStrain( suit );
+	}
+	var level = bid[0];
+	var suit = bid[1];
+	return Bridge.isLevel( level ) && Bridge.isCall( suit ) && Bridge.isStrain( suit );
 };
 
 /**
@@ -398,6 +477,15 @@ Bridge._checkRank = function( rank, context ) {
 };
 
 /**
+ * Check to see if rank is a valid rank
+ * @param {string} rank - The rank to check
+ * @return {boolean} true if valid, false if not
+ */
+Bridge.isRank = function( rank ) {
+	return Bridge._belongsTo( rank, Bridge.ranks );
+};
+
+/**
  * Check to see if vulnerability is a valid vulnerability
  * @param {string} vulnerability - The vulnerability to check
  * @param {string} [context] - The context ( for example the method ) of this call
@@ -405,4 +493,13 @@ Bridge._checkRank = function( rank, context ) {
  */
 Bridge._checkVulnerability = function( vulnerability, context ) {
 	Bridge._checkListMembership( vulnerability, Bridge.vulnerabilities, 'Vulnerability', context );
+};
+
+/**
+ * Check to see if vulnerability is a valid vulnerability
+ * @param {string} vulnerability - The vulnerability to check
+ * @return {boolean} true if valid, false if not
+ */
+Bridge.isVulnerability = function( vulnerability ) {
+	return Bridge._belongsTo( vulnerability, Bridge.vulnerabilities );
 };

@@ -181,12 +181,56 @@ Bridge._generateClasses = function( prefix, additionalClasses ) {
 }; 
 
 /**
+ * Utility to generate table config classes
+ */
+Bridge.getTableConfig = function( prefix ) {
+	var tags = {};
+	tags[ prefix ] = "table";
+	tags[ prefix + "-header" ] = "thead";
+	tags[ prefix + "-content" ] = "tbody";
+	tags[ prefix + "-footer" ] = "tfoot";
+	tags[ prefix + "-row" ] = "tr";
+	tags[ prefix + "-column" ] = "td";
+	tags[ prefix + "-field" ] = "span";	
+	return tags;	
+};
+
+/**
+ * Utility to generate div config classes
+ */
+Bridge.getDivConfig = function( prefix ) {
+	var tags = {};
+	tags[ prefix ] = "div";
+	tags[ prefix + "-header" ] = "div";
+	tags[ prefix + "-content" ] = "div";
+	tags[ prefix + "-footer" ] = "div";
+	tags[ prefix + "-row" ] = "div";
+	tags[ prefix + "-column" ] = "span";
+	tags[ prefix + "-field" ] = "span";	
+	return tags;	
+};
+
+/**
+ * Utility to generate div config classes
+ */
+Bridge.getSpanConfig = function( prefix ) {
+	var tags = {};
+	tags[ prefix ] = "div";
+	tags[ prefix + "-header" ] = "span";
+	tags[ prefix + "-content" ] = "span";
+	tags[ prefix + "-footer" ] = "span";
+	tags[ prefix + "-row" ] = "span";
+	tags[ prefix + "-column" ] = "span";
+	tags[ prefix + "-field" ] = "span";	
+	return tags;	
+};
+
+/**
  * Utility to generate a BBO style hand diagram.
  * This just uses toHTML with appropriate configuration
  */
 Bridge.Hand.prototype.toBBODiagram = function( config ) {
 	config = Bridge.assignDefault( config, {} );	
-	config = Bridge.assignDefault( config, {} );
 	_.defaults( config, {
 		prefix: "hand-diagram",
 		show: {},
@@ -197,22 +241,17 @@ Bridge.Hand.prototype.toBBODiagram = function( config ) {
 		containerID: null,
 		registerChangeHandler: true
 	});	
-	config.show.direction = true;
-	config.show.name = true;
-	config.show.count = false;
-	config.show.suit = true;
-	config.show.cards = true;
+	_.defaults( config.show, {
+		direction: true,
+		name: true,
+		count: false,
+		suit: true,
+		cards: true
+	});
 	var prefix = config.prefix
 	if( _.has( config.classes , prefix ) ) config.classes[ prefix ].push( "bbo" );
 	else config.classes[ prefix ] = [ "bbo" ];
-	var prefix = config.prefix;
-	config.tags[ prefix ] = "table";
-	config.tags[ prefix + "-header" ] = "thead";
-	config.tags[ prefix + "-content" ] = "tbody";
-	config.tags[ prefix + "-footer" ] = "tfoot";
-	config.tags[ prefix + "-row" ] = "tr";
-	config.tags[ prefix + "-column" ] = "td";
-	config.tags[ prefix + "-field" ] = "span";		
+	config.tags = Bridge.getTableConfig( config.prefix );	
 	return this.toHTML( config );
 };
 
@@ -234,25 +273,21 @@ Bridge.Hand.prototype.toHTML = function( config, isCallback ) {
 		classes: {},
 		idPrefix: null,
 		containerID: null,
-		registerChangeHandler: true
+		registerChangeHandler: false
 	});	
 	var prefix = config.prefix;
 	// Since lodash does not have recursive defaults we need this hack
 	_.defaults( config.show, {
 		direction: false,
 		name: false,
-		count: false,
+		countInHeader: false,
+		countInContent: false,
 		suit: true,
-		cards: true		
+		cards: true,
+		text: true,
+		emptySuit: true	
 	});
-	var tags = {};
-	tags[ prefix ] = "div";
-	tags[ prefix + "-header" ] = "div";
-	tags[ prefix + "-content" ] = "div";
-	tags[ prefix + "-footer" ] = "div";
-	tags[ prefix + "-row" ] = "span";
-	tags[ prefix + "-column" ] = "span";
-	tags[ prefix + "-field" ] = "span";	
+	var tags = Bridge.getSpanConfig( prefix );
 	_.defaults( config.tags, tags);	
 	if ( config.registerChangeHandler && !config.idPrefix ) {
 		Bridge._reportError( "idPrefix is required if change handler has to registered" );
@@ -261,50 +296,53 @@ Bridge.Hand.prototype.toHTML = function( config, isCallback ) {
 	var headerHTML = "";
 	var rowClasses = Bridge._generateClasses( prefix, [ "row", "info" ] );
 	var rowTag = Bridge._getTag( config, rowClasses );
-	headerHTML += Bridge._openTag( rowTag, config, rowClasses, [] );
-	var columnClasses = [];
-	var columnTag = ""	
-	var field = "direction";
-	if ( config.show[ field ] ) {
-		columnClasses = Bridge._generateClasses( prefix, [ "column", field ] );
-		columnTag = Bridge._getTag( config, columnClasses );	
-		headerHTML += Bridge._openTag( columnTag, config, columnClasses, [] );
-		var classes = Bridge._generateClasses( prefix, [ "field", field ] );
-		var tag = Bridge._getTag( config, classes );
-		var data = [ "data-" + field + "='" + this.get( field ) + "'" ];
-		headerHTML += Bridge._openTag( tag, config, classes, data );
-		headerHTML += this.get( field ).toUpperCase();
-		headerHTML += Bridge._closeTag( tag );
-		headerHTML += Bridge._closeTag( columnTag );
-	}		
-	field = "name";
-	if ( config.show[ field ] ) {
-		columnClasses = Bridge._generateClasses( prefix, [ "column", field ] );
-		columnTag = Bridge._getTag( config, columnClasses );
-		headerHTML += Bridge._openTag( columnTag, config, columnClasses, [] );
-		var classes = Bridge._generateClasses( prefix, [ "field", field ] );
-		var tag = Bridge._getTag( config, classes );		
-		var data = [ "data-" + field + "='" + this.get( field ) + "'" ];
-		headerHTML += Bridge._openTag( tag, config, classes, data );
-		headerHTML += this.get( field );
-		if ( config.show.count ) {
-			var subField = "count";
-			var classes = Bridge._generateClasses( prefix, [ "field", subField ] );
-			var tag = Bridge._getTag( config, classes );		
-			var data = [ "data-" + subField + "='" + this.get( subField ) + "'" ];		
+	if ( config.show.direction || config.show.name ) {
+		headerHTML += Bridge._openTag( rowTag, config, rowClasses, [] );
+		var columnClasses = [];
+		var columnTag = ""	
+		var field = "direction";
+		if ( config.show[ field ] ) {
+			columnClasses = Bridge._generateClasses( prefix, [ "column", field ] );
+			columnTag = Bridge._getTag( config, columnClasses );	
+			headerHTML += Bridge._openTag( columnTag, config, columnClasses, [] );
+			var classes = Bridge._generateClasses( prefix, [ "field", field ] );
+			var tag = Bridge._getTag( config, classes );
+			var data = [ "data-" + field + "='" + this.get( field ) + "'" ];
 			headerHTML += Bridge._openTag( tag, config, classes, data );
-			headerHTML += "(" + this.get( subField ) + ")";
-			headerHTML += Bridge._closeTag( tag );			
-		}
-		headerHTML += Bridge._closeTag( tag );
-		headerHTML += Bridge._closeTag( columnTag );
-	}	
-	
-	headerHTML += Bridge._closeTag( rowTag );
+			headerHTML += this.get( field ).toUpperCase();
+			headerHTML += Bridge._closeTag( tag );
+			headerHTML += Bridge._closeTag( columnTag );
+		}		
+		field = "name";
+		if ( config.show[ field ] ) {
+			columnClasses = Bridge._generateClasses( prefix, [ "column", field ] );
+			columnTag = Bridge._getTag( config, columnClasses );
+			headerHTML += Bridge._openTag( columnTag, config, columnClasses, [] );
+			var classes = Bridge._generateClasses( prefix, [ "field", field ] );
+			var tag = Bridge._getTag( config, classes );		
+			var data = [ "data-" + field + "='" + this.get( field ) + "'" ];
+			headerHTML += Bridge._openTag( tag, config, classes, data );
+			headerHTML += this.get( field );
+			if ( config.show.countInHeader ) {
+				var subField = "count";
+				var classes = Bridge._generateClasses( prefix, [ "field", subField ] );
+				var tag = Bridge._getTag( config, classes );		
+				var data = [ "data-" + subField + "='" + this.get( subField ) + "'" ];		
+				headerHTML += Bridge._openTag( tag, config, classes, data );
+				headerHTML += "(" + this.get( subField ) + ")";
+				headerHTML += Bridge._closeTag( tag );			
+			}
+			headerHTML += Bridge._closeTag( tag );
+			headerHTML += Bridge._closeTag( columnTag );
+		}	
+		
+		headerHTML += Bridge._closeTag( rowTag );
+	}
 	
 	// Content
 	var contentHTML = "";	
 	// Cards in each suit
+	var cardNumber = 0;
 	_.each( Bridge.suitOrder, function( suit ) {
 		rowClasses = Bridge._generateClasses( prefix, [ "row", suit ] );
 		rowTag = Bridge._getTag( config, rowClasses );		
@@ -329,26 +367,38 @@ Bridge.Hand.prototype.toHTML = function( config, isCallback ) {
 			contentHTML += Bridge._openTag( columnTag, config, columnClasses, [] );
 			var classes = Bridge._generateClasses( prefix, [ "field", field, suit ] );
 			var tag = Bridge._getTag( config, classes );		
-			var data = [ "data-" + field + "='" + suit + "'" ];					
+			var data = [ "data-suit='" + suit + "'" ];					
 			var cards = "";
 			var count = 0;
 			_.each( Bridge.rankOrder, function( rank ) {
 				if ( this.cards[ suit ][ rank ] ) {
 					count++;
 					classes = Bridge._generateClasses( prefix, [ "field", field, suit, rank ] );
-					tag = Bridge._getTag( config, classes );					
+					classes.push( prefix + "-field-" + field + "-" + cardNumber );
+					tag = Bridge._getTag( config, classes );	
+					var data = [ "data-suit='" + suit + "'", "data-rank='" + rank + "'", "data-card='" + suit + rank + "'" ];				
 					cards += Bridge._openTag( tag, config, classes, data );
-					cards += Bridge.ranks[ rank ].html;
+					if ( config.show.text ) cards += Bridge.ranks[ rank ].html;
 					cards += Bridge._closeTag( tag );
+					cardNumber++;
 				}
 			}, this);	
-			if ( count === 0 ) cards += "-";			
+			if ( count === 0 && config.show.emptySuit && config.show.text ) cards += "-";			
 			contentHTML += cards;
 			contentHTML += Bridge._closeTag( columnTag );
-		}				
+		}	
+				
 		contentHTML += Bridge._closeTag( rowTag );
 	}, this );
-	
+	if ( config.show.countInContent ) {
+		var subField = "count";
+		var classes = Bridge._generateClasses( prefix, [ "field", subField ] );
+		var tag = Bridge._getTag( config, classes );		
+		var data = [ "data-" + subField + "='" + this.get( subField ) + "'" ];		
+		contentHTML += Bridge._openTag( tag, config, classes, data );
+		contentHTML += "(" + this.get( subField ) + ")";
+		contentHTML += Bridge._closeTag( tag );			
+	}
 	// Footer
 	var footerHTML = "";
 	var html = Bridge._generateHTMLModule( config, headerHTML, contentHTML, footerHTML );
@@ -357,7 +407,9 @@ Bridge.Hand.prototype.toHTML = function( config, isCallback ) {
 	if ( !isCallback && config.registerChangeHandler ) {
 		var id = config.idPrefix + "-" + config.prefix;
 		var event = "hand:changed." + id;
-		$( document ).on( event, { config: _.cloneDeep( config ), id: id, event: event, direction: this.getDirection() }, function( e, hand ) {
+		$( document ).off( event );
+		$( document ).on( event, { config: _.cloneDeep( config ), hand: this, id: id, event: event, direction: this.getDirection() }, function( e, hand ) {
+			if ( hand !== e.data.hand ) return;
 			var id = e.data.id;
 			if ( $( '#' + id ).length === 0 ) {
 				// block has been removed. Turn off event handler.
@@ -365,7 +417,7 @@ Bridge.Hand.prototype.toHTML = function( config, isCallback ) {
 				$( document ).off( event );
 				return;
 			}
-			if ( hand.getDirection() === e.data.direction ) hand.toHTML( e.data.config, true );
+			hand.toHTML( e.data.config, true );
 		});
 	}	
 	return html;
@@ -392,13 +444,7 @@ Bridge.Auction.prototype.toBBODiagram = function( config ) {
 	config.show.direction = true;
 	if( _.has( config.classes , prefix ) ) config.classes[ prefix ].push( "bbo" );
 	else config.classes[ prefix ] = [ "bbo" ];
-	config.tags[ prefix ] = "table";
-	config.tags[ prefix + "-header" ] = "thead";
-	config.tags[ prefix + "-content" ] = "tbody";
-	config.tags[ prefix + "-footer" ] = "tfoot";
-	config.tags[ prefix + "-row" ] = "tr";
-	config.tags[ prefix + "-column" ] = "td";
-	config.tags[ prefix + "-field" ] = "span";		
+	config.tags = Bridge.getTableConfig( config.prefix );	
 	return this.toHTML( config );
 };
 
@@ -422,7 +468,7 @@ Bridge.Auction.prototype.toHTML = function( config, isCallback ) {
 		classes: {},
 		idPrefix: null,
 		containerID: null,
-		registerChangeHandler: true,
+		registerChangeHandler: false,
 		addQuestionMark: true
 	});	
 	var prefix = config.prefix;
@@ -430,14 +476,7 @@ Bridge.Auction.prototype.toHTML = function( config, isCallback ) {
 	_.defaults( config.show, {
 		direction: false
 	});
-	var tags = {};
-	tags[ prefix ] = "div";
-	tags[ prefix + "-header" ] = "div";
-	tags[ prefix + "-content" ] = "div";
-	tags[ prefix + "-footer" ] = "div";
-	tags[ prefix + "-row" ] = "span";
-	tags[ prefix + "-column" ] = "span";
-	tags[ prefix + "-field" ] = "span";		
+	var tags = Bridge.getSpanConfig( prefix );	
 	_.defaults( config.tags, tags );	
 	if ( config.registerChangeHandler && !config.idPrefix ) {
 		Bridge._reportError( "idPrefix is required if change handler has to registered" );
@@ -560,7 +599,8 @@ Bridge.Auction.prototype.toHTML = function( config, isCallback ) {
 	if ( !isCallback && config.registerChangeHandler ) {
 		var id = config.idPrefix + "-" + config.prefix;
 		var event = "auction:changed." + id;
-		$( document ).on( event, { config: _.cloneDeep( config ), id: id, event: event }, function( e, auction ) {
+		$( document ).on( event, { config: _.cloneDeep( config ), auction: this, id: id, event: event }, function( e, auction ) {
+			if ( e.data.auction !== auction ) return;
 			var id = e.data.id;
 			if ( $( '#' + id ).length === 0 ) {
 				// block has been removed. Turn off event handler.
@@ -630,24 +670,18 @@ Bridge.Deal.prototype.toCardDeck = function( config, isCallback ) {
 		classes: {},
 		idPrefix: null,
 		containerID: null,
-		registerChangeHandler: true
+		registerChangeHandler: false
 	});	
 	var prefix = config.prefix;
 	// Since lodash does not have recursive defaults we need this hack
 	_.defaults( config.show, {
 		title: true,
 		activeHand: true,
-		card: true,
-		assignedTo: true
+		text: true,
+		assignedTo: true,
+		reset: false
 	});
-	var tags = {};
-	tags[ prefix ] = "table";
-	tags[ prefix + "-header" ] = "thead";
-	tags[ prefix + "-content" ] = "tbody";
-	tags[ prefix + "-footer" ] = "tfoot";
-	tags[ prefix + "-row" ] = "tr";
-	tags[ prefix + "-column" ] = "td";
-	tags[ prefix + "-field" ] = "span";	
+	var tags = Bridge.getTableConfig( prefix );
 	_.defaults( config.tags, tags);	
 	
 	// Header
@@ -701,7 +735,7 @@ Bridge.Deal.prototype.toCardDeck = function( config, isCallback ) {
 			else classes.push( "unassigned" );
 			tag = Bridge._getTag( config, classes );	
 			contentHTML += Bridge._openTag( tag, config, classes, data );
-			contentHTML += Bridge.suits[ suit ].html + Bridge.ranks[ rank ].html;
+			if ( config.show.text ) contentHTML += Bridge.suits[ suit ].html + Bridge.ranks[ rank ].html;
 			if ( config.show.assignedTo ) {
 				if ( assignedTo ) contentHTML += "(" + assignedTo.toUpperCase() + ")";
 			}
@@ -714,11 +748,34 @@ Bridge.Deal.prototype.toCardDeck = function( config, isCallback ) {
 	
 	// Footer	
 	var footerHTML = "";
+	if ( config.show.reset ) {
+		var rowClasses = Bridge._generateClasses( prefix, [ "row", "reset" ] );
+		var rowTag = Bridge._getTag( config, rowClasses );
+		footerHTML += Bridge._openTag( rowTag, config, rowClasses, [] );
+		var columnClasses = [];
+		var columnTag = "";
+		var field = "reset";
+		columnClasses = Bridge._generateClasses( prefix, [ "column", field ] );
+		columnTag = Bridge._getTag( config, columnClasses );
+		footerHTML += Bridge._openTag( columnTag, config, columnClasses, [ "colspan=13" ] );
+		var classes = Bridge._generateClasses( prefix, [ "field", field ] );
+		var tag = Bridge._getTag( config, classes );
+		var data = [];	
+		footerHTML += Bridge._openTag( tag, config, classes, data );
+		var text = "Reset/Clear Hand";
+		footerHTML += text;
+		footerHTML += Bridge._closeTag( tag );
+		footerHTML += Bridge._closeTag( columnTag );								
+		footerHTML += Bridge._closeTag( rowTag );
+	}	
 	var html = Bridge._generateHTMLModule( config, headerHTML, contentHTML, footerHTML );	
-	if ( config.containerID ) Bridge.embedHTML( config.containerID, html );
+	if ( config.containerID ) {
+		Bridge.embedHTML( config.containerID, html );
+		$( document ).trigger( "card-deck:updated" );		
+	}
 	if ( config.registerChangeHandler ) {
 		var id = config.idPrefix + "-" + config.prefix;
-		$(  "#" + id ).on( "click", ".card-deck-field-cards", { deal: this } , function( e ) {
+		$(  "#" + id ).on( "click", "." + config.prefix + "-field-cards", { deal: this } , function( e ) {
 			try {
 				var suit = $( this ).data( "suit" );
 				var rank = $( this ).data( "rank" );
@@ -734,11 +791,20 @@ Bridge.Deal.prototype.toCardDeck = function( config, isCallback ) {
 				alert( err.message );
 			}
 		});	
+		$(  "#" + id ).on( "click", "." + config.prefix + "-field-reset", { deal: this } , function( e ) {
+			try {
+				var deal = e.data.deal;
+				deal.getHand( deal.getActiveHand() ).clearCards();
+			}
+			catch ( err ) {
+				alert( err.message );
+			}
+		});				
 		if ( !isCallback ) {
 			var event = "hand:changed." + id;
+			$( document ).off( event );
 			$( document ).on( event, { deal: this, config: _.cloneDeep(config), id: id, event:event }, function( e, hand ) {
 				var id = e.data.id;
-				console.log("Event id = " + id );
 				if ( $( '#' + id ).length === 0 ) {
 					// block has been removed. Turn off event handler.
 					var event = e.data.event;
@@ -772,7 +838,7 @@ Bridge.Auction.prototype.toBiddingBox = function( config, isCallback ) {
 		classes: {},
 		idPrefix: null,
 		containerID: null,
-		registerChangeHandler: true
+		registerChangeHandler: false
 	});	
 	
 	// Since lodash does not have recursive defaults we need this hack
@@ -782,14 +848,7 @@ Bridge.Auction.prototype.toBiddingBox = function( config, isCallback ) {
 		reset: true
 	});
 	var prefix = config.prefix;
-	var tags = {};
-	tags[ prefix ] = "table";
-	tags[ prefix + "-header" ] = "thead";
-	tags[ prefix + "-content" ] = "tbody";
-	tags[ prefix + "-footer" ] = "tfoot";
-	tags[ prefix + "-row" ] = "tr";
-	tags[ prefix + "-column" ] = "td";
-	tags[ prefix + "-field" ] = "span";	
+	var tags = Bridge.getTableConfig( prefix );
 	_.defaults( config.tags, tags);	
 	
 	if ( config.layout === "concise" ) {
@@ -802,16 +861,14 @@ Bridge.Auction.prototype.toBiddingBox = function( config, isCallback ) {
 	if ( config.containerID ) Bridge.embedHTML( config.containerID, html );
 	if ( config.registerChangeHandler ) {
 		var id = config.idPrefix + "-" + config.prefix;
-		$( "#" + id ).on( "click", ".bidding-box-field-level.enabled", { auction: this }, function( e ) {
+		$( "#" + id ).on( "click", "." + config.prefix + "-field-level.enabled", { auction: this }, function( e ) {
 			var level = $( this ).data( "level" );
-			console.log("Level is " + level);
 			e.data.auction.setSelectedLevel( level );
 		});
-		$(  "#" + id ).on( "click", ".bidding-box-field-calls.enabled", { auction: this }, function( e ) {
+		$(  "#" + id ).on( "click", "." + config.prefix + "-field-calls.enabled", { auction: this }, function( e ) {
 			try {
 				var call = $( this ).data( "call" );
 				var auction = e.data.auction;
-				console.log("Call is " + call);
 				if ( call === "allpass" ) auction.addAllPass();
 				else if ( call === "undo" ) auction.removeCall();
 				else if ( call === "reset" ) auction.clearCalls();
@@ -823,7 +880,9 @@ Bridge.Auction.prototype.toBiddingBox = function( config, isCallback ) {
 		});		
 		if ( !isCallback ) {
 			var event = "bidding-box:changed." + id;
-			$(  document ).on( event, { config: _.cloneDeep(config), id: id, event: event }, function( e, auction ) {
+			$( document ).off( event );
+			$( document ).on( event, { config: _.cloneDeep(config), auction: this, id: id, event: event }, function( e, auction ) {
+				if ( auction !== e.data.auction ) return;
 				var id = e.data.id;
 				if ( $( '#' + id ).length === 0 ) {
 					// block has been removed. Turn off event handler.
@@ -860,26 +919,21 @@ Bridge.Auction.prototype._createConciseBiddingBox = function( config ) {
 	contentHTML += Bridge._openTag( rowTag, config, rowClasses, [] );
 	_.each( _.range( 0, 8 ), function( level ) {
 		columnClasses = Bridge._generateClasses( prefix, [ "column", field, level ] );
-		data = [ "data-level='" + level + "'" ];	
+		var data = [ "data-level='" + level + "'" ];	
 		columnTag = Bridge._getTag( config, columnClasses );
-		if ( level === 0 ) {
-			contentHTML += "<" + columnTag + "/>";
-		}
+		contentHTML += Bridge._openTag( columnTag, config, columnClasses, data );
+		var classes = Bridge._generateClasses( prefix, [ "field", field, level ] );
+		var tag = Bridge._getTag( config, classes );
+		if ( level !== 0 && level === selectedLevel ) classes.push( "selected" );	
+		var allowedCall = ( level >= minimumLevel );		
+		if ( allowedCall ) classes.push( "enabled" );
 		else {
-			contentHTML += Bridge._openTag( columnTag, config, columnClasses, data );
-			var classes = Bridge._generateClasses( prefix, [ "field", field, level ] );
-			var tag = Bridge._getTag( config, classes );
-			if ( level === selectedLevel ) classes.push( "selected" );	
-			var allowedCall = ( level >= minimumLevel );		
-			if ( allowedCall ) classes.push( "enabled" );
-			else {
-				classes.push( "disabled" );
-				data.push( "disabled" );
-			}				
-			contentHTML += Bridge._openTag( tag, config, classes, data );
-			contentHTML += level;
-			contentHTML += Bridge._closeTag( tag );	
-		}			
+			classes.push( "disabled" );
+			data.push( "disabled" );
+		}				
+		contentHTML += Bridge._openTag( tag, config, classes, data );
+		if ( level !== 0 ) contentHTML += level;
+		contentHTML += Bridge._closeTag( tag );			
 		contentHTML += Bridge._closeTag( columnTag );				
 	}, this );
 	field = "calls";
@@ -887,17 +941,17 @@ Bridge.Auction.prototype._createConciseBiddingBox = function( config ) {
 	rowTag = Bridge._getTag( config, rowClasses );		
 	contentHTML += Bridge._openTag( rowTag, config, rowClasses, [] );	
 	_.each( Bridge.callOrder.slice().reverse(), function( suit ) {
-		var text = ( Bridge.isBid( suit ) ? Bridge.calls[ suit ].html : Bridge.calls[ suit ].text );
+		var text = ( Bridge.isStrain( suit ) ? Bridge.calls[ suit ].html : Bridge.calls[ suit ].text );
 		columnClasses = Bridge._generateClasses( prefix, [ "column", field, suit ] );
-		var call = ( Bridge.isBid( suit ) ? selectedLevel + suit : suit );
-		data = [ "data-suit='" + suit + "'", "data-call='" + call + "'" ];	
+		var call = ( Bridge.isStrain( suit ) ? selectedLevel + suit : suit );
+		var data = [ "data-suit='" + suit + "'", "data-call='" + call + "'" ];	
 		columnTag = Bridge._getTag( config, columnClasses );
 		contentHTML += Bridge._openTag( columnTag, config, columnClasses, data );
 		var classes = Bridge._generateClasses( prefix, [ "field", field, suit ] );
 		var tag = Bridge._getTag( config, classes );
 		var allowedCall = selectedLevel ? true : false;
 		if ( selectedLevel ) {
-			allowedCall = ( Bridge.isBid( suit ) ? allowedCalls[ selectedLevel + suit ] : allowedCalls[ suit ] );
+			allowedCall = ( Bridge.isStrain( suit ) ? allowedCalls[ selectedLevel + suit ] : allowedCalls[ suit ] );
 		}
 		if ( allowedCalls[ call ] ) classes.push( "enabled" );
 		else {
@@ -930,8 +984,9 @@ Bridge.Auction.prototype._createConciseBiddingBox = function( config ) {
 	_.each( fields, function( item ) {
 		columnClasses = Bridge._generateClasses( prefix, [ "column", field, item.field ] );
 		columnTag = Bridge._getTag( config, columnClasses );
-		data = [ "data-bid='" + item.call + "'", "data-call='" + item.call + "'" ];
-		data.push( "colspan=2" );
+		var data = [ "data-bid='" + item.call + "'", "data-call='" + item.call + "'" ];
+		var colspan = ( item.field !== "skip" ? "colspan=2" : "colspan=1" );
+		data.push( colspan );
 		if ( config.show[ item.field ] && item.field !== "skip" ) {
 			footerHTML += Bridge._openTag( columnTag, config, columnClasses,data );
 			var classes = Bridge._generateClasses( prefix, [ "field", field, item.field ] );
@@ -946,7 +1001,7 @@ Bridge.Auction.prototype._createConciseBiddingBox = function( config ) {
 			footerHTML += Bridge._closeTag( tag );
 		}
 		else {
-			footerHTML += "<" + columnTag + "/>";
+			footerHTML += "<" + columnTag + " " + colspan  + ">";
 		}		
 		footerHTML += Bridge._closeTag( columnTag );										
 	}, this );
@@ -1012,7 +1067,7 @@ Bridge.Auction.prototype._createFullBiddingBox = function( config ) {
 		var rowTag = Bridge._getTag( config, rowClasses );		
 		contentHTML += Bridge._openTag( rowTag, config, rowClasses, [] );
 		_.each( Bridge.callOrder.slice().reverse(), function( bid ) {
-			if ( Bridge.isBid( bid ) ) {
+			if ( Bridge.isStrain( bid ) ) {
 				var call = level + bid;
 				var text = level + Bridge.calls[ bid ].html;	
 				columnClasses = Bridge._generateClasses( prefix, [ "column", field, level, bid ] );

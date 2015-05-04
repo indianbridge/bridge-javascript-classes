@@ -8,7 +8,7 @@ QUnit.test( "Constructor", function( assert ) {
 	assert.equal( contract.declarer, null, "declarer is null" );
 	for( var call in Bridge.calls ) {
 		for ( var direction in Bridge.directions) {
-			if ( Bridge.isBid( call ) ) {
+			if ( Bridge.isStrain( call ) ) {
 				assert.equal( contract.firstToBid[ call ][ direction ], null, "First bid for " + call + direction + " is null" );
 			}			
 		}

@@ -71,12 +71,26 @@ Bridge.Deal = function() {
 	 * The auction associated with this deal.
 	 * @member {object}
 	 */
-	this.auction = new Bridge.Auction( this );		
+	this.auction = new Bridge.Auction( this );	
+	
+	// Should an event be raised if anything changes.
+	this.triggerEvents = true;	
 };
 
 //
 // Getters and Setters
 //
+
+/**
+ * Enable trigger of events when deal changes.
+ */
+Bridge.Deal.prototype.enableEventTrigger = function() { this.triggerEvents = true; }
+
+/**
+ * Disable trigger of events when deal changes.
+ */
+Bridge.Deal.prototype.disableEventTrigger = function() { this.triggerEvents = false; }
+
 
 /** 
  * Get the hand for the specified direction
@@ -424,6 +438,8 @@ Bridge.Deal.prototype.fromJSON = function( json ) {
  * Raise corresponding events.
  */
 Bridge.Deal.prototype.onChange = function( operation, parameter ) {
-	console.log("raising deal " + operation + " - " + parameter );
-	$( document ).trigger( "deal:changed",  [ this, operation, parameter ]);	
+	if ( this.triggerEvents ) {
+		if ( Bridge.options.enableDebug ) console.log( "deal:changed " + operation + " - " + parameter );
+		$( document ).trigger( "deal:changed",  [ this, operation, parameter ]);	
+	}
 };

@@ -153,11 +153,11 @@ QUnit.test( "Calls", function( assert ) {
 	
 	var bids = [ "n", "s", "h", "d", "c" ];
 	for ( var i = 0; i < bids.length; ++i ) {
-		assert.ok( Bridge.isBid( bids[i] ), bids[i] + " is a bid" );
+		assert.ok( Bridge.isStrain( bids[i] ), bids[i] + " is a bid" );
 	}
 	var notBids = [ "p", "x", "r", "a", "", " " ];
 	for ( var i = 0; i < notBids.length; ++i ) {
-		assert.ok( !Bridge.isBid( notBids[i] ), notBids[i] + " is not a bid" );
+		assert.ok( !Bridge.isStrain( notBids[i] ), notBids[i] + " is not a bid" );
 	}	
 });
 
@@ -202,7 +202,7 @@ QUnit.test( "Level", function( assert ) {
 QUnit.test( "Bids", function( assert ) {
 	for( var i = 1; i <= 7; ++i ) {
 		for( var call in Bridge.calls ) {
-			if ( Bridge.isBid( call ) ) {
+			if ( Bridge.isStrain( call ) ) {
 				Bridge._checkBid( i + call );
 				assert.throws(
 					function() {

@@ -5,23 +5,18 @@
 	<link rel="stylesheet" type="text/css" href="test.css">
 	<title>Bridge Tests</title>
 	    <script src="jquery.min.js"></script>
+	    <link rel="stylesheet" type="text/css" href="test.css">
 </head>
 <body>
-	<div id="output"><button id="count">Count = 1</button></div>
-	<script>
-		var count = 1;
-		function setup() {
-			$("#output").html( '<button id="count">Count = ' + count + '</button>' );
-			$(document).click( "#output", function() {
-				count++;
-				setup();
-			});	
-				
-			
-		};
-		$(function() {
-			setup();
-		});
-	</script>
+	
+	<table>
+		<tbody>
+			<tr>
+				<td>Test</td>
+				<td class="container"><span class="item"></span></td>
+				<td class="container"><span class="item2"></span></td>
+			</tr>
+		</tbody>
+	</table>
 </body>
 </html>

@@ -21,7 +21,7 @@ Bridge.Contract = function() {
 	this.declarer = null;
 	this.firstToBid =  {};
 	for( var call in Bridge.calls ) {
-		if ( Bridge.isBid( call ) ) {
+		if ( Bridge.isStrain( call ) ) {
 			this.firstToBid[ call ] = {};
 			for ( var direction in Bridge.directions) {
 				this.firstToBid[ call ][ direction ] = null;
@@ -47,7 +47,7 @@ Bridge.Contract.prototype.allowedCalls = function( direction ) {
 	output[ "r" ] = false
 	for( var i = 1; i <= 7; ++i ) {
 		for( var call in Bridge.calls ) {
-			if ( Bridge.isBid( call ) ) {
+			if ( Bridge.isStrain( call ) ) {
 				output[ i + call ] = ( !this.isComplete );
 			}
 		}
@@ -61,7 +61,7 @@ Bridge.Contract.prototype.allowedCalls = function( direction ) {
 	
 	for( var i = 1; i <= 7; ++i ) {
 		for( var call in Bridge.calls ) {
-			if ( Bridge.isBid( call ) ) {
+			if ( Bridge.isStrain( call ) ) {
 				if ( i > this.level || ( i === this.level && Bridge.calls[ call ].index < Bridge.calls[ this.suit ].index ) ) {
 					output[ i + call ] = true;
 					if ( i < output[ "minimum_level" ] ) output[ "minimum_level" ] = i;

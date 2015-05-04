@@ -23,12 +23,24 @@ Bridge.Auction = function( deal ) {
 	
 	// If the bidding box uses a split level and suit then we select level first
 	this.selectedLevel = 0;
+	
+	// Should an event be raised if anything changes.
+	this.triggerEvents = true;	
 };
 
 //
 // Getters and Setters
 //
 
+/**
+ * Enable trigger of events when auction changes.
+ */
+Bridge.Auction.prototype.enableEventTrigger = function() { this.triggerEvents = true; }
+
+/**
+ * Disable trigger of events when auction changes.
+ */
+Bridge.Auction.prototype.disableEventTrigger = function() { this.triggerEvents = false; }
 
 /**
  * Get the dealer of this auction
@@ -82,13 +94,21 @@ Bridge.Auction.prototype.getSelectedLevel = function() {
 };
 
 /**
- * Set the vulnerability for this auction.
- * @param {string} vulnerability - the new vulnerability
+ * Set the selected level for this auction.
+ * @param {number} level - the new selected level
  */
 Bridge.Auction.prototype.setSelectedLevel = function( level ) {
-	Bridge._checkLevel( level )
+	Bridge._checkLevel( level );
 	this.selectedLevel = level;
 	this.onChange( "setSelectedLevel", level );
+};
+
+/**
+ * Unset the selected level
+ */
+Bridge.Auction.prototype.unsetSelectedLevel = function() {
+	this.selectedLevel = null;
+	this.onChange( "setSelectedLevel", this.selectedLevel  );
 };
 
 /**
@@ -125,7 +145,7 @@ Bridge.Auction.prototype.setContract = function( contract ) {
 	}	
 	var suit = contract[ charIndex++ ].toLowerCase();
 	Bridge._checkBid( level + suit, prefix );
-	if ( !Bridge.isBid( suit ) ) {
+	if ( !Bridge.isStrain( suit ) ) {
 		Bridge._reportError( 'Contract string ' + contract + ' does not specify a valid suit!', prefix );			
 	}
 	var doubled = false;
@@ -307,7 +327,7 @@ Bridge.Auction.prototype.fromString = function ( auction ) {
 	var charIndex = 0;
 	while( charIndex < auction.length ) {
 		var nextChar = auction[ charIndex++ ].toLowerCase();
-		if ( _.has( Bridge.calls, nextChar ) && !Bridge.isBid( nextChar ) ) {
+		if ( _.has( Bridge.calls, nextChar ) && !Bridge.isStrain( nextChar ) ) {
 			var call = nextChar;
 		}
 		else {
@@ -367,10 +387,19 @@ Bridge.Auction.prototype.toJSON = function( ) {
  * Raise an event
  */
 Bridge.Auction.prototype.onChange = function( operation, parameter ) {
-	//console.log("raising " + changeType );
-	// Raise the event and pass this object so handler can have access to information.
-	$( document ).trigger( "auction:changed",  [ this, operation, parameter ]);
-	$( document ).trigger( "bidding-box:changed",  [ this, operation, parameter ]);	
-	if ( this.deal ) $( document ).trigger( "deal:changed",  [ this.deal, operation, parameter ]);	
+	if ( this.triggerEvents && ( !this.deal || this.deal.triggerEvents ) ) {
+		if ( Bridge.options.enableDebug ) {
+			console.log( "auction:changed " + operation + " - " + parameter );
+			console.log( "bidding-box:changed " + operation + " - " + parameter );
+		}
+		// Raise the event and pass this object so handler can have access to information.
+		$( document ).trigger( "auction:changed",  [ this, operation, parameter ]);
+		$( document ).trigger( "bidding-box:changed",  [ this, operation, parameter ]);	
+		
+	}
+	if ( this.deal && this.deal.triggerEvents ) {
+		if ( Bridge.options.enableDebug ) console.log( "deal:changed " + operation + " - " + parameter );
+		$( document ).trigger( "deal:changed",  [ this.deal, operation, parameter ]);	
+	}
 };
 

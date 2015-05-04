@@ -1,10 +1,15 @@
+
 .hand-diagram-column {
 	font-weight: bold;
 	font-family: arial; 
 	padding-left: 2px;
 }
 
-
+.hand-diagram-field-count {
+	font-weight: bold;
+	font-family: arial; 
+	padding-left: 2px;
+}
 
 table.bbo.hand-diagram {
 	border: 2px solid #006600;
@@ -65,6 +70,45 @@ table.bbo span.hand-diagram-field-suit {
 	text-align:center;
 }
 
+div.bbo div.card-deck-row {
+	padding-bottom: 5px;
+}
+	
+div.bbo span.card-deck-field-cards {
+	display: inline-block;
+	font-weight: bold;
+	font-size: 16px;
+	width: 32px;
+	font-family: arial; 
+    text-align: center;	
+    border-radius:5px;
+    border: 1px solid gray;
+    cursor: pointer;
+}
+
+div.bbo span.card-deck-field-reset {
+	display: inline-block;
+	font-weight: bold;
+	font-size: 16px;
+	font-family: arial; 
+    text-align: center;	
+    border-radius:5px;
+    border: 1px solid gray;
+    cursor: pointer; 
+	background-color: #000000;
+	color: #FFFFFF;
+}
+
+div.bbo span.card-deck-field-cards.unassigned {
+	opacity: 0.50;
+    filter: Alpha(opacity=50); /* IE8 and earlier */
+}
+
+div.bbo span.card-deck-field-cards.assigned {
+	background-color: #99cccc;
+	color: #000000;	
+}
+
 table.bbo span.card-deck-field-cards {
 	display: inline-block;
 	font-weight: bold;
@@ -78,12 +122,12 @@ table.bbo span.card-deck-field-cards {
     
 }
 
-table.bbo span.card-deck-field-cards.assigned {
-	background-color: #990000;
-	color: #FFFFFF;
+table.bbo span.card-deck-field-cards.unassigned {
+	opacity: 0.50;
+    filter: Alpha(opacity=50); /* IE8 and earlier */
 }
 
-table.bbo span.card-deck-field-cards.unassigned {
+table.bbo span.card-deck-field-cards.assigned {
 	background-color: #99cccc;
 	color: #000000;	
 }
@@ -95,25 +139,6 @@ table.bbo td.card-deck-column-title {
     text-align: center;	
 }
 
-table.bbo span.bidding-box-field-calls.disabled, table.bbo span.bidding-box-field-level.disabled {
-	opacity: 0.25;
-    filter: Alpha(opacity=25); /* IE8 and earlier */
-	cursor: not-allowed;
-}
-
-table.bbo span.bidding-box-field-calls.enabled, table.bbo span.bidding-box-field-level.enabled {
-	cursor: pointer;
-}
-
-table.bbo span.bidding-box-field-calls, table.bbo span.bidding-box-field-level {
-	background-color: #99cccc;
-	color: #000000;	
-}
-
-table.bbo span.bidding-box-field-level.selected {
-	background-color: #FFCE00;
-}
-
 table.bbo.bidding-box {
 	border: 2px solid #006600;
 	font-size: 20px;
@@ -123,7 +148,26 @@ table.bbo.bidding-box {
 	margin-bottom:5px; 
 }
 
-table.bbo span.bidding-box-field-calls, table.bbo span.bidding-box-field-level {
+.bbo span.bidding-box-field-calls.disabled, .bbo span.bidding-box-field-level.disabled {
+	opacity: 0.25;
+    filter: Alpha(opacity=25); /* IE8 and earlier */
+	cursor: not-allowed;
+}
+
+.bbo span.bidding-box-field-calls.enabled, .bbo span.bidding-box-field-level.enabled {
+	cursor: pointer;
+}
+
+.bbo span.bidding-box-field-calls, .bbo span.bidding-box-field-level {
+	background-color: #99cccc;
+	color: #000000;	
+}
+
+.bbo span.bidding-box-field-level.selected {
+	background-color: #FFCE00;
+}
+
+.bbo span.bidding-box-field-calls, .bbo span.bidding-box-field-level {
 	display: inline-block;
 	width: 48px;
 	font-weight: bold;
@@ -133,26 +177,876 @@ table.bbo span.bidding-box-field-calls, table.bbo span.bidding-box-field-level {
     border-radius:5px;
     border: 1px solid gray;
     cursor: pointer;  
+    margin-bottom: 2px;
+    margin-right: 2px;
 }
 
-table.bbo span.bidding-box-field-calls-p, table.bbo span.bidding-box-field-calls-allpass {
+.bbo span.bidding-box-field-level-0 {
+	border-style:none;
+	cursor: none;
+}
+
+.bbo span.bidding-box-field-calls-p, .bbo span.bidding-box-field-calls-allpass {
 	background-color: #006600;
 	color: #FFFFFF;
 }
 
-table.bbo span.bidding-box-field-calls-x {
+.bbo span.bidding-box-field-calls-x {
 	background-color: #990000;
 	color: #FFFFFF;
 }
 
-table.bbo span.bidding-box-field-calls-r {
+.bbo span.bidding-box-field-calls-r {
 	background-color: #000099;
 	color: #FFFFFF;
 }
 
-table.bbo span.bidding-box-field-calls-undo, table.bbo span.bidding-box-field-calls-reset {
+.bbo span.bidding-box-field-calls-undo, .bbo span.bidding-box-field-calls-reset {
 	background-color: #000000;
 	color: #FFFFFF;
 }
 
+table.images span.card-deck-field-cards {
+	display: inline-block;
+	width: 37px;
+	height: 50px;
+    cursor: pointer;
+}
+
+table.images span.card-deck-field-reset {
+	display: inline-block;
+	font-weight: bold;
+	font-size: 16px;
+	font-family: arial; 
+    text-align: center;	
+    border-radius:5px;
+    border: 1px solid gray;
+    cursor: pointer; 
+	background-color: #000000;
+	color: #FFFFFF;
+}
+
+table.images span.card-deck-field-cards.assigned {
+	background-image: url(img/cards/cb.png);
+	background-size: contain;
+}
+table.images span.card-deck-field-cards-s-a.unassigned {
+        background-image: url(img/cards/sa.png);
+        background-size: contain;
+}
+
+table.images span.card-deck-field-cards-s-k.unassigned {
+        background-image: url(img/cards/sk.png);
+        background-size: contain;
+}
+
+table.images span.card-deck-field-cards-s-q.unassigned {
+        background-image: url(img/cards/sq.png);
+        background-size: contain;
+}
+
+table.images span.card-deck-field-cards-s-j.unassigned {
+        background-image: url(img/cards/sj.png);
+        background-size: contain;
+}
+
+table.images span.card-deck-field-cards-s-t.unassigned {
+        background-image: url(img/cards/st.png);
+        background-size: contain;
+}
+
+table.images span.card-deck-field-cards-s-9.unassigned {
+        background-image: url(img/cards/s9.png);
+        background-size: contain;
+}
+
+table.images span.card-deck-field-cards-s-8.unassigned {
+        background-image: url(img/cards/s8.png);
+        background-size: contain;
+}
+
+table.images span.card-deck-field-cards-s-7.unassigned {
+        background-image: url(img/cards/s7.png);
+        background-size: contain;
+}
+
+table.images span.card-deck-field-cards-s-6.unassigned {
+        background-image: url(img/cards/s6.png);
+        background-size: contain;
+}
+
+table.images span.card-deck-field-cards-s-5.unassigned {
+        background-image: url(img/cards/s5.png);
+        background-size: contain;
+}
+
+table.images span.card-deck-field-cards-s-4.unassigned {
+        background-image: url(img/cards/s4.png);
+        background-size: contain;
+}
+
+table.images span.card-deck-field-cards-s-3.unassigned {
+        background-image: url(img/cards/s3.png);
+        background-size: contain;
+}
+
+table.images span.card-deck-field-cards-s-2.unassigned {
+        background-image: url(img/cards/s2.png);
+        background-size: contain;
+}
+
+table.images span.card-deck-field-cards-h-a.unassigned {
+        background-image: url(img/cards/ha.png);
+        background-size: contain;
+}
+
+table.images span.card-deck-field-cards-h-k.unassigned {
+        background-image: url(img/cards/hk.png);
+        background-size: contain;
+}
+
+table.images span.card-deck-field-cards-h-q.unassigned {
+        background-image: url(img/cards/hq.png);
+        background-size: contain;
+}
+
+table.images span.card-deck-field-cards-h-j.unassigned {
+        background-image: url(img/cards/hj.png);
+        background-size: contain;
+}
+
+table.images span.card-deck-field-cards-h-t.unassigned {
+        background-image: url(img/cards/ht.png);
+        background-size: contain;
+}
+
+table.images span.card-deck-field-cards-h-9.unassigned {
+        background-image: url(img/cards/h9.png);
+        background-size: contain;
+}
+
+table.images span.card-deck-field-cards-h-8.unassigned {
+        background-image: url(img/cards/h8.png);
+        background-size: contain;
+}
+
+table.images span.card-deck-field-cards-h-7.unassigned {
+        background-image: url(img/cards/h7.png);
+        background-size: contain;
+}
+
+table.images span.card-deck-field-cards-h-6.unassigned {
+        background-image: url(img/cards/h6.png);
+        background-size: contain;
+}
+
+table.images span.card-deck-field-cards-h-5.unassigned {
+        background-image: url(img/cards/h5.png);
+        background-size: contain;
+}
+
+table.images span.card-deck-field-cards-h-4.unassigned {
+        background-image: url(img/cards/h4.png);
+        background-size: contain;
+}
+
+table.images span.card-deck-field-cards-h-3.unassigned {
+        background-image: url(img/cards/h3.png);
+        background-size: contain;
+}
+
+table.images span.card-deck-field-cards-h-2.unassigned {
+        background-image: url(img/cards/h2.png);
+        background-size: contain;
+}
+
+table.images span.card-deck-field-cards-d-a.unassigned {
+        background-image: url(img/cards/da.png);
+        background-size: contain;
+}
+
+table.images span.card-deck-field-cards-d-k.unassigned {
+        background-image: url(img/cards/dk.png);
+        background-size: contain;
+}
+
+table.images span.card-deck-field-cards-d-q.unassigned {
+        background-image: url(img/cards/dq.png);
+        background-size: contain;
+}
+
+table.images span.card-deck-field-cards-d-j.unassigned {
+        background-image: url(img/cards/dj.png);
+        background-size: contain;
+}
+
+table.images span.card-deck-field-cards-d-t.unassigned {
+        background-image: url(img/cards/dt.png);
+        background-size: contain;
+}
+
+table.images span.card-deck-field-cards-d-9.unassigned {
+        background-image: url(img/cards/d9.png);
+        background-size: contain;
+}
+
+table.images span.card-deck-field-cards-d-8.unassigned {
+        background-image: url(img/cards/d8.png);
+        background-size: contain;
+}
+
+table.images span.card-deck-field-cards-d-7.unassigned {
+        background-image: url(img/cards/d7.png);
+        background-size: contain;
+}
+
+table.images span.card-deck-field-cards-d-6.unassigned {
+        background-image: url(img/cards/d6.png);
+        background-size: contain;
+}
+
+table.images span.card-deck-field-cards-d-5.unassigned {
+        background-image: url(img/cards/d5.png);
+        background-size: contain;
+}
+
+table.images span.card-deck-field-cards-d-4.unassigned {
+        background-image: url(img/cards/d4.png);
+        background-size: contain;
+}
+
+table.images span.card-deck-field-cards-d-3.unassigned {
+        background-image: url(img/cards/d3.png);
+        background-size: contain;
+}
+
+table.images span.card-deck-field-cards-d-2.unassigned {
+        background-image: url(img/cards/d2.png);
+        background-size: contain;
+}
+
+table.images span.card-deck-field-cards-c-a.unassigned {
+        background-image: url(img/cards/ca.png);
+        background-size: contain;
+}
+
+table.images span.card-deck-field-cards-c-k.unassigned {
+        background-image: url(img/cards/ck.png);
+        background-size: contain;
+}
+
+table.images span.card-deck-field-cards-c-q.unassigned {
+        background-image: url(img/cards/cq.png);
+        background-size: contain;
+}
+
+table.images span.card-deck-field-cards-c-j.unassigned {
+        background-image: url(img/cards/cj.png);
+        background-size: contain;
+}
+
+table.images span.card-deck-field-cards-c-t.unassigned {
+        background-image: url(img/cards/ct.png);
+        background-size: contain;
+}
+
+table.images span.card-deck-field-cards-c-9.unassigned {
+        background-image: url(img/cards/c9.png);
+        background-size: contain;
+}
+
+table.images span.card-deck-field-cards-c-8.unassigned {
+        background-image: url(img/cards/c8.png);
+        background-size: contain;
+}
+
+table.images span.card-deck-field-cards-c-7.unassigned {
+        background-image: url(img/cards/c7.png);
+        background-size: contain;
+}
+
+table.images span.card-deck-field-cards-c-6.unassigned {
+        background-image: url(img/cards/c6.png);
+        background-size: contain;
+}
+
+table.images span.card-deck-field-cards-c-5.unassigned {
+        background-image: url(img/cards/c5.png);
+        background-size: contain;
+}
+
+table.images span.card-deck-field-cards-c-4.unassigned {
+        background-image: url(img/cards/c4.png);
+        background-size: contain;
+}
+
+table.images span.card-deck-field-cards-c-3.unassigned {
+        background-image: url(img/cards/c3.png);
+        background-size: contain;
+}
+
+table.images span.card-deck-field-cards-c-2.unassigned {
+        background-image: url(img/cards/c2.png);
+        background-size: contain;
+}
+
+div.images span.hand-diagram-field-cards {
+	display: inline-block;
+	position: relative;
+	width: 37px;
+	height: 50px;
+    cursor: pointer;
+}
+
+div.images span.hand-diagram-field-cards:hover {
+	top: -10px;
+	-webkit-filter: sepia(1);
+	filter: sepia(1);
+}
+
+
+div.images span.hand-diagram-field-cards-s-a {
+        background-image: url(img/cards/sa.png);
+        background-size: contain;
+}
+
+div.images span.hand-diagram-field-cards-s-k {
+        background-image: url(img/cards/sk.png);
+        background-size: contain;
+}
+
+div.images span.hand-diagram-field-cards-s-q {
+        background-image: url(img/cards/sq.png);
+        background-size: contain;
+}
+
+div.images span.hand-diagram-field-cards-s-j {
+        background-image: url(img/cards/sj.png);
+        background-size: contain;
+}
+
+div.images span.hand-diagram-field-cards-s-t {
+        background-image: url(img/cards/st.png);
+        background-size: contain;
+}
+
+div.images span.hand-diagram-field-cards-s-9 {
+        background-image: url(img/cards/s9.png);
+        background-size: contain;
+}
+
+div.images span.hand-diagram-field-cards-s-8 {
+        background-image: url(img/cards/s8.png);
+        background-size: contain;
+}
+
+div.images span.hand-diagram-field-cards-s-7 {
+        background-image: url(img/cards/s7.png);
+        background-size: contain;
+}
+
+div.images span.hand-diagram-field-cards-s-6 {
+        background-image: url(img/cards/s6.png);
+        background-size: contain;
+}
+
+div.images span.hand-diagram-field-cards-s-5 {
+        background-image: url(img/cards/s5.png);
+        background-size: contain;
+}
+
+div.images span.hand-diagram-field-cards-s-4 {
+        background-image: url(img/cards/s4.png);
+        background-size: contain;
+}
+
+div.images span.hand-diagram-field-cards-s-3 {
+        background-image: url(img/cards/s3.png);
+        background-size: contain;
+}
+
+div.images span.hand-diagram-field-cards-s-2 {
+        background-image: url(img/cards/s2.png);
+        background-size: contain;
+}
+
+div.images span.hand-diagram-field-cards-h-a {
+        background-image: url(img/cards/ha.png);
+        background-size: contain;
+}
+
+div.images span.hand-diagram-field-cards-h-k {
+        background-image: url(img/cards/hk.png);
+        background-size: contain;
+}
+
+div.images span.hand-diagram-field-cards-h-q {
+        background-image: url(img/cards/hq.png);
+        background-size: contain;
+}
+
+div.images span.hand-diagram-field-cards-h-j {
+        background-image: url(img/cards/hj.png);
+        background-size: contain;
+}
+
+div.images span.hand-diagram-field-cards-h-t {
+        background-image: url(img/cards/ht.png);
+        background-size: contain;
+}
+
+div.images span.hand-diagram-field-cards-h-9 {
+        background-image: url(img/cards/h9.png);
+        background-size: contain;
+}
+
+div.images span.hand-diagram-field-cards-h-8 {
+        background-image: url(img/cards/h8.png);
+        background-size: contain;
+}
+
+div.images span.hand-diagram-field-cards-h-7 {
+        background-image: url(img/cards/h7.png);
+        background-size: contain;
+}
+
+div.images span.hand-diagram-field-cards-h-6 {
+        background-image: url(img/cards/h6.png);
+        background-size: contain;
+}
+
+div.images span.hand-diagram-field-cards-h-5 {
+        background-image: url(img/cards/h5.png);
+        background-size: contain;
+}
+
+div.images span.hand-diagram-field-cards-h-4 {
+        background-image: url(img/cards/h4.png);
+        background-size: contain;
+}
+
+div.images span.hand-diagram-field-cards-h-3 {
+        background-image: url(img/cards/h3.png);
+        background-size: contain;
+}
+
+div.images span.hand-diagram-field-cards-h-2 {
+        background-image: url(img/cards/h2.png);
+        background-size: contain;
+}
+
+div.images span.hand-diagram-field-cards-d-a {
+        background-image: url(img/cards/da.png);
+        background-size: contain;
+}
+
+div.images span.hand-diagram-field-cards-d-k {
+        background-image: url(img/cards/dk.png);
+        background-size: contain;
+}
+
+div.images span.hand-diagram-field-cards-d-q {
+        background-image: url(img/cards/dq.png);
+        background-size: contain;
+}
+
+div.images span.hand-diagram-field-cards-d-j {
+        background-image: url(img/cards/dj.png);
+        background-size: contain;
+}
+
+div.images span.hand-diagram-field-cards-d-t {
+        background-image: url(img/cards/dt.png);
+        background-size: contain;
+}
+
+div.images span.hand-diagram-field-cards-d-9 {
+        background-image: url(img/cards/d9.png);
+        background-size: contain;
+}
+
+div.images span.hand-diagram-field-cards-d-8 {
+        background-image: url(img/cards/d8.png);
+        background-size: contain;
+}
+
+div.images span.hand-diagram-field-cards-d-7 {
+        background-image: url(img/cards/d7.png);
+        background-size: contain;
+}
+
+div.images span.hand-diagram-field-cards-d-6 {
+        background-image: url(img/cards/d6.png);
+        background-size: contain;
+}
+
+div.images span.hand-diagram-field-cards-d-5 {
+        background-image: url(img/cards/d5.png);
+        background-size: contain;
+}
+
+div.images span.hand-diagram-field-cards-d-4 {
+        background-image: url(img/cards/d4.png);
+        background-size: contain;
+}
+
+div.images span.hand-diagram-field-cards-d-3 {
+        background-image: url(img/cards/d3.png);
+        background-size: contain;
+}
+
+div.images span.hand-diagram-field-cards-d-2 {
+        background-image: url(img/cards/d2.png);
+        background-size: contain;
+}
+
+div.images span.hand-diagram-field-cards-c-a {
+        background-image: url(img/cards/ca.png);
+        background-size: contain;
+}
+
+div.images span.hand-diagram-field-cards-c-k {
+        background-image: url(img/cards/ck.png);
+        background-size: contain;
+}
+
+div.images span.hand-diagram-field-cards-c-q {
+        background-image: url(img/cards/cq.png);
+        background-size: contain;
+}
+
+div.images span.hand-diagram-field-cards-c-j {
+        background-image: url(img/cards/cj.png);
+        background-size: contain;
+}
+
+div.images span.hand-diagram-field-cards-c-t {
+        background-image: url(img/cards/ct.png);
+        background-size: contain;
+}
+
+div.images span.hand-diagram-field-cards-c-9 {
+        background-image: url(img/cards/c9.png);
+        background-size: contain;
+}
+
+div.images span.hand-diagram-field-cards-c-8 {
+        background-image: url(img/cards/c8.png);
+        background-size: contain;
+}
+
+div.images span.hand-diagram-field-cards-c-7 {
+        background-image: url(img/cards/c7.png);
+        background-size: contain;
+}
+
+div.images span.hand-diagram-field-cards-c-6 {
+        background-image: url(img/cards/c6.png);
+        background-size: contain;
+}
+
+div.images span.hand-diagram-field-cards-c-5 {
+        background-image: url(img/cards/c5.png);
+        background-size: contain;
+}
+
+div.images span.hand-diagram-field-cards-c-4 {
+        background-image: url(img/cards/c4.png);
+        background-size: contain;
+}
+
+div.images span.hand-diagram-field-cards-c-3 {
+        background-image: url(img/cards/c3.png);
+        background-size: contain;
+}
+
+div.images span.hand-diagram-field-cards-c-2 {
+        background-image: url(img/cards/c2.png);
+        background-size: contain;
+}
+
+div.images span.card-deck-field-cards {
+	display: inline-block;
+	width: 37px;
+	height: 50px;
+    cursor: pointer;
+}
+
+div.images span.card-deck-field-reset {
+	display: inline-block;
+	font-weight: bold;
+	font-size: 16px;
+	font-family: arial; 
+    text-align: center;	
+    border-radius:5px;
+    border: 1px solid gray;
+    cursor: pointer; 
+	background-color: #000000;
+	color: #FFFFFF;
+}
+
+div.images span.card-deck-field-cards.assigned {
+	background-image: url(img/cards/cb.png);
+	background-size: contain;
+}
+
+div.images span.card-deck-field-cards-s-a.unassigned {
+        background-image: url(img/cards/sa.png);
+        background-size: contain;
+}
+
+div.images span.card-deck-field-cards-s-k.unassigned {
+        background-image: url(img/cards/sk.png);
+        background-size: contain;
+}
+
+div.images span.card-deck-field-cards-s-q.unassigned {
+        background-image: url(img/cards/sq.png);
+        background-size: contain;
+}
+
+div.images span.card-deck-field-cards-s-j.unassigned {
+        background-image: url(img/cards/sj.png);
+        background-size: contain;
+}
+
+div.images span.card-deck-field-cards-s-t.unassigned {
+        background-image: url(img/cards/st.png);
+        background-size: contain;
+}
+
+div.images span.card-deck-field-cards-s-9.unassigned {
+        background-image: url(img/cards/s9.png);
+        background-size: contain;
+}
+
+div.images span.card-deck-field-cards-s-8.unassigned {
+        background-image: url(img/cards/s8.png);
+        background-size: contain;
+}
+
+div.images span.card-deck-field-cards-s-7.unassigned {
+        background-image: url(img/cards/s7.png);
+        background-size: contain;
+}
+
+div.images span.card-deck-field-cards-s-6.unassigned {
+        background-image: url(img/cards/s6.png);
+        background-size: contain;
+}
+
+div.images span.card-deck-field-cards-s-5.unassigned {
+        background-image: url(img/cards/s5.png);
+        background-size: contain;
+}
+
+div.images span.card-deck-field-cards-s-4.unassigned {
+        background-image: url(img/cards/s4.png);
+        background-size: contain;
+}
+
+div.images span.card-deck-field-cards-s-3.unassigned {
+        background-image: url(img/cards/s3.png);
+        background-size: contain;
+}
+
+div.images span.card-deck-field-cards-s-2.unassigned {
+        background-image: url(img/cards/s2.png);
+        background-size: contain;
+}
+
+div.images span.card-deck-field-cards-h-a.unassigned {
+        background-image: url(img/cards/ha.png);
+        background-size: contain;
+}
+
+div.images span.card-deck-field-cards-h-k.unassigned {
+        background-image: url(img/cards/hk.png);
+        background-size: contain;
+}
+
+div.images span.card-deck-field-cards-h-q.unassigned {
+        background-image: url(img/cards/hq.png);
+        background-size: contain;
+}
+
+div.images span.card-deck-field-cards-h-j.unassigned {
+        background-image: url(img/cards/hj.png);
+        background-size: contain;
+}
+
+div.images span.card-deck-field-cards-h-t.unassigned {
+        background-image: url(img/cards/ht.png);
+        background-size: contain;
+}
+
+div.images span.card-deck-field-cards-h-9.unassigned {
+        background-image: url(img/cards/h9.png);
+        background-size: contain;
+}
+
+div.images span.card-deck-field-cards-h-8.unassigned {
+        background-image: url(img/cards/h8.png);
+        background-size: contain;
+}
+
+div.images span.card-deck-field-cards-h-7.unassigned {
+        background-image: url(img/cards/h7.png);
+        background-size: contain;
+}
+
+div.images span.card-deck-field-cards-h-6.unassigned {
+        background-image: url(img/cards/h6.png);
+        background-size: contain;
+}
+
+div.images span.card-deck-field-cards-h-5.unassigned {
+        background-image: url(img/cards/h5.png);
+        background-size: contain;
+}
+
+div.images span.card-deck-field-cards-h-4.unassigned {
+        background-image: url(img/cards/h4.png);
+        background-size: contain;
+}
+
+div.images span.card-deck-field-cards-h-3.unassigned {
+        background-image: url(img/cards/h3.png);
+        background-size: contain;
+}
+
+div.images span.card-deck-field-cards-h-2.unassigned {
+        background-image: url(img/cards/h2.png);
+        background-size: contain;
+}
+
+div.images span.card-deck-field-cards-d-a.unassigned {
+        background-image: url(img/cards/da.png);
+        background-size: contain;
+}
+
+div.images span.card-deck-field-cards-d-k.unassigned {
+        background-image: url(img/cards/dk.png);
+        background-size: contain;
+}
+
+div.images span.card-deck-field-cards-d-q.unassigned {
+        background-image: url(img/cards/dq.png);
+        background-size: contain;
+}
+
+div.images span.card-deck-field-cards-d-j.unassigned {
+        background-image: url(img/cards/dj.png);
+        background-size: contain;
+}
+
+div.images span.card-deck-field-cards-d-t.unassigned {
+        background-image: url(img/cards/dt.png);
+        background-size: contain;
+}
+
+div.images span.card-deck-field-cards-d-9.unassigned {
+        background-image: url(img/cards/d9.png);
+        background-size: contain;
+}
+
+div.images span.card-deck-field-cards-d-8.unassigned {
+        background-image: url(img/cards/d8.png);
+        background-size: contain;
+}
+
+div.images span.card-deck-field-cards-d-7.unassigned {
+        background-image: url(img/cards/d7.png);
+        background-size: contain;
+}
+
+div.images span.card-deck-field-cards-d-6.unassigned {
+        background-image: url(img/cards/d6.png);
+        background-size: contain;
+}
+
+div.images span.card-deck-field-cards-d-5.unassigned {
+        background-image: url(img/cards/d5.png);
+        background-size: contain;
+}
+
+div.images span.card-deck-field-cards-d-4.unassigned {
+        background-image: url(img/cards/d4.png);
+        background-size: contain;
+}
+
+div.images span.card-deck-field-cards-d-3.unassigned {
+        background-image: url(img/cards/d3.png);
+        background-size: contain;
+}
+
+div.images span.card-deck-field-cards-d-2.unassigned {
+        background-image: url(img/cards/d2.png);
+        background-size: contain;
+}
+
+div.images span.card-deck-field-cards-c-a.unassigned {
+        background-image: url(img/cards/ca.png);
+        background-size: contain;
+}
+
+div.images span.card-deck-field-cards-c-k.unassigned {
+        background-image: url(img/cards/ck.png);
+        background-size: contain;
+}
+
+div.images span.card-deck-field-cards-c-q.unassigned {
+        background-image: url(img/cards/cq.png);
+        background-size: contain;
+}
+
+div.images span.card-deck-field-cards-c-j.unassigned {
+        background-image: url(img/cards/cj.png);
+        background-size: contain;
+}
+
+div.images span.card-deck-field-cards-c-t.unassigned {
+        background-image: url(img/cards/ct.png);
+        background-size: contain;
+}
+
+div.images span.card-deck-field-cards-c-9.unassigned {
+        background-image: url(img/cards/c9.png);
+        background-size: contain;
+}
+
+div.images span.card-deck-field-cards-c-8.unassigned {
+        background-image: url(img/cards/c8.png);
+        background-size: contain;
+}
+
+div.images span.card-deck-field-cards-c-7.unassigned {
+        background-image: url(img/cards/c7.png);
+        background-size: contain;
+}
+
+div.images span.card-deck-field-cards-c-6.unassigned {
+        background-image: url(img/cards/c6.png);
+        background-size: contain;
+}
+
+div.images span.card-deck-field-cards-c-5.unassigned {
+        background-image: url(img/cards/c5.png);
+        background-size: contain;
+}
+
+div.images span.card-deck-field-cards-c-4.unassigned {
+        background-image: url(img/cards/c4.png);
+        background-size: contain;
+}
+
+div.images span.card-deck-field-cards-c-3.unassigned {
+        background-image: url(img/cards/c3.png);
+        background-size: contain;
+}
+
+div.images span.card-deck-field-cards-c-2.unassigned {
+        background-image: url(img/cards/c2.png);
+        background-size: contain;
+}
 
