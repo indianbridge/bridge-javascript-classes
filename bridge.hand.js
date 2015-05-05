@@ -350,6 +350,35 @@ Bridge.Hand.prototype.fromString = function( handString ) {
  };
  
 /**
+ * Does this hand have any cards in the given suit?
+ * @param {string} suit the suit to check cards in
+ * @return {boolean} true if this hand has cards in the given suit
+ */
+Bridge.Hand.prototype._hasCards = function( suit ) {
+	for( var rank in Bridge.ranks ) {
+		if ( this.cards[ suit ][ rank ] ) return true;
+	}	
+	return false;
+}; 
+ 
+/**
+ * Get the suit order for this hand by alternating colors
+ * @return {array} an array of suits in alternating color order if possible
+ */
+Bridge.Hand.prototype.getAlternatingSuitOrder = function() {
+	var numSuits = 0;
+	var hasCards = {};
+	_.each( Bridge.suitOrder, function( suit ) {	
+		hasCards[ suit ] = this._hasCards( suit );
+		if ( hasCards[ suit ] ) numSuits++;
+	}, this );
+	if ( numSuits < 3 ) return Bridge.suitOrder;
+	if ( numSuits === 4 ) return [ 'h', 's', 'd', 'c' ];
+	if ( hasCards[ 's' ] && hasCards[ 'c' ] ) return Bridge.suitOrder;
+	else return [ 'h', 's', 'c', 'd' ];
+}; 
+ 
+/**
  * Generate a json format of this hand
  * @return {object} json representation of this hand.
  */

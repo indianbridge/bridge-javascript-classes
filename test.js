@@ -2,10 +2,24 @@ var hand;
 $(function() {
 
 	try {
-	var auction = new Bridge.Auction();
-	for( var direction in Bridge.directions ) {
-		auction.set( "dealer", direction );
-	}
+	var handString = "sakqjhakqdakqcakq";
+	var hand = new Bridge.Hand( 'n' );
+	hand.set( "hand", handString );	
+	var config = {
+		prefix: "bw-hand-diagram",
+		show: {
+			direction: false,
+			name: false
+		},
+		tags: Bridge.getDivConfig( "bw-hand-diagram" ),
+		data: {},
+		classes: {},
+		idPrefix: "h",
+		containerID: "hand-n",
+		alternateSuitColor: true,
+		registerChangeHandler: false
+	};		
+	hand.toHTML( config );
 
 		//var deal = new Bridge.Deal();
 		//deal.fromString( "n=sakqhakqdakqjt98&a=1c1hppxr" );

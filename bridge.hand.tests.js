@@ -242,3 +242,30 @@ QUnit.test( 'Add and Remove Cards', function( assert ) {
 	}
 });
 
+QUnit.test( "Miscellaneous", function( assert ) {
+	var hands = {
+		"sakqj" : { count: 1, hasCards: { 's': true, 'h': false, 'd': false, 'c': false }, output: "shdc" },
+		"sakqjhakq" : { count: 2, hasCards: { 's': true, 'h': true, 'd': false, 'c': false }, output: "shdc" },
+		"sakqjdakq" : { count: 2, hasCards: { 's': true, 'h': false, 'd': true, 'c': false }, output: "shdc" },
+		"sakqjcakq" : { count: 2, hasCards: { 's': true, 'h': false, 'd': false, 'c': true }, output: "shdc" },
+		"hakqjdakq" : { count: 2, hasCards: { 's': false, 'h': true, 'd': true, 'c': false }, output: "shdc" },
+		"hakqjcakq" : { count: 2, hasCards: { 's': false, 'h': true, 'd': false, 'c': true }, output: "shdc" },
+		"dakqjcakq" : { count: 2, hasCards: { 's': false, 'h': false, 'd': true, 'c': true }, output: "shdc" },
+		"sahada" : { count: 3, hasCards: { 's': true, 'h': true, 'd': true, 'c': false }, output: "hscd" },
+		"sahaca" : { count: 3, hasCards: { 's': true, 'h': true, 'd': false, 'c': true }, output: "shdc" },
+		"sadaca" : { count: 3, hasCards: { 's': true, 'h': false, 'd': true, 'c': true }, output: "shdc" },
+		"hadaca" : { count: 3, hasCards: { 's': false, 'h': true, 'd': true, 'c': true }, output: "hscd" },
+		"sahadaca" : { count: 4, hasCards: { 's': true, 'h': true, 'd': true, 'c': true }, output: "hsdc" }
+	};
+	for( var direction in Bridge.directions ) {
+		for( var handString in hands ) {
+			var hand = new Bridge.Hand( direction );
+			hand.set( "hand", handString );	
+			for( var suit in Bridge.suits ) {
+				assert.equal( hands[ handString ].hasCards[ suit ], hand._hasCards( suit ), "has cards matches for " + handString + " in suit " + suit );
+			}	
+			assert.equal( hands[ handString ].output, hand.getAlternatingSuitOrder().join( '' ), "suit order for " + handString + " matches" );
+		};	
+	}
+});
+

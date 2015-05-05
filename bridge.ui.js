@@ -211,11 +211,11 @@ Bridge.getDivConfig = function( prefix ) {
 };
 
 /**
- * Utility to generate div config classes
+ * Utility to generate span config classes
  */
 Bridge.getSpanConfig = function( prefix ) {
 	var tags = {};
-	tags[ prefix ] = "div";
+	tags[ prefix ] = "span";
 	tags[ prefix + "-header" ] = "span";
 	tags[ prefix + "-content" ] = "span";
 	tags[ prefix + "-footer" ] = "span";
@@ -273,6 +273,7 @@ Bridge.Hand.prototype.toHTML = function( config, isCallback ) {
 		classes: {},
 		idPrefix: null,
 		containerID: null,
+		alternateSuitColor: false,
 		registerChangeHandler: false
 	});	
 	var prefix = config.prefix;
@@ -343,7 +344,8 @@ Bridge.Hand.prototype.toHTML = function( config, isCallback ) {
 	var contentHTML = "";	
 	// Cards in each suit
 	var cardNumber = 0;
-	_.each( Bridge.suitOrder, function( suit ) {
+	var suitOrder = ( config.alternateSuitColor ? this.getAlternatingSuitOrder() : Bridge.suitOrder );
+	_.each( suitOrder, function( suit ) {
 		rowClasses = Bridge._generateClasses( prefix, [ "row", suit ] );
 		rowTag = Bridge._getTag( config, rowClasses );		
 		contentHTML += Bridge._openTag( rowTag, config, rowClasses, [] );

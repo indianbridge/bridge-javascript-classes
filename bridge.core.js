@@ -139,7 +139,6 @@ Bridge.suitOrder = Bridge._createIndexArray( Bridge.suits );
 Bridge.callOrder = Bridge._createIndexArray( Bridge.calls );
 Bridge.rankOrder = Bridge._createIndexArray( Bridge.ranks );
 
-
 /**
  * Configuration options object.
  * Use this to store all options you might use to configure stuff.
