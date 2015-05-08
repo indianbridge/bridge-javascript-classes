@@ -617,6 +617,37 @@ Bridge.Auction.prototype.toHTML = function( config, isCallback ) {
 };
 
 /**
+ * Get the HTML for a given call.
+ * @param {string} call the call to get html for
+ * @return {string} the html
+ */
+Bridge.getCallHTML = function( call ) {
+	var len = call.length;
+	if ( len < 1 || len > 2 ) return call;
+	Bridge._checkBid( call );
+	if ( len === 1 ) {
+		return Bridge.calls[ call ].html;
+	}
+	else if ( len === 2 )  {
+		return call[0] + Bridge.calls[ call[1] ].html;
+	}	
+};
+
+
+/**
+ * Get the HTML for a given card.
+ * @param {string} card the card to get html representation for
+ * @return {string} the html
+ */
+Bridge.getCardHTML = function( card ) {
+	var html = "";
+	if ( card.length !== 2 ) return card;
+	Bridge._checkSuit( card[0] );
+	Bridge._checkRank( card[1] );
+	return Bridge.suits[ card[0] ].html + Bridge.ranks[ card[1] ].html;	
+};
+
+/**
  * Generate a html display of this call.
  * @param {string} explanationClass - the option class to apply to span that will have explanation as title
  * @return {string} HTML representation of this bid.

@@ -43,6 +43,14 @@ Bridge.Auction.prototype.enableEventTrigger = function() { this.triggerEvents = 
 Bridge.Auction.prototype.disableEventTrigger = function() { this.triggerEvents = false; }
 
 /**
+ * Get the direction who is next to call
+ * @return {string} the direction that is next to call
+ */
+Bridge.Auction.prototype.getNextToCall = function() {
+	return this.nextToCall;
+};
+
+/**
  * Get the dealer of this auction
  * @return {string} the dealer
  */

@@ -32,6 +32,24 @@ Bridge.Contract = function() {
 	this.isComplete = false;
 };
 
+
+/**
+ * Get the declarer of this contract
+ * @return {string} the declarer
+ */
+Bridge.Contract.prototype.getDeclarer = function() {
+	return this.declarer;
+};
+
+
+/**
+ * Get the leader is this becomes contract
+ * @return {string} the leader
+ */
+Bridge.Contract.prototype.getLeader = function() {
+	return Bridge.getLHO( this.declarer );
+};
+
 /**
  * Determine what bids are allowed next for specified direction.
  * @param {string} direction the direction whose bids are being checked

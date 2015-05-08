@@ -197,16 +197,6 @@ Bridge.arePartners = function( direction1, direction2 ) {
 };
 
 /**
- * Check if call is a bid ( not pass double or redouble )
- * @param {string} suit - the suit of the call
- * @return true if it is a bid
- */
-/*Bridge.isBid = function( suit ) {
-	if ( !_.has( Bridge.calls, suit ) ) return false;
-	return Bridge.calls[ suit ].bid;
-};*/
-
-/**
  * Check if suit is a strain ( not pass double or redouble )
  * @param {string} suit - the suit of the call
  * @return true if it is a strain
