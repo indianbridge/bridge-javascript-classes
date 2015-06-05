@@ -152,13 +152,15 @@ Bridge.Hand.prototype.addCard = function( suit, rank ) {
 	} 	
 	// If deal is specified then check if this card has been assigned
 	if ( this.deal ) {
-		var assignedTo = this.deal._cardAssignedTo[ suit ][ rank ];
-		if ( assignedTo ) {
-			Bridge._reportError( suit + rank + " is already assigned to " + assignedTo + ". Cannot add again", prefix );
+		var card = this.deal.cards[ suit ][ rank ];
+		if ( card.isAssigned() ) {
+			Bridge._reportError( suit + rank + " is already assigned to " + card.getDirection() + ". Cannot add again", prefix );
 		}
 	}
 	this.cards[ suit ][ rank ] = true;
-	if ( this.deal ) this.deal._cardAssignedTo[ suit ][ rank ] = this.direction;
+	if ( this.deal ) {
+		this.deal.cards[ suit ][ rank ].assign( this.direction );
+	}
 	this.numCards++;
 	this.onChange( "addCard", suit + rank );
 };
@@ -175,8 +177,8 @@ Bridge.Hand.prototype.removeCard = function( suit, rank ) {
 	Bridge._checkRank( rank, prefix );
 	// If deal is specified then check if this card has been assigned
 	if ( this.deal ) {
-		var assignedTo = this.deal._cardAssignedTo[ suit ][ rank ];
-		if ( assignedTo !== this.direction ) {
+		var card = this.deal.cards[ suit ][ rank ];
+		if ( !card.isAssigned() ) {
 			Bridge._reportError( suit + rank + " is not assigned to " + this.direction + ". Cannot remove", prefix );
 		}
 	}
@@ -185,7 +187,9 @@ Bridge.Hand.prototype.removeCard = function( suit, rank ) {
 	}
 	this.cards[ suit ][ rank ] = false;
 	this.numCards--;
-	if ( this.deal ) this.deal._cardAssignedTo[ suit ][ rank ] = null;
+	if ( this.deal ) {
+		this.deal.cards[ suit ][ rank ].unAssign();
+	}
 	this.onChange( "removeCard", suit + rank );
 };
 

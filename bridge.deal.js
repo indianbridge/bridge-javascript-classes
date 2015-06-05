@@ -12,16 +12,14 @@ if ( !Bridge ) var Bridge = {};
  */
 Bridge.Deal = function() {
 	/**
-	 * Information about who is assigned which card
-	 * This is just for error checking.
-	 * @private
+	 * The 52 card objects
 	 * @member {object}
 	 */
-	this._cardAssignedTo = {};
+	this.cards = {};
 	for( var suit in Bridge.suits ) {
-		this._cardAssignedTo[ suit ] = {};
-		for ( var rank in Bridge.ranks ) {
-			this._cardAssignedTo[ suit ][ rank ] = null;
+		this.cards[ suit ] = {};
+		for( var rank in Bridge.ranks ) {
+			this.cards[ suit ][ rank ] = new Bridge.Card( suit, rank );
 		}
 	}	
 	
@@ -72,6 +70,12 @@ Bridge.Deal = function() {
 	 * @member {object}
 	 */
 	this.auction = new Bridge.Auction( this );	
+	
+	/**
+	 * The play associated with this deal
+	 * @member {object}
+	 */
+	this.play = new Bridge.Play( this );
 	
 	// Should an event be raised if anything changes.
 	this.triggerEvents = true;	
@@ -216,6 +220,14 @@ Bridge.Deal.prototype.getAuction = function() {
 	return this.auction;
 };
 
+/**
+ * Get the play associated with this deal
+ * @return {object} the play object
+ */
+Bridge.Deal.prototype.getPlay = function() {
+	return this.play;
+};
+
 
 /**
  * Set a property in this deal.
@@ -275,6 +287,8 @@ Bridge.Deal.prototype.get = function( property ) {
 			return this.getNotes();
 		case "auction" :
 			return this.getAuction();
+		case "play" :
+			return this.getPlay();			
 		default :
 			Bridge._reportError( "Unknown deal property " + property, prefix );
 	}
@@ -288,7 +302,7 @@ Bridge.Deal.prototype.assignRest = function() {
 	var unassigned = [];
 	for( var suit in Bridge.suits ) {
 		for ( var rank in Bridge.ranks ) {
-			if ( !this._cardAssignedTo[ suit ][ rank ] ) {
+			if ( !this.cards[ suit ][ rank ].isAssigned() ) {
 				unassigned.push( suit + rank );
 			}
 		}
@@ -344,6 +358,9 @@ Bridge.Deal.prototype.fromString = function( deal ) {
 					auction.setAuction( value );
 				}
 				break;
+			case 'p' :
+				this.getPlay().fromString( value );
+				break;
 			case 'n' :
 			case 'e' :
 			case 's' :
@@ -389,7 +406,10 @@ Bridge.Deal.prototype.toString = function( expandedFormat ) {
 		if ( hand ) items.push( direction + "=" + hand );
 		items.push( direction + "n=" + hand.getName() );
 	};
-	if ( this.auction ) items.push ( "a=" + this.auction.toString() );	
+	var auctionString = this.getAuction().toString();
+	if ( auctionString ) items.push ( "a=" + auctionString );	
+	var playString = this.getPlay().toString();
+	if ( playString ) items.push( "p=" + playString );
 	return items.join( "&" );
 };
 
@@ -409,7 +429,8 @@ Bridge.Deal.prototype.toJSON = function() {
 		var hand = this.getHand( direction );
 		output.hands[ direction ] = hand.toJSON();
 	};
-	output.auction = this.auction.toJSON();
+	output.auction = this.getAuction().toJSON();
+	output.play = this.getPlay().toJSON();
 	return output;
 };
 
@@ -430,7 +451,82 @@ Bridge.Deal.prototype.fromJSON = function( json ) {
 			}
 		};
 	}
-	if ( _.has( json, "auction" ) ) this.auction.fromJSON( json.auction );
+	if ( _.has( json, "auction" ) ) this.getAuction().fromJSON( json.auction );
+	if ( _.has( json, "play" ) ) this.getPlay().fromJSON( json.play );
+};
+
+/**
+ * Load the deal from BBO lin representation
+ * @param {string} the lin representation of deal
+ */
+Bridge.Deal.prototype.fromLIN = function( lin ) {
+	var prefix = "In Bridge.Deal.fromLin - ";
+	var tokens = lin.split( '|' );
+	var directions = [ 's', 'w', 'n', 'e' ];
+	for ( var i = 0; i < tokens.length; ++i ) {
+		if ( _.startsWith( tokens[i].toLowerCase(), "board" ) ) {
+			this.setBoard( tokens[i].trim().slice(5).trim() );
+		}
+		switch ( tokens[i].toLowerCase() ) {
+			case "pn" :
+				Bridge._checkIndex( tokens, i+1, prefix + "processing pn - " );
+				var names = tokens[ i + 1 ].split( ',' );
+				for ( var j = 0; j < directions.length; ++j ) {
+					if ( j < names.length ) {
+						var direction = directions[j];
+						var name = names[j]
+						if ( _.startsWith( name, "~~" ) ) name = "Robot";
+						this.getHand( direction ).setName( name );
+					}
+				}
+				break;
+			case "md" :
+				Bridge._checkIndex( tokens, i+1, prefix + "processing md - " );
+				var hands = tokens[ i + 1 ].split( ',' );
+				var directionNumbers = {
+					'1' : 's',
+					'2' : 'w',
+					'3' : 'n',
+					'4' : 'e'
+				};
+				var dealer = directionNumbers[ hands[0][0] ];
+				this.setDealer( dealer );
+				var hand = hands[0].slice(1);
+				var direction = 's';
+				this.getHand( direction ).setHand( hand );
+				for ( var j = 1; j < hands.length; ++j ) {
+					var direction = Bridge.getLHO( direction );
+					var hand = hands[j]
+					this.getHand( direction ).setHand( hand );
+				}	
+				this.assignRest();			
+				break;
+			case "mb" :
+				Bridge._checkIndex( tokens, i+1, prefix + "processing mb - " );
+				var bid = tokens[ i + 1 ].slice(0,2).toLowerCase();
+				if ( bid === 'd' ) bid = 'x';
+				var annotation = null;
+				if ( i + 2 < tokens.length && tokens[ i + 2 ].toLowerCase() === "an" ) {
+					var annotation = tokens[ i + 3 ];
+					annotation = annotation.replace( '(', '' );
+					annotation = annotation.replace( ')', '' );
+				}
+				this.getAuction().addCall( bid, null, annotation );
+				break;
+			case "pc" :
+				Bridge._checkIndex( tokens, i+1, prefix + "processing pc - " );
+				var play = tokens[ i + 1 ].slice(0,2);
+				this.getPlay().addPlayedCard( play[0], play[1] ); 
+				break;
+			case "sv" :
+				Bridge._checkIndex( tokens, i+1, prefix + "processing sv - " );
+				var vulnerability = tokens[ i + 1 ];
+				if ( vulnerability === 'o' ) vulnerability = '-';
+				this.setVulnerability( vulnerability );
+			default:
+				break;
+		}
+	}
 };
 
 /**

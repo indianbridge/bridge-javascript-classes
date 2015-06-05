@@ -275,6 +275,7 @@ Bridge.Auction.prototype.set = function( property, value ) {
  */
 Bridge.Auction.prototype.addCall = function( call, explanation, annotation ) {
 	var prefix = 'In Auction.addCall';
+	call = call.toLowerCase();
 	Bridge._checkBid( call, prefix );
 	var call = new Bridge.Call( call, this.nextToCall );
 	if ( annotation ) call.setAnnotation( annotation );
@@ -335,6 +336,7 @@ Bridge.Auction.prototype.fromString = function ( auction ) {
 	var charIndex = 0;
 	while( charIndex < auction.length ) {
 		var nextChar = auction[ charIndex++ ].toLowerCase();
+		if ( nextChar === 'd' ) nextChar = 'x';
 		if ( _.has( Bridge.calls, nextChar ) && !Bridge.isStrain( nextChar ) ) {
 			var call = nextChar;
 		}

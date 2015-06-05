@@ -63,6 +63,7 @@ var Bridge = {
 	}
 };
 
+
 /**
  * Adds a key field to enumeration (stored as an object)
  * @param {string} list - The enumeration
@@ -149,6 +150,33 @@ Bridge.options = {
 	enableDebug: false
 };
 
+/**
+ * Does the first rank beat the second rank?
+ * @param {string} rank1 - the first rank
+ * @param {string} rank2 - the second rank
+ * @return {boolean} true if rank1 is higher than rank2
+ */
+Bridge.isHigherRank = function( rank1, rank2 ) {
+	return Bridge.ranks[ rank1 ].index < Bridge.ranks[ rank2 ].index;
+};
+
+/**
+ * Is this direction North or South?
+ * @param {string} direction - the direction to check
+ * @return {boolean} true if direction is north or south, false otherwise.
+ */
+Bridge.isNorthSouth = function( direction ) {
+	return direction === 'n' || direction === 's';
+};
+
+/**
+ * Is this direction East or west?
+ * @param {string} direction - the direction to check
+ * @return {boolean} true if direction is east or west, false otherwise.
+ */
+Bridge.isEastWest = function( direction ) {
+	return direction === 'e' || direction === 'w';
+};
 
 /**
  * Get the LHO of the specified direction.
@@ -196,14 +224,6 @@ Bridge.arePartners = function( direction1, direction2 ) {
 	return Bridge.getPartner( direction1 ) === direction2;
 };
 
-/**
- * Check if suit is a strain ( not pass double or redouble )
- * @param {string} suit - the suit of the call
- * @return true if it is a strain
- */
-Bridge.isStrain = function( suit ) {
-	return _.has( Bridge.calls, suit ) && Bridge.calls[ suit ].isStrain;
-};
 
 /**
  * Convert text to a valid identifier.
@@ -366,6 +386,56 @@ Bridge.isSuit = function( suit ) {
 };
 
 /**
+ * Check to see if strain is a valid strain
+ * @param {string} strain - The strain to check
+ * @param {string} [context] - The context ( for example the method ) of this call
+ * @throws strain is not a valid suit
+ */
+Bridge._checkStrain = function( strain, context ) {
+	Bridge._checkListMembership( strain, Bridge.calls, 'Strain', context );
+	if ( !Bridge.calls[ strain ].isStrain ) {
+		Bridge._reportError( "Strain " + strain + " is not a valid strain!", context );
+	}
+};
+
+/**
+ * Check if suit is a strain ( not pass double or redouble )
+ * @param {string} suit - the suit of the call
+ * @return true if it is a strain
+ */
+Bridge.isStrain = function( suit ) {
+	return _.has( Bridge.calls, suit ) && Bridge.calls[ suit ].isStrain;
+};
+
+/**
+ * Check to see if card is a valid card
+ * @param {string} card - The card to check
+ * @param {string} [context] - The context ( for example the method ) of this call
+ * @throws card is not a valid card
+ */
+Bridge._checkCard = function( card, context ) {
+	if ( !card || card.length !== 2 ) {
+		Bridge._reportError( "Card " + card + " does not have length 2", context );
+	}	
+	var suit = card[0];
+	Bridge._checkSuit( suit, context );
+	var rank = card[1];
+	Bridge._checkRank( rank, context );
+};
+
+/**
+ * Check to see if card is a valid card
+ * @param {string} card - The card to check
+ * @return {boolean} true if valid, false if not
+ */
+Bridge.isCard = function( card ) {
+	if ( !card || card.length !== 2 ) return false;
+	var suit = card[0];
+	var rank = card[1];
+	return Bridge.isSuit( suit ) && Bridge.isRank( rank );
+};
+
+/**
  * Check to see if suit of a call is a valid
  * @param {string} call - The call to check
  * @param {string} [context] - The context ( for example the method ) of this call
@@ -491,4 +561,17 @@ Bridge._checkVulnerability = function( vulnerability, context ) {
  */
 Bridge.isVulnerability = function( vulnerability ) {
 	return Bridge._belongsTo( vulnerability, Bridge.vulnerabilities );
+};
+
+/**
+ * Utility to check if array has the specified element.
+ * @param {array} items - the array to check
+ * @param {number} index - the index to check for existence
+ * @param {string} [context] - The context ( for example the method ) of this call
+ * @throws items does not have index
+ */
+Bridge._checkIndex = function( items, index, context ) {
+	if ( index >= items.length ) {
+		Bridge._reportError( "array does not have item at index " + index, context );
+	}
 };

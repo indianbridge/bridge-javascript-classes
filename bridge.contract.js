@@ -34,6 +34,14 @@ Bridge.Contract = function() {
 
 
 /**
+ * Get the suit of this contract
+ * @return {string} the suit
+ */
+Bridge.Contract.prototype.getSuit = function() {
+	return this.suit;
+};
+
+/**
  * Get the declarer of this contract
  * @return {string} the declarer
  */

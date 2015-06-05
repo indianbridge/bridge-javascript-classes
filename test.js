@@ -1,98 +1,10 @@
-var hand;
+
 $(function() {
-
 	try {
-	var handString = "sakqjhakqdakqcakq";
-	var hand = new Bridge.Hand( 'n' );
-	hand.set( "hand", handString );	
-	var config = {
-		prefix: "bw-hand-diagram",
-		show: {
-			direction: false,
-			name: false
-		},
-		tags: Bridge.getDivConfig( "bw-hand-diagram" ),
-		data: {},
-		classes: {},
-		idPrefix: "h",
-		containerID: "hand-n",
-		alternateSuitColor: true,
-		registerChangeHandler: false
-	};		
-	hand.toHTML( config );
-
-		//var deal = new Bridge.Deal();
-		//deal.fromString( "n=sakqhakqdakqjt98&a=1c1hppxr" );
-		/*auction.toBBODiagram( { containerID: "auction", idPrefix: "a" } );
-		auction2.toBBODiagram( { containerID: "auction2", idPrefix: "a2" } );
-		auction.toBiddingBox( { layout: "full", containerID: "bidding-box", idPrefix: "bb", classes: { "bidding-box": ["bbo"] } } );
-		auction2.toBiddingBox( { layout: "full", containerID: "bidding-box2", registerChangeHandler: true, idPrefix: "bb2", classes: { "bidding-box": ["bbo"] } } );		*/
-		
-		//var direction = 'n';
-		//hand = deal.getHand( direction );	
-		//$("#hand-n").html( hand.toHTML( { tags: Bridge.getTableConfig( "hand-diagram" ) } ) );
-		//var auction = deal.getAuction();
-		//$( "#auction").html( auction.toHTML( { tags: Bridge.getTableConfig( "auction-diagram" ) } ) );
-		/*hand.toBBODiagram( { containerID: "hand-"+direction, idPrefix: direction } );	
-		direction = 's';
-		deal2.setActiveHand( 's' );
-		hand = deal2.getHand( direction );	
-		hand.toBBODiagram( { containerID: "hand-"+direction, idPrefix: direction } );
-		deal.toCardDeck( { containerID: "card-deck1", idPrefix: "cd1", show: { reset: true, text:true, title: true, activeHand: true, assignedTo: false }, classes: { "card-deck": ["bbo"] } } );			
-		deal2.toCardDeck( { containerID: "card-deck2", idPrefix: "cd2", show: { reset: true, text:true, title: true, activeHand: true, assignedTo: false }, classes: { "card-deck": ["bbo"] } } );			*/
-		//$( ".hand" ).click( { deal: deal }, function( e ) { e.data.deal.setActiveHand( $( this ).data( "hand" ) ); } );
-		/*
-		var direction = 'n';
-		hand = deal.getHand( direction );	
-		var config = { 
-			containerID: "hand-" + direction, 
-			idPrefix: direction, 
-			classes: { "hand-diagram": ["images"] },
-			show: { suit: false, emptySuit: false, text: false, cards: true, countInContent: false } 
-		};
-		hand.toHTML( config );	
-		for( var i = 0; i <= 12; ++i ) {
-			var className = "hand-diagram-field-cards-" + i;
-			var left = -1*i*50;
-			var rotate = -24 + 4*i;
-			$( "." + className ).css( { left: left, transform: 'rotate(' + rotate + 'deg)' } );
-		}	
-		$( ".hand-diagram-field-cards" ).width( 74 ).height( 100 );
-		var auction = deal.getAuction();
-		auction.toBBODiagram( { containerID: "auction", idPrefix: "a" } );
-		config = { 
-			layout: "concise", 
-			containerID: "bidding-box", 
-			idPrefix: "bb",
-			classes: { "bidding-box": ["bbo"] },
-			show: { allpass: false, undo: false, reset: false },
-			tags: {}
-		}
-		var prefix = "bidding-box";
-		config.tags[ prefix ] = "div";
-		config.tags[ prefix + "-header" ] = "div";
-		config.tags[ prefix + "-content" ] = "div";
-		config.tags[ prefix + "-footer" ] = "div";
-		config.tags[ prefix + "-row" ] = "div";
-		config.tags[ prefix + "-column" ] = "span";
-		config.tags[ prefix + "-field" ] = "span";	
-		auction.toBiddingBox( config );*/
-		/*$( document ).on( "auction:changed", function( e, auction, operation, parameter ) {
-			if ( operation === "addCall" ) alert( "op: " + operation + " param: " + parameter );
-		});*/
-		/*hand = deal.getHand( direction );	
-		hand.toHTML( { containerID: "hand-" + direction, idPrefix: direction, show: { countInContent: true } } );
-		
-		var auction = deal.getAuction();
-		auction.toBBODiagram( { containerID: "auction", idPrefix: "a" } );
-		auction.toBBODiagram( { containerID: "auction2", idPrefix: "a2" } );
-		deal.toCardDeck( { containerID: "card-deck", idPrefix: "cd", show: { reset: true, text:true, title: true, activeHand: false, assignedTo: false }, classes: { "card-deck": ["bbo"] } } );
-		$( document ).on( "deal:changed", function( e, deal, operation ) {
-			$("#deal").empty().append(deal.toString());
-		});		
-		auction.toBiddingBox( { layout: "full", containerID: "bidding-box", idPrefix: "bb", classes: { "bidding-box": ["bbo"] } } );
-		auction.toBiddingBox( { layout: "full", containerID: "bidding-box2", registerChangeHandler: true, idPrefix: "bb2", classes: { "bidding-box": ["bbo"] } } );
-		$("#remove").click( function() { $("#bidding-box2").empty(); } );*/
+		var lin = "pn|shdinkin,~~M5041ckc,~~M5177yqh,~~M52290ji|st||md|2S2468AH7QD2JC236A,S35TQKH89D8KC579J,SH36TKD34679QAC4T,|rh||ah|Board 12|sv|n|mb|p|mb|p|mb|p|mb|1S|an|Major suit opening -- 5+ !S; 11-21 HCP; |mb|p|mb|1N|an|2- !S; 6-11 HCP; 12- total points |mb|p|mb|p|mb|p|pc|CK|pc|CA|pc|C5|pc|C4|pc|DJ|pc|DK|pc|D3|pc|D5|pc|D8|pc|DA|pc|DT|pc|D2|pc|DQ|pc|H2|pc|S2|pc|S3|pc|D9|pc|H5|pc|S4|pc|S5|pc|D7|pc|HJ|pc|S6|pc|H9|pc|D6|pc|S7|pc|S8|pc|ST|pc|D4|pc|SJ|pc|C2|pc|SQ|pc|H3|pc|HA|pc|H7|pc|H8|pc|CQ|pc|C3|pc|C9|pc|CT|pc|C8|pc|C6|pc|CJ|pc|H6|pc|C7|pc|HT|pc|H4|pc|HQ|pc|SK|pc|HK|pc|S9|pc|SA|";
+		var deal = new Bridge.Deal();
+		deal.fromLIN( lin );
+		$( "#output" ).empty().append( deal.toString() );	
 	}
 	catch ( err ) {
 		alert(err.message);

@@ -753,7 +753,7 @@ Bridge.Deal.prototype.toCardDeck = function( config, isCallback ) {
 		var data = [ "data-suit='" + suit + "'" ];		
 		contentHTML += Bridge._openTag( rowTag, config, rowClasses, data );
 		_.each( Bridge.rankOrder, function( rank ) {
-			var assignedTo = this._cardAssignedTo[ suit ][ rank ];
+			var assignedTo = this.cards[ suit ][ rank ].getDirection();
 			if ( !assignedTo ) assignedTo = "";
 			columnClasses = Bridge._generateClasses( prefix, [ "column", field, suit, rank ] );
 			if ( assignedTo ) columnClasses.push( "assigned" );

@@ -3,7 +3,7 @@ QUnit.test( "Constructor", function( assert ) {
 	var deal = new Bridge.Deal();
 	for ( var suit in Bridge.suits ) {
 		for( var rank in Bridge.ranks ) {
-			assert.deepEqual( deal._cardAssignedTo[ suit ][ rank ], null, "None of the cards are assigned" );
+			assert.ok( !deal.cards[ suit ][ rank ].isAssigned(), "None of the cards are assigned" );
 		}
 	}	
 	assert.deepEqual( deal.board, 1, "board is default" );
