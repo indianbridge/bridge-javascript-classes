@@ -1,3 +1,55 @@
+table.bw-bidding-box {
+	margin: 0 auto;
+}
+
+table.bw-bidding-box td {
+	padding:0; margin:0;
+}
+
+.bw-bidding-box-field {
+	display: inline-block;
+	width: 40px;
+	height: 40px;
+	line-height: 40px;
+	text-align: center;
+	font-size: 28px;
+	font-weight: bold;
+	border: 1px solid blue;
+	background: #ccf;
+	-moz-border-radius: 3px;
+	-webkit-border-radius: 3px;
+	border-radius: 3px;
+}
+
+.bw-bidding-box-field.disabled {
+	opacity: 0.25;
+    filter: Alpha(opacity=25); /* IE8 and earlier */
+	cursor: not-allowed;
+}
+
+.bw-bidding-box-field.enabled {
+	cursor: pointer;
+}
+
+
+.bw-bidding-box-field-calls-p {
+	background-color: #006600;
+	color: #FFFFFF;
+}
+
+.bw-bidding-box-field-calls-x {
+	background-color: #990000;
+	color: #FFFFFF;
+}
+
+.bw-bidding-box-field-calls-r {
+	background-color: #000099;
+	color: #FFFFFF;
+}
+
+.selected {
+	background-color: #FFCE00;
+}
 
 .hand-diagram-column {
 	font-weight: bold;

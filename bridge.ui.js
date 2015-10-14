@@ -372,15 +372,21 @@ Bridge.Hand.prototype.toHTML = function( config, isCallback ) {
 			var data = [ "data-suit='" + suit + "'" ];					
 			var cards = "";
 			var count = 0;
-			_.each( Bridge.rankOrder, function( rank ) {
-				if ( this.cards[ suit ][ rank ] ) {
+			_.each( Bridge.rankOrder, function( actualRank ) {
+				if ( this.cards[ suit ][ actualRank ] ) {
+					var rank = this.showAsX[ suit ][ actualRank ] ? 'x' : actualRank;
+					var rankHTML = this.showAsX[ suit ][ actualRank ] ? 'x' : Bridge.ranks[ rank ].html;
 					count++;
 					classes = Bridge._generateClasses( prefix, [ "field", field, suit, rank ] );
 					classes.push( prefix + "-field-" + field + "-" + cardNumber );
 					tag = Bridge._getTag( config, classes );	
-					var data = [ "data-suit='" + suit + "'", "data-rank='" + rank + "'", "data-card='" + suit + rank + "'" ];				
+					var suitIndex = 3 - Bridge.suits[ suit ].index;
+					if ( rank === 'x' ) var rankIndex = 13;
+					else var rankIndex = 12 - Bridge.ranks[ rank ].index;
+					var cardIndex = suitIndex * 14 + rankIndex;
+					var data = [ "data-suit='" + suit + "'", "data-rank='" + rank + "'", "data-card='" + suit + rank + "'", "data-card-order='" + cardIndex + "'" ];				
 					cards += Bridge._openTag( tag, config, classes, data );
-					if ( config.show.text ) cards += Bridge.ranks[ rank ].html;
+					if ( config.show.text ) cards += rankHTML;
 					cards += Bridge._closeTag( tag );
 					cardNumber++;
 				}
@@ -624,6 +630,7 @@ Bridge.Auction.prototype.toHTML = function( config, isCallback ) {
 Bridge.getCallHTML = function( call ) {
 	var len = call.length;
 	if ( len < 1 || len > 2 ) return call;
+	call = call.toLowerCase();
 	Bridge._checkBid( call );
 	if ( len === 1 ) {
 		return Bridge.calls[ call ].html;
@@ -633,19 +640,25 @@ Bridge.getCallHTML = function( call ) {
 	}	
 };
 
-
 /**
  * Get the HTML for a given card.
- * @param {string} card the card to get html representation for
+ * @param {string} card the card to get html for
  * @return {string} the html
  */
 Bridge.getCardHTML = function( card ) {
-	var html = "";
-	if ( card.length !== 2 ) return card;
-	Bridge._checkSuit( card[0] );
-	Bridge._checkRank( card[1] );
-	return Bridge.suits[ card[0] ].html + Bridge.ranks[ card[1] ].html;	
+	var len = card.length;
+	if ( len !== 2 ) return card;
+	var rank = card[1].toLowerCase();
+	var suit = card[0].toLowerCase();
+	if ( rank !== 'x' ) Bridge._checkRank( rank );
+	Bridge._checkSuit( suit );
+	var html = '';
+	html += Bridge.suits[ suit ].html;
+	if ( rank === 'x' ) html += rank;
+	else html += Bridge.ranks[ rank ].html;
+	return html	
 };
+
 
 /**
  * Generate a html display of this call.
@@ -887,6 +900,12 @@ Bridge.Auction.prototype.toBiddingBox = function( config, isCallback ) {
 	if ( config.layout === "concise" ) {
 		var html = this._createConciseBiddingBox( config );
 	}
+	else if ( config.layout === "concise-level" ) {
+		var html = this._createConciseBiddingBoxLevel( config );
+	}
+	else if ( config.layout === "concise-calls" ) {
+		var html = this._createConciseBiddingBoxCalls( config );
+	}	
 	else {
 		var html = this._createFullBiddingBox( config );
 	}
@@ -931,6 +950,103 @@ Bridge.Auction.prototype.toBiddingBox = function( config, isCallback ) {
 };
 
 /**
+ * Create a split concise bidding box for level only
+ * @param {object} config the config parameters
+ * @return {string} html generated for bidding box
+ */
+Bridge.Auction.prototype._createConciseBiddingBoxLevel = function( config ) {
+	var allowedCalls = this.getContract().allowedCalls( this.nextToCall );
+	var selectedLevel = this.getSelectedLevel();
+	var prefix = config.prefix;
+	var minimumLevel = allowedCalls[ "minimum_level" ];
+	
+	// Header
+	var headerHTML = "";										
+	
+	// Content
+	var contentHTML = "";	
+	var field = "level";
+	var rowClasses = Bridge._generateClasses( prefix, [ "row", "level" ] );
+	var rowTag = Bridge._getTag( config, rowClasses );		
+	contentHTML += Bridge._openTag( rowTag, config, rowClasses, [] );
+	_.each( _.range( 1, 8 ), function( level ) {
+		var columnClasses = Bridge._generateClasses( prefix, [ "column", field, level ] );
+		var data = [ "data-level='" + level + "'" ];	
+		var columnTag = Bridge._getTag( config, columnClasses );
+		contentHTML += Bridge._openTag( columnTag, config, columnClasses, data );
+		var classes = Bridge._generateClasses( prefix, [ "field", field, level ] );
+		var tag = Bridge._getTag( config, classes );
+		if ( level !== 0 && level === selectedLevel ) classes.push( "selected" );	
+		var allowedCall = ( level >= minimumLevel );		
+		if ( allowedCall ) classes.push( "enabled" );
+		else {
+			classes.push( "disabled" );
+			data.push( "disabled" );
+		}				
+		contentHTML += Bridge._openTag( tag, config, classes, data );
+		if ( level !== 0 ) contentHTML += level;
+		contentHTML += Bridge._closeTag( tag );			
+		contentHTML += Bridge._closeTag( columnTag );				
+	}, this );
+	contentHTML += Bridge._closeTag( rowTag );
+	
+	
+	// Footer	
+	var footerHTML = "";	
+	
+	return Bridge._generateHTMLModule( config, headerHTML, contentHTML, footerHTML );
+};
+
+/**
+ * Create a split concise bidding box for calls only
+ * @param {object} config the config parameters
+ * @return {string} html generated for bidding box
+ */
+Bridge.Auction.prototype._createConciseBiddingBoxCalls = function( config ) {
+	var allowedCalls = this.getContract().allowedCalls( this.nextToCall );
+	var selectedLevel = this.getSelectedLevel();
+	var prefix = config.prefix;
+	var minimumLevel = allowedCalls[ "minimum_level" ];
+	
+	// Header
+	var headerHTML = "";										
+	
+	// Content
+	var contentHTML = "";		
+	var field = "calls";
+	var rowClasses = Bridge._generateClasses( prefix, [ "row", field ] );
+	var rowTag = Bridge._getTag( config, rowClasses );		
+	contentHTML += Bridge._openTag( rowTag, config, rowClasses, [] );	
+	_.each( Bridge.callOrder.slice().reverse(), function( suit ) {
+		var text = ( Bridge.isStrain( suit ) ? Bridge.calls[ suit ].html : Bridge.calls[ suit ].text );
+		var columnClasses = Bridge._generateClasses( prefix, [ "column", field, suit ] );
+		var call = ( Bridge.isStrain( suit ) ? selectedLevel + suit : suit );
+		var data = [ "data-suit='" + suit + "'", "data-call='" + call + "'" ];	
+		var columnTag = Bridge._getTag( config, columnClasses );
+		contentHTML += Bridge._openTag( columnTag, config, columnClasses, data );
+		var classes = Bridge._generateClasses( prefix, [ "field", field, suit ] );
+		var tag = Bridge._getTag( config, classes );
+		var allowedCall = selectedLevel ? true : false;
+		if ( selectedLevel ) {
+			allowedCall = ( Bridge.isStrain( suit ) ? allowedCalls[ selectedLevel + suit ] : allowedCalls[ suit ] );
+		}
+		if ( allowedCalls[ call ] ) classes.push( "enabled" );
+		else {
+			classes.push( "disabled" );
+			data.push( "disabled" );
+		}				
+		contentHTML += Bridge._openTag( tag, config, classes, data );
+		contentHTML += text;
+		contentHTML += Bridge._closeTag( tag );				
+		contentHTML += Bridge._closeTag( columnTag );				
+	}, this );
+	contentHTML += Bridge._closeTag( rowTag );		
+	var footerHTML = "";
+	return Bridge._generateHTMLModule( config, headerHTML, contentHTML, footerHTML );	
+};
+
+
+/**
  * Create a concise bidding box
  * @param {object} config the config parameters
  * @return {string} html generated for bidding box
@@ -949,6 +1065,8 @@ Bridge.Auction.prototype._createConciseBiddingBox = function( config ) {
 	var field = "level";
 	var rowClasses = Bridge._generateClasses( prefix, [ "row", "level" ] );
 	var rowTag = Bridge._getTag( config, rowClasses );		
+	var columnClasses = null;
+	var columnTag = null;
 	contentHTML += Bridge._openTag( rowTag, config, rowClasses, [] );
 	_.each( _.range( 0, 8 ), function( level ) {
 		columnClasses = Bridge._generateClasses( prefix, [ "column", field, level ] );

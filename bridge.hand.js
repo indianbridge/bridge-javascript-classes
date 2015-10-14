@@ -14,6 +14,13 @@ if ( !Bridge ) var Bridge = {};
  */
 Bridge.Hand = function( direction, deal ) {
 	Bridge._checkDirection( direction );
+	
+	/**
+	 * Optional Unique id to identify this hand.
+	 * @member {string}
+	 */
+	this.id = null;
+	 
 	/**
 	 * The direction of this hand
 	 * @member {string}
@@ -43,6 +50,17 @@ Bridge.Hand = function( direction, deal ) {
 			this.cards[ suit ][ rank ] = false;
 		}
 	 }
+	 
+	/**
+	 * Whether the card should be show as x or not
+	 */
+	 this.showAsX = {};
+	 for( var suit in Bridge.suits ) {
+	 	this.showAsX[ suit ] = {};
+	 	for( var rank in Bridge.ranks ) {
+			this.showAsX[ suit ][ rank ] = false;
+		}
+	 }	
 	 
 	/**
 	 * The number of cards this hand has
@@ -136,6 +154,39 @@ Bridge.Hand.prototype.getHand = function() {
 };
 
 /**
+ * Set a unique id 
+ * @param {string} id - a unique identifier
+ */
+Bridge.Hand.prototype.setID = function( id ) {
+	Bridge._checkRequiredArgument( id );
+	this.id = id;
+};
+
+/**
+ * Get the unique id
+ * @return {string} the id in string format
+ */
+Bridge.Hand.prototype.getID = function() {
+	return this.id;
+};
+
+/**
+ * Get the cards in a specific suit
+ * @return {string} the cards in string format
+ */
+Bridge.Hand.prototype.getCards = function( suit ) {
+	Bridge._checkSuit( suit );
+	var output = "";
+	_.each( Bridge.rankOrder, function( rank ) {
+		if ( this.cards[ suit ][ rank ] ) {
+			if ( this.showAsX[ suit ][ rank ] ) output += 'x';
+			else output += rank;
+		}
+	}, this);	
+	return output;
+};
+
+/**
  * Add a card to this hand.
  * @param {string} suit - The suit of this card
  * @param {string} rank - The rank of this card
@@ -143,6 +194,27 @@ Bridge.Hand.prototype.getHand = function() {
 Bridge.Hand.prototype.addCard = function( suit, rank ) {
 	var prefix = "In addCard";
 	Bridge._checkSuit( suit, prefix );
+	var showAsX = false;
+	if ( typeof rank === "string" && rank.toLowerCase() === 'x' ) {
+		for( var i = Bridge.rankOrder.length-1; i >= 0; --i ) {
+			var newRank = Bridge.rankOrder[i];
+			if ( this.deal ) {
+				var card = this.deal.cards[ suit ][ newRank ];
+				if ( !card.isAssigned() ) {
+					rank = newRank;
+					showAsX = true;
+					i = -1;
+				}
+			}
+			else {
+				if ( ! this.cards[suit][newRank] ) {
+					rank = newRank;
+					showAsX = true;
+					i = -1;					
+				}
+			}
+		}
+	}
 	Bridge._checkRank( rank, prefix );
 	if ( this.numCards === 13 ) {
 		Bridge._reportError( this.name + "'s Hand : already has 13 cards. Cannot add " + suit + rank, prefix );
@@ -158,6 +230,7 @@ Bridge.Hand.prototype.addCard = function( suit, rank ) {
 		}
 	}
 	this.cards[ suit ][ rank ] = true;
+	this.showAsX[ suit ][ rank ] = showAsX;
 	if ( this.deal ) {
 		this.deal.cards[ suit ][ rank ].assign( this.direction );
 	}
@@ -223,6 +296,7 @@ Bridge.Hand.prototype.clearCards = function() {
  * The properties that can be set are as follows<br/>
  * name - string - name of player holding this hand<br/>
  * hand - string - hand in BBO Handviewer string format<br/>
+ * id - string - unique id for this hand<br/>
  * @param {string} property - the property to set
  * @param {string} value - the value to set the property to
  */
@@ -237,6 +311,9 @@ Bridge.Hand.prototype.set = function( property, value ) {
 		case "hand" :
 			this.setHand( value );
 			break;
+		case "id" :
+			this.setID( value );
+			break;
 		default :
 			Bridge._reportError( "Unknown property " + property, prefix );
 	}
@@ -247,6 +324,7 @@ Bridge.Hand.prototype.set = function( property, value ) {
  * The properties that can be got are as follows<br/>
  * direction - string - the direction of this hand
  * name - string - name of player holding this hand<br/>
+ * id - string - a unique id for this hand<br/>
  * count - number - the number of cards this hand has<br/>
  * hand - string - hand in BBO Handviewer string format<br/>
  * @param {string} property - the property to get
@@ -262,6 +340,9 @@ Bridge.Hand.prototype.get = function( property ) {
 			break;
 		case "name" :
 			return this.getName();
+			break;
+		case "id" :
+			return this.getID();
 			break;
 		case "count" :
 			return this.getCount();
@@ -285,7 +366,8 @@ Bridge.Hand.prototype.toString = function() {
 		var item = "";
 		_.each( Bridge.rankOrder, function( rank ) {
 			if ( this.cards[ suit ][ rank ] ) {
-				item += rank;
+				if ( this.showAsX[ suit ][ rank ] ) item += 'x';
+				else item += rank;
 			}
 		}, this);	
 		if ( item ) output += suit + item;	
@@ -346,7 +428,6 @@ Bridge.Hand.prototype.fromString = function( handString ) {
 					continue;
 				}
 				currentRank = currentChar;
-				Bridge._checkRank( currentRank, prefix );
 				this.addCard( currentSuit, currentRank );
 				break;											
 		}	
@@ -377,9 +458,9 @@ Bridge.Hand.prototype.getAlternatingSuitOrder = function() {
 		if ( hasCards[ suit ] ) numSuits++;
 	}, this );
 	if ( numSuits < 3 ) return Bridge.suitOrder;
-	if ( numSuits === 4 ) return [ 'h', 's', 'd', 'c' ];
+	if ( numSuits === 4 ) return [ 's', 'h', 'c', 'd' ];
 	if ( hasCards[ 's' ] && hasCards[ 'c' ] ) return Bridge.suitOrder;
-	else return [ 'h', 's', 'c', 'd' ];
+	else return [ 's', 'h', 'd', 'c' ];
 }; 
  
 /**
@@ -410,15 +491,18 @@ Bridge.Hand.prototype.fromJSON = function( handString ) {
  * Raise an event, call all registered change callbacks etc.
  */
 Bridge.Hand.prototype.onChange = function( operation, parameter ) {
-	if ( this.triggerEvents && !this.deal || this.deal.triggerEvents ) {
+	if ( this.triggerEvents && ( !this.deal || this.deal.triggerEvents ) ) {
 		if ( Bridge.options.enableDebug ) console.log( "hand:changed " + operation + " - " + parameter );
 		// Raise the event and pass this object so handler can have access to information.
 		$( document ).trigger( "hand:changed",  [ this, operation, parameter ]);	
-			
+		var id = this.getID();
+		if ( id ) $( document ).trigger( id + ":hand:changed",  [ this, operation, parameter ]);
 	}
 	if ( this.deal && this.deal.triggerEvents ) {
 		if ( Bridge.options.enableDebug ) console.log( "deal:changed " + operation + " - " + parameter );
 		$( document ).trigger( "deal:changed",  [ this.deal, operation, parameter ]);
+		var id = this.deal.getID();
+		if ( id ) $( document ).trigger( id + ":deal:changed",  [ this.deal, operation, parameter ]);
 	}
 };
 

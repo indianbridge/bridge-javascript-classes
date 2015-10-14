@@ -13,6 +13,7 @@ if ( !Bridge ) var Bridge = {};
  */
 Bridge.Auction = function( deal ) {
 	this.deal = deal;
+	this.id = ( deal ? deal.id : null );
 	this.dealer = ( deal ? deal.getDealer() : "n" );
 	this.vulnerability = ( deal ? deal.getVulnerability() : "-" );
 	this.nextToCall = this.dealer;
@@ -194,6 +195,24 @@ Bridge.Auction.prototype.getContract = function() {
 };
 
 /**
+ * Set a unique id 
+ * @param {string} id - a unique identifier
+ */
+Bridge.Auction.prototype.setID = function( id ) {
+	Bridge._checkRequiredArgument( id );
+	this.id = id;
+};
+
+/**
+ * Get the unique id
+ * @return {string} the id in string format
+ */
+Bridge.Auction.prototype.getID = function() {
+	return this.id;
+};
+
+
+/**
  * Get a property in this auction.
  * The properties that can be got are as follows<br/>
  * dealer - character [ n e s w ] - the dealer for this auction<br/>
@@ -223,7 +242,10 @@ Bridge.Auction.prototype.get = function( property ) {
 			break;
 		case 'auction' :
 			return this.getAuction();
-			break;			
+			break;		
+		case 'id' :
+			return this.getID();
+			break;
 		default :
 			Bridge._reportError( 'Unknown deal property ' + property, prefix );
 	}
@@ -260,7 +282,10 @@ Bridge.Auction.prototype.set = function( property, value ) {
 			break;
 		case 'auction' :
 			this.setAuction( value );
-			break;			
+			break;
+		case 'id' :
+			this.setID( value );
+			break;
 		default :
 			Bridge._reportError( 'Unknown deal property ' + property, prefix );
 	}
@@ -405,11 +430,20 @@ Bridge.Auction.prototype.onChange = function( operation, parameter ) {
 		// Raise the event and pass this object so handler can have access to information.
 		$( document ).trigger( "auction:changed",  [ this, operation, parameter ]);
 		$( document ).trigger( "bidding-box:changed",  [ this, operation, parameter ]);	
+		var id = this.getID();
+		if ( id ) {
+			$( document ).trigger( id + ":auction:changed",  [ this, operation, parameter ]);
+			$( document ).trigger( id + ":bidding-box:changed",  [ this, operation, parameter ]);				
+		}
 		
 	}
 	if ( this.deal && this.deal.triggerEvents ) {
 		if ( Bridge.options.enableDebug ) console.log( "deal:changed " + operation + " - " + parameter );
 		$( document ).trigger( "deal:changed",  [ this.deal, operation, parameter ]);	
+		var id = this.deal.getID();
+		if ( id ) {
+			$( document ).trigger( id + ":deal:changed",  [ this.deal, operation, parameter ]);	
+		}
 	}
 };
 

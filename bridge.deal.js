@@ -10,7 +10,14 @@ if ( !Bridge ) var Bridge = {};
  * @constructor
  * @memberof Bridge
  */
-Bridge.Deal = function() {
+Bridge.Deal = function( id ) {
+	
+	/**
+	 * Optional Unique id to identify this deal.
+	 * @member {string}
+	 */
+	this.id = id;
+		
 	/**
 	 * The 52 card objects
 	 * @member {object}
@@ -30,7 +37,7 @@ Bridge.Deal = function() {
 	this.hands = {};
 	for( var direction in Bridge.directions ) {
 		this.hands[ direction ] = new Bridge.Hand( direction, this );
-	}	
+	}		
 	
 	/** The currently active hand. */
 	this._activeHand = 'n';
@@ -196,6 +203,24 @@ Bridge.Deal.prototype.setScoring = function( scoring ) {
 	this.onChange( "setScoring", scoring );
 };
 
+
+/**
+ * Set a unique id 
+ * @param {string} id - a unique identifier
+ */
+Bridge.Deal.prototype.setID = function( id ) {
+	Bridge._checkRequiredArgument( id );
+	this.id = id;
+};
+
+/**
+ * Get the unique id
+ * @return {string} the id in string format
+ */
+Bridge.Deal.prototype.getID = function() {
+	return this.id;
+};
+
 /**
  * Get the notes of this deal.
  * @return {string} the notes.
@@ -259,7 +284,9 @@ Bridge.Deal.prototype.set = function( property, value ) {
 			break;
 		case "notes" :
 			this.setNotes( value );
-			break;			
+			break;	
+		case "id" :
+			this.setID( value );
 		default :
 			Bridge._reportError( "Unknown deal property " + property, prefix );
 	}
@@ -289,6 +316,8 @@ Bridge.Deal.prototype.get = function( property ) {
 			return this.getAuction();
 		case "play" :
 			return this.getPlay();			
+		case "id" :
+			return this.getID();
 		default :
 			Bridge._reportError( "Unknown deal property " + property, prefix );
 	}
@@ -503,7 +532,7 @@ Bridge.Deal.prototype.fromLIN = function( lin ) {
 				break;
 			case "mb" :
 				Bridge._checkIndex( tokens, i+1, prefix + "processing mb - " );
-				var bid = tokens[ i + 1 ].slice(0,2).toLowerCase();
+				var bid = tokens[ i + 1 ].split("!")[0].slice(0,2).toLowerCase();
 				if ( bid === 'd' ) bid = 'x';
 				var annotation = null;
 				if ( i + 2 < tokens.length && tokens[ i + 2 ].toLowerCase() === "an" ) {
@@ -537,5 +566,7 @@ Bridge.Deal.prototype.onChange = function( operation, parameter ) {
 	if ( this.triggerEvents ) {
 		if ( Bridge.options.enableDebug ) console.log( "deal:changed " + operation + " - " + parameter );
 		$( document ).trigger( "deal:changed",  [ this, operation, parameter ]);	
+		var id = this.getID();
+		if ( id ) $( document ).trigger( id + ":deal:changed",  [ this, operation, parameter ]);
 	}
 };

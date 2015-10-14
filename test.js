@@ -1,10 +1,33 @@
 
 $(function() {
-	try {
-		var lin = "pn|shdinkin,~~M5041ckc,~~M5177yqh,~~M52290ji|st||md|2S2468AH7QD2JC236A,S35TQKH89D8KC579J,SH36TKD34679QAC4T,|rh||ah|Board 12|sv|n|mb|p|mb|p|mb|p|mb|1S|an|Major suit opening -- 5+ !S; 11-21 HCP; |mb|p|mb|1N|an|2- !S; 6-11 HCP; 12- total points |mb|p|mb|p|mb|p|pc|CK|pc|CA|pc|C5|pc|C4|pc|DJ|pc|DK|pc|D3|pc|D5|pc|D8|pc|DA|pc|DT|pc|D2|pc|DQ|pc|H2|pc|S2|pc|S3|pc|D9|pc|H5|pc|S4|pc|S5|pc|D7|pc|HJ|pc|S6|pc|H9|pc|D6|pc|S7|pc|S8|pc|ST|pc|D4|pc|SJ|pc|C2|pc|SQ|pc|H3|pc|HA|pc|H7|pc|H8|pc|CQ|pc|C3|pc|C9|pc|CT|pc|C8|pc|C6|pc|CJ|pc|H6|pc|C7|pc|HT|pc|H4|pc|HQ|pc|SK|pc|HK|pc|S9|pc|SA|";
+	try {	
 		var deal = new Bridge.Deal();
-		deal.fromLIN( lin );
-		$( "#output" ).empty().append( deal.toString() );	
+		var linText = "|o2|st||md|4SQ982HT97DKQJ7CQ8,SAKJT74H4DA8CA732,SHAKQJ832DT5CJT95,S653H65D96432CK64|sv|n|mb|1S|mb|p|mb|2H|mb|p|mb|2S|mb|p|mb|3H|mb|p|mb|4H|mb|p|mb|p|mb|p|pc|d9|pc|dJ|pc|dQ|pc|dA|pg||pc|c2|pc|c3|pc|cQ|pc|cK|pg||pc|dK|pc|d2|pc|s8|pc|d5|pg||pc|d3|pc|d6|pc|h3|pc|d7|pg||pc|c6|pc|h4|pc|c5|pc|cJ|pg||pc|h8|pc|h2|pc|hQ|pc|hK|pg||pc|s5|pc|sA|pc|s6|pc|s7|pg||pc|sK|pc|s2|pc|s9|pc|hT|pg||mc|8|pg||";
+		deal.fromLIN( linText );
+		$("#output").empty().append(deal.toString());
+		/*var auction = deal.getAuction();
+	var prefix = "bw-bidding-box";
+	var bbConfig = { 
+		prefix: prefix,
+		layout: "concise-level", 
+		containerID: "bidding-box-level", 
+		//idPrefix: "id",
+		show: { allpass: false, undo: false, reset: false },
+		tags: Bridge.getTableConfig( prefix ),
+		registerChangeHandler: false
+	};		
+	auction.toBiddingBox( bbConfig );
+	var prefix = "bw-bidding-box";
+	var bbConfig = { 
+		prefix: prefix,
+		layout: "concise-calls", 
+		containerID: "bidding-box-calls", 
+		//idPrefix: "id",
+		show: { allpass: false, undo: false, reset: false },
+		tags: Bridge.getTableConfig( prefix ),
+		registerChangeHandler: false
+	};		
+	auction.toBiddingBox( bbConfig );*/
 	}
 	catch ( err ) {
 		alert(err.message);

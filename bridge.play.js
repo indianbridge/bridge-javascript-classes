@@ -17,7 +17,8 @@ Bridge.Play = function( deal ) {
 	 * The deal that this hand belongs to.
 	 * @member {object}
 	 */
-	this.deal = deal;	
+	this.deal = deal;
+	this.id = ( deal ? deal.getID() : null );	
 	this.currentPlayNumber = 1;
 	this.plays = [];
 	this.initialized = false;
@@ -28,6 +29,24 @@ Bridge.Play = function( deal ) {
 	this.triggerEvents = true;		 
 
 };
+
+/**
+ * Set a unique id 
+ * @param {string} id - a unique identifier
+ */
+Bridge.Hand.prototype.setID = function( id ) {
+	Bridge._checkRequiredArgument( id );
+	this.id = id;
+};
+
+/**
+ * Get the unique id
+ * @return {string} the id in string format
+ */
+Bridge.Hand.prototype.getID = function() {
+	return this.id;
+};
+
 
 /**
  * Contract is complete, initialize the play
@@ -172,11 +191,15 @@ Bridge.Play.prototype.onChange = function( operation, parameter ) {
 		if ( Bridge.options.enableDebug ) console.log( "play:changed " + operation + " - " + parameter );
 		// Raise the event and pass this object so handler can have access to information.
 		$( document ).trigger( "play:changed",  [ this, operation, parameter ]);	
+		/*var id = this.getID();
+		if ( id ) $( document ).trigger( id + ":play:changed",  [ this, operation, parameter ]);*/
 			
 	}
 	if ( this.deal && this.deal.triggerEvents ) {
 		if ( Bridge.options.enableDebug ) console.log( "deal:changed " + operation + " - " + parameter );
 		$( document ).trigger( "deal:changed",  [ this.deal, operation, parameter ]);
+		var id = this.deal.getID();
+		if ( id ) $( document ).trigger( id + ":deal:changed",  [ this.deal, operation, parameter ]);
 	}
 };
 
