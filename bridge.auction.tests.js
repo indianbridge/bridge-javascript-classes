@@ -147,3 +147,41 @@ QUnit.test( "add remove calls", function( assert ) {
 	assert.equal( auction.get( "auction" ), "p1cx3nppp", "auction matches" );
 	assert.equal( auction.get( "contract" ).toString(), "3nw", "contract matches" );							
 });
+
+QUnit.test( "advance rewind calls", function( assert ) {
+	var auction = new Bridge.Auction();
+	assert.equal( auction.currentAuctionIndex, -1, "auction index matches" );
+	auction.set( "auction", "p1h2d4dp4sp6cp6hppp" );
+	auction.advanceAuction();
+	assert.equal( auction.currentAuctionIndex, 0, "auction index matches" );
+	auction.advanceAuctionAll();
+	assert.equal( auction.currentAuctionIndex, 12, "auction index matches" );
+	assert.throws(
+		function() {
+			auction.advanceAuction();
+		},
+		"auction advanced fully"
+	);
+	assert.throws(
+		function() {
+			auction.advanceAuctionAll();
+		},
+		"auction advanced fully"
+	);
+	auction.rewindAuction();
+	assert.equal( auction.currentAuctionIndex, 11, "auction index matches" );
+	auction.rewindAuctionAll();
+	assert.equal( auction.currentAuctionIndex, -1, "auction index matches" );
+	assert.throws(
+		function() {
+			auction.rewindAuction();
+		},
+		"auction rewinded fully"
+	);
+	assert.throws(
+		function() {
+			auction.rewindAuctionAll();
+		},
+		"auction rewinded fully"
+	);
+});

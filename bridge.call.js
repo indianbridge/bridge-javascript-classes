@@ -166,10 +166,10 @@ Bridge.Call.prototype.toString = function() {
 	var output = "";
 	output += this.call;
 	if ( this.explanation ) {
-		output += "{" + this.explanation + "}";
+		output += "(" + this.explanation + ")";
 	}
 	if ( this.annotation ) {
-		output += "(" + this.annotation + ")";
+		output += "{" + this.annotation + "}";
 	}		
 	return output;
 };

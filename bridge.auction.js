@@ -12,18 +12,63 @@ if ( !Bridge ) var Bridge = {};
  * @param {object} deal - The deal that this auction belongs to.
  */
 Bridge.Auction = function( deal ) {
+	
+	/**
+	 * The deal that this play belongs to.
+	 * @member {object}
+	 */
 	this.deal = deal;
-	this.id = ( deal ? deal.id : null );
+	
+	/**
+	 * A unique id to identify this auction.
+	 * @member {string}
+	 */
+	this.id = deal.id || Bridge._generateID();
+	
+	/**
+	 * The dealer for this auction.
+	 * @member {string}
+	 */
 	this.dealer = ( deal ? deal.getDealer() : "n" );
+	
+	/**
+	 * The vulnerability for this auction.
+	 * @member {string}
+	 */
 	this.vulnerability = ( deal ? deal.getVulnerability() : "-" );
+	
+	/**
+	 * Who is next to call?
+	 * @member {string}
+	 */
 	this.nextToCall = this.dealer;
 	
 	// these two should be in sync
+	/**
+	 * The calls in this auction
+	 * @member {array}
+	 */
 	this.calls = [];	
+
+	/**
+	 * The contracts at end of corresponding call.
+	 * @member {array}
+	 */
 	this.contracts = [];
 	
 	// If the bidding box uses a split level and suit then we select level first
+	/**
+	 * The currently selected level in bidding box.
+	 * @member {object}
+	 * @todo This probably does not belong in this class.
+	 */
 	this.selectedLevel = 0;
+	
+	/**
+	 * The current call index when trying to step through the auction.
+	 * @member {number}
+	 */
+	this.currentAuctionIndex = -1;
 	
 	// Should an event be raised if anything changes.
 	this.triggerEvents = true;	
@@ -73,7 +118,7 @@ Bridge.Auction.prototype.setDealer = function( dealer ) {
 		direction = Bridge.getLHO( direction );
 	}, this);
 	this.nextToCall = direction;
-	this.onChange( "changed dealer to " + dealer );
+	this.onChange( "setDealer", dealer );
 };
 
 /**
@@ -314,9 +359,15 @@ Bridge.Auction.prototype.addCall = function( call, explanation, annotation ) {
 	this.contracts.push( contract );
 	this.nextToCall = Bridge.getLHO( this.nextToCall );
 	this.selectedLevel = 0;
-	this.onChange( "addCall", call );
+	this.onChange( "addCall", {
+		"call": call,
+		"contract": this.getContract()
+	});
 	if ( this.getContract().isComplete ) {
-		$( document ).trigger( "auction:complete",  this);
+		this.onChange( "auctionComplete", {
+			"call": call,
+			"contract": this.getContract()
+		});
 	}
 };
 
@@ -350,6 +401,83 @@ Bridge.Auction.prototype.removeCall = function() {
 	}
 };
 
+/**
+ * Advances the auction till the specified index
+ * @param {number} index - The call number to advance to.
+ */
+Bridge.Auction.prototype.advanceAuctionTillIndex_ = function( index ) {
+	var prefix = "In Bridge.Auction.advanceAuctionTillIndex_";
+	if ( index < 0 || index >= this.calls.length ) {
+		Bridge._reportError( "Cannot advance because specified call number " + index + " is invalid", prefix );
+	}
+	if ( this.currentAuctionIndex >= index ) {
+		Bridge._reportError( "Cannot advance because current call number is at or greater than specified call number " + index, prefix );
+	}
+	while ( this.currentAuctionIndex < index ) {
+		this.currentAuctionIndex++;
+		var call = this.calls[ this.currentAuctionIndex ];
+		
+		// Trigger events if enabled
+		this.onChange( "advanceAuction", call );
+	}
+	this.onChange( "advanceAuctionCompleted", call );
+};
+
+/**
+ * Advance the auction by one call
+ */
+Bridge.Auction.prototype.advanceAuction = function() {
+	this.advanceAuctionTillIndex_( this.currentAuctionIndex + 1 );
+};
+
+
+/**
+ * Advance the auction to the end.
+ */
+Bridge.Auction.prototype.advanceAuctionAll = function() {
+	var index = this.calls.length - 1;
+	this.advanceAuctionTillIndex_( index );
+};
+
+/**
+ * Rewind the auction till the specified index.
+ * @param {number} index - The play number to rewind to.
+ */
+Bridge.Auction.prototype.rewindAuctionTillIndex_ = function( index ) {
+	var prefix = "In Bridge.Auction.rewindAuctionTillIndex_";
+	if ( index < -1 || index >= this.calls.length - 1 ) {
+		Bridge._reportError( "Cannot rewind because specified call number " + index + " is invalid", prefix );
+	}
+	if ( this.currentAuctionIndex <= index ) {
+		Bridge._reportError( "Cannot rewind because current call number is at or lesser than specified call number " + index, prefix );
+	}
+	while ( this.currentAuctionIndex > index ) {
+		var call = this.calls[ this.currentAuctionIndex ];
+		this.currentAuctionIndex--;
+		
+		// Trigger events if enabled
+		this.onChange( "rewindAuction", call );
+	}
+	this.onChange( "rewindAuctionCompleted", call );
+};
+
+/**
+ * Rewind the auction by one call.
+ */
+Bridge.Auction.prototype.rewindAuction = function() {
+	this.rewindAuctionTillIndex_( this.currentAuctionIndex - 1 );
+};
+
+/**
+ * Rewind the auction to the start.
+ */
+Bridge.Auction.prototype.rewindAuctionAll = function() {
+	var index = -1;
+	this.rewindAuctionTillIndex_( index );
+};
+Bridge.Auction.prototype.rewind = Bridge.Auction.prototype.rewindAuctionAll;
+
+
 
 /**
  * Load the auction from a string format of auction
@@ -374,12 +502,12 @@ Bridge.Auction.prototype.fromString = function ( auction ) {
 			if ( auction[ charIndex ] === '(' ) {
 				var endChar = ')';
 				var returnValue = Bridge._parseContainedText( auction, charIndex, endChar, prefix );
-				annotation = returnValue.text;
+				explanation = returnValue.text;
 			}
 			else {
 				var endChar = '}';
 				var returnValue = Bridge._parseContainedText( auction, charIndex, endChar, prefix );		
-				explanation = returnValue.text;
+				annotation = returnValue.text;
 			}
 			charIndex = returnValue.position + 1;
 		}
@@ -422,6 +550,7 @@ Bridge.Auction.prototype.toJSON = function( ) {
  * Raise an event
  */
 Bridge.Auction.prototype.onChange = function( operation, parameter ) {
+	Bridge._triggerEvent( this, operation, parameter );
 	if ( this.triggerEvents && ( !this.deal || this.deal.triggerEvents ) ) {
 		if ( Bridge.options.enableDebug ) {
 			console.log( "auction:changed " + operation + " - " + parameter );

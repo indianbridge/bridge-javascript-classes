@@ -255,7 +255,7 @@ QUnit.test( "Miscellaneous", function( assert ) {
 		"sahaca" : { count: 3, hasCards: { 's': true, 'h': true, 'd': false, 'c': true }, output: "shdc" },
 		"sadaca" : { count: 3, hasCards: { 's': true, 'h': false, 'd': true, 'c': true }, output: "shdc" },
 		"hadaca" : { count: 3, hasCards: { 's': false, 'h': true, 'd': true, 'c': true }, output: "hscd" },
-		"sahadaca" : { count: 4, hasCards: { 's': true, 'h': true, 'd': true, 'c': true }, output: "hsdc" }
+		"sahadaca" : { count: 4, hasCards: { 's': true, 'h': true, 'd': true, 'c': true }, output: "shcd" }
 	};
 	for( var direction in Bridge.directions ) {
 		for( var handString in hands ) {

@@ -25,51 +25,51 @@ Bridge.Hand = function( direction, deal ) {
 	 * The direction of this hand
 	 * @member {string}
 	 */
-	 this.direction = direction;
+	this.direction = direction;
 	 
 	/**
 	 * The deal that this hand belongs to.
 	 * @member {object}
 	 */
-	 this.deal = deal;	 
+	this.deal = deal;	 
 	 
 	/**
 	 * The name of person holding this hand
 	 * @member {string}
 	 */	 
-	 this.name = Bridge.directions[ direction ].name;
+	this.name = Bridge.directions[ direction ].name;
 	 
 	/**
 	 * The actual cards in this hand
 	 * @member {object}
 	 */
-	 this.cards = {};
-	 for( var suit in Bridge.suits ) {
-	 	this.cards[ suit ] = {};
-	 	for( var rank in Bridge.ranks ) {
+	this.cards = {};
+	for( var suit in Bridge.suits ) {
+		this.cards[ suit ] = {};
+		for( var rank in Bridge.ranks ) {
 			this.cards[ suit ][ rank ] = false;
 		}
-	 }
+	}
 	 
 	/**
 	 * Whether the card should be show as x or not
 	 */
-	 this.showAsX = {};
-	 for( var suit in Bridge.suits ) {
-	 	this.showAsX[ suit ] = {};
-	 	for( var rank in Bridge.ranks ) {
+	this.showAsX = {};
+	for( var suit in Bridge.suits ) {
+		this.showAsX[ suit ] = {};
+		for( var rank in Bridge.ranks ) {
 			this.showAsX[ suit ][ rank ] = false;
 		}
-	 }	
+	}	
 	 
 	/**
 	 * The number of cards this hand has
 	 * @member {number}
 	 */	 	 
-	 this.numCards = 0;
+	this.numCards = 0;
 	 
-	 /** Is this the active hand? */
-	 this._isActive = false;
+	/** Is this the active hand? */
+	this._isActive = false;
 	 
 	// Should an event be raised if anything changes.
 	this.triggerEvents = true;		 
@@ -460,7 +460,7 @@ Bridge.Hand.prototype.getAlternatingSuitOrder = function() {
 	if ( numSuits < 3 ) return Bridge.suitOrder;
 	if ( numSuits === 4 ) return [ 's', 'h', 'c', 'd' ];
 	if ( hasCards[ 's' ] && hasCards[ 'c' ] ) return Bridge.suitOrder;
-	else return [ 's', 'h', 'd', 'c' ];
+	else return [ 'h', 's', 'c', 'd' ];
 }; 
  
 /**

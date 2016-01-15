@@ -4,20 +4,20 @@ QUnit.test( "Constructor", function( assert ) {
 		function() {
 			var call = new Bridge.Call();
 		},
-		"Bridge.Hand constructor needs 2 arguments"
+		"Bridge.Call constructor needs 2 arguments"
 	);	
 	assert.throws(
 		function() {
 			var call = new Bridge.Call( "a" );
 		},
-		"Bridge.Hand constructor needs valid call argument"
+		"Bridge.Call constructor needs valid call argument"
 	);	
 	
 	assert.throws(
 		function() {
 			var call = new Bridge.Call( "p" );
 		},
-		"Bridge.Hand constructor needs second argument"
+		"Bridge.Call constructor needs second argument"
 	);		
 	for( var direction in Bridge.directions ) {
 		for( var i = 1; i <= 7; ++i ) {
@@ -67,39 +67,39 @@ QUnit.test( "Getter and Setter", function( assert ) {
 		function() {
 			call.set();
 		},
-		"Bridge.Hand.set needs property argument"
+		"Bridge.Call.set needs property argument"
 	);
 	assert.throws(
 		function() {
 			call.set( "name" );
 		},
-		"Bridge.Hand.set needs a value argument"
+		"Bridge.Call.set needs a value argument"
 	);	
 	
 	assert.throws(
 		function() {
 			call.set( "random_property", "value" );
 		},
-		"Bridge.Hand.set valid property"
+		"Bridge.Call.set valid property"
 	);	
 	assert.throws(
 		function() {
 			call.get();
 		},
-		"Bridge.Hand.get needs property argument"
+		"Bridge.Call.get needs property argument"
 	);	
 	assert.throws(
 		function() {
 			call.get( "random_property" );
 		},
-		"Bridge.Hand.get needs a known property argument"
+		"Bridge.Call.get needs a known property argument"
 	);	
 	var annotation = "some_annotation";
 	call.set( "annotation", annotation );
 	assert.equal( call.get( "annotation" ), annotation, "Annotation matches" );	
 	var explanation = "some_explanation";
 	call.set( "explanation", explanation );
-	var output = "p{" + explanation + "}(" + annotation + ")";
+	var output = "p(" + explanation + "){" + annotation + "}";
 	assert.equal( call.get( "explanation" ), explanation, "Explanation matches" );
 	assert.equal( call.toString(), output, "toString matches" );
 	for( var direction in Bridge.directions ) {

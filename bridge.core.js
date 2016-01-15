@@ -1,3 +1,11 @@
+// jQuery and Lodash are required. So check they have been loaded.
+if ( typeof jQuery === "undefined" ) {
+	throw new Error( "jQuery is not loaded. jQuery is required for Bridge Javascript Library to work." );
+}
+if ( typeof _ === "undefined" ) {
+	throw new Error( "Lodash is not loaded. Lodash is required for Bridge Javascript Library to work." );
+}
+
 /**
  * Bridge Namespace
  * @namespace
@@ -147,7 +155,39 @@ Bridge.rankOrder = Bridge._createIndexArray( Bridge.ranks );
 Bridge.options = {
 	// Should error message include context?
 	useContextInErrorMessage: false,
-	enableDebug: false
+	// Which classes of logs to enable
+	enableLog: {
+		"events": true
+	},
+	// The delimiter used in event names
+	eventNameDelimiter: ':'
+};
+
+/**
+ * Trigger events with a payload attached.
+ * @param {object} raiser - the object raising the event
+ * @param {string} operation - the operation (event) that is causing this trigger
+ * @param {mixed} parameters - Any relevant parameters used in the operation
+ */
+Bridge._triggerEvent = function( raiser, operation, parameters ) {
+	var delimiter = Bridge.options.eventNameDelimiter;
+	var eventName = raiser.constructor.name.split( ',' ).pop() + delimiter + "event";
+	if ( raiser.triggerEnabled ) {
+		$( document ).trigger( eventName,  [ raiser, operation, parameter ] );
+		Bridge._log( eventName + " - " + operation, "events" );
+	}
+};
+
+/**
+ * Log some information.
+ * options are used to determine how the message is logged.
+ * @param {string} message - the message to log
+ * @param {string} logClass - the class that this log message belongs to
+ */
+Bridge._log = function( message, logClass ) {
+	if ( Bridge.options.enableLog[ logClass ] ) {
+		if ( console ) console.log( logClass + " : " + message );	
+	}
 };
 
 /**
@@ -271,6 +311,20 @@ Bridge._getQuery = function( text, delimiter ) {
 //
 // Some utilities. Internal only.
 //
+
+/**
+ * Generate a random GUID like string.
+ * @return {string} a random GUID string.
+ */
+Bridge._generateID = function() {
+    var d = new Date().getTime();
+    var uuid = 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+        var r = ( d + Math.random() * 16 ) % 16 | 0;
+        d = Math.floor( d / 16 );
+        return ( c == 'x' ? r : ( r & 0x3 | 0x8 ) ).toString( 16 );
+    });
+    return uuid;
+};
 
 /**
  * Parse the string and return as an associative array of parameters based on specified delimiters

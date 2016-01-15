@@ -16,7 +16,7 @@ Bridge.Deal = function( id ) {
 	 * Optional Unique id to identify this deal.
 	 * @member {string}
 	 */
-	this.id = id;
+	this.id = id || Bridge._generateID();
 		
 	/**
 	 * The 52 card objects
@@ -545,7 +545,7 @@ Bridge.Deal.prototype.fromLIN = function( lin ) {
 			case "pc" :
 				Bridge._checkIndex( tokens, i+1, prefix + "processing pc - " );
 				var play = tokens[ i + 1 ].slice(0,2);
-				this.getPlay().addPlayedCard( play[0], play[1] ); 
+				this.getPlay().addCard( play[0], play[1] ); 
 				break;
 			case "sv" :
 				Bridge._checkIndex( tokens, i+1, prefix + "processing sv - " );
