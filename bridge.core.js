@@ -149,6 +149,28 @@ Bridge.callOrder = Bridge._createIndexArray( Bridge.calls );
 Bridge.rankOrder = Bridge._createIndexArray( Bridge.ranks );
 
 /**
+ * Convenience enums to use instead of string/number constants.
+ */
+Bridge.enums = {
+	directions: {
+		NORTH: 'n',
+		SOUTH: 's',
+		EAST: 'e',
+		WEST: 'w'
+	},
+	suits: {
+		SPADES: 's',
+		SPADE: 's',
+		HEARTS: 'h',
+		HEART: 'h',
+		DIAMONDS: 'd',
+		DIAMOND: 'd',
+		CLUBS: 'c',
+		CLUB: 'c'
+	}
+};
+
+/**
  * Configuration options object.
  * Use this to store all options you might use to configure stuff.
  */
@@ -156,11 +178,41 @@ Bridge.options = {
 	// Should error message include context?
 	useContextInErrorMessage: false,
 	// Which classes of logs to enable
-	enableLog: {
-		"events": true
+	log: {
+		EVENT: { name: "events", enabled: true }
 	},
+	// Which object events to trigger
+	triggerEvents: {
+		"deal": true,
+		"hand": true,
+		"auction": true,
+		"play": true
+	}
+};
+
+/**
+ * Convenience function to enable all event triggers.
+ */
+Bridge.enableAllEventTriggers = function() {
+	_.each( Bridge.options.triggerEvents, function(value, key, obj) { obj[key] = true; });
+};
+
+/**
+ * Convenience function to disable all event triggers.
+ */
+Bridge.disableAllEventTriggers = function() {
+	_.each( Bridge.options.triggerEvents, function(value, key, obj) { obj[key] = false; });
+};
+
+/**
+ * Constants used all over the code.
+ * Use this instead of "magic" numbers/strings etc.
+ */
+Bridge.CONSTANTS = {
 	// The delimiter used in event names
-	eventNameDelimiter: ':'
+	eventNameDelimiter: ':',
+	// Name of event raised by all objects
+	eventName: "event"	
 };
 
 /**
@@ -169,14 +221,41 @@ Bridge.options = {
  * @param {string} operation - the operation (event) that is causing this trigger
  * @param {mixed} parameters - Any relevant parameters used in the operation
  */
-Bridge._triggerEvent = function( raiser, operation, parameters ) {
-	var delimiter = Bridge.options.eventNameDelimiter;
-	var eventName = raiser.constructor.name.split( ',' ).pop() + delimiter + "event";
-	if ( raiser.triggerEnabled ) {
-		$( document ).trigger( eventName,  [ raiser, operation, parameter ] );
-		Bridge._log( eventName + " - " + operation, "events" );
+Bridge._triggerEvents = function( raiser, operation, parameters ) {
+	if ( Bridge.options.triggerEvents[ raiser.type ] ||  Bridge.options.triggerEvents[ raiser.type.toLowerCase() ] ) {
+		var delimiter = Bridge.CONSTANTS.eventNameDelimiter;
+		var prefix = raiser.type || '';
+		var eventName = prefix + delimiter + Bridge.CONSTANTS.eventName;
+		Bridge._triggerOneEvent( eventName, raiser, operation, parameters );
+		eventName = prefix + delimiter + operation;
+		Bridge._triggerOneEvent( eventName, raiser, operation, parameters );
 	}
 };
+
+/**
+ * Trigger one event in a set of events
+ * @param {object} raiser - the object raising the event
+ * @param {string} operation - the operation (event) that is causing this trigger
+ * @param {mixed} parameters - Any relevant parameters used in the operation
+ */
+Bridge._triggerOneEvent = function( eventName, raiser, operation, parameters ) {
+	var delimiter = Bridge.CONSTANTS.eventNameDelimiter;
+	$( document ).trigger( eventName,  {
+		"raisedBy": raiser, 
+		"action": operation, 
+		"parameters": parameters
+	});
+	Bridge._log( eventName + " - " + operation, Bridge.options.log.EVENT );
+	eventName = raiser.id + delimiter + eventName;
+	$( document ).trigger( eventName,  {
+		"raisedBy": raiser, 
+		"action": operation, 
+		"parameters": parameters
+	});
+	Bridge._log( eventName + " - " + operation, Bridge.options.log.EVENT );
+};
+
+
 
 /**
  * Log some information.
@@ -185,8 +264,8 @@ Bridge._triggerEvent = function( raiser, operation, parameters ) {
  * @param {string} logClass - the class that this log message belongs to
  */
 Bridge._log = function( message, logClass ) {
-	if ( Bridge.options.enableLog[ logClass ] ) {
-		if ( console ) console.log( logClass + " : " + message );	
+	if ( logClass.enabled ) {
+		if ( console ) console.log( logClass.name + " : " + message );	
 	}
 };
 
@@ -316,7 +395,8 @@ Bridge._getQuery = function( text, delimiter ) {
  * Generate a random GUID like string.
  * @return {string} a random GUID string.
  */
-Bridge._generateID = function() {
+Bridge._generateID = function( parent ) {
+	if ( parent && parent.id ) return parent.id;
     var d = new Date().getTime();
     var uuid = 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
         var r = ( d + Math.random() * 16 ) % 16 | 0;

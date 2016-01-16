@@ -1,11 +1,25 @@
 
 $(function() {
 	try {	
+		/*var auction = new Bridge.Auction();
+		auction.setAuction( "1sp3ndrppp" );
+		auction.toBBODiagram( { registerChangeHandler: false, containerID: 'auction' } );*/
+		/*var hand = new Bridge.Hand( 'n' );
+		hand.setHand("SQ982HT97DKQJ7CQ8");
+		hand.toBBODiagram( { registerChangeHandler: false, containerID: 'auction' } );*/
+		
 		var deal = new Bridge.Deal();
-		var linText = "|o2|st||md|4SQ982HT97DKQJ7CQ8,SAKJT74H4DA8CA732,SHAKQJ832DT5CJT95,S653H65D96432CK64|sv|n|mb|1S|mb|p|mb|2H|mb|p|mb|2S|mb|p|mb|3H|mb|p|mb|4H|mb|p|mb|p|mb|p|pc|d9|pc|dJ|pc|dQ|pc|dA|pg||pc|c2|pc|c3|pc|cQ|pc|cK|pg||pc|dK|pc|d2|pc|s8|pc|d5|pg||pc|d3|pc|d6|pc|h3|pc|d7|pg||pc|c6|pc|h4|pc|c5|pc|cJ|pg||pc|h8|pc|h2|pc|hQ|pc|hK|pg||pc|s5|pc|sA|pc|s6|pc|s7|pg||pc|sK|pc|s2|pc|s9|pc|hT|pg||mc|8|pg||";
+		deal.getHand('n').toBBODiagram( { registerChangeHandler: true, containerID: 'hand-n' } );
+		
+		var linText = "|o2|st||md|1S2389JHTD3JC237KA,S7TH4QKD678TC4569,S456KAH25D25KACJQ,|rh||ah|Board 7|sv|b|mb|p|mb|p|mb|1S|mb|2H|mb|3S|mb|p|mb|4D|mb|p|mb|4S|mb|p|mb|p|mb|p|pg||pc|SQ|pc|S2|pc|S7|pc|SA|pg||pc|SK|pc|H3|pc|S8|pc|ST|pg||pc|CQ|pc|C8|pc|C2|pc|C4|pg||pc|CJ|pc|CT|pc|C3|pc|C5|pg||mc|13";
+		var linText2 = "|o2|st||md|4SQ982HT97DKQJ7CQ8,SAKJT74H4DA8CA732,SHAKQJ832DT5CJT95,S653H65D96432CK64|sv|n|mb|1S|mb|p|mb|2H|mb|p|mb|2S|mb|p|mb|3H|mb|p|mb|4H|mb|p|mb|p|mb|p||";
+		var deal2 = new Bridge.Deal();
+		deal2.getHand('n').toBBODiagram( { registerChangeHandler: true, containerID: 'hand-s' } );
 		deal.fromLIN( linText );
+		deal2.fromLIN( linText2 );
 		$("#output").empty().append(deal.toString());
-		var auction = deal.getAuction();
+		
+		/*var auction = deal.getAuction();
 	var prefix = "bw-bidding-box";
 	var bbConfig = { 
 		prefix: prefix,
@@ -27,7 +41,7 @@ $(function() {
 		tags: Bridge.getTableConfig( prefix ),
 		registerChangeHandler: false
 	};		
-	auction.toBiddingBox( bbConfig );
+	auction.toBiddingBox( bbConfig );*/
 	}
 	catch ( err ) {
 		alert(err.message);

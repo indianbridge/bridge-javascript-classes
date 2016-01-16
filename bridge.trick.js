@@ -2,8 +2,8 @@
  * Defines Trick class and all methods associated with it.
  */
  
-// Check if namespace has been defined.
-if ( !Bridge ) var Bridge = {};
+// Get Namespace.
+var Bridge = Bridge || {};
 
 /**
  * Creates a new Bridge Trick.

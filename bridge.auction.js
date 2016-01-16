@@ -2,8 +2,8 @@
  * Defines Auction class and all methods associated with it.
  */
  
-// Check if namespace has been defined.
-if ( !Bridge ) var Bridge = {};
+// Define namespace if necessary
+var Bridge = Bridge || {};
 
 /**
  * Creates a new Bridge Auction.
@@ -23,7 +23,13 @@ Bridge.Auction = function( deal ) {
 	 * A unique id to identify this auction.
 	 * @member {string}
 	 */
-	this.id = deal.id || Bridge._generateID();
+	this.id = Bridge._generateID( deal );
+	
+	/**
+	 * The type of this object.
+	 * @member {string}
+	 */
+	this.type = "Auction";
 	
 	/**
 	 * The dealer for this auction.
@@ -69,24 +75,11 @@ Bridge.Auction = function( deal ) {
 	 * @member {number}
 	 */
 	this.currentAuctionIndex = -1;
-	
-	// Should an event be raised if anything changes.
-	this.triggerEvents = true;	
 };
 
 //
 // Getters and Setters
 //
-
-/**
- * Enable trigger of events when auction changes.
- */
-Bridge.Auction.prototype.enableEventTrigger = function() { this.triggerEvents = true; }
-
-/**
- * Disable trigger of events when auction changes.
- */
-Bridge.Auction.prototype.disableEventTrigger = function() { this.triggerEvents = false; }
 
 /**
  * Get the direction who is next to call
@@ -172,6 +165,7 @@ Bridge.Auction.prototype.unsetSelectedLevel = function() {
 Bridge.Auction.prototype.setAuction = function( auction ) {
 	Bridge._checkRequiredArgument( auction );
 	this.fromString( auction );
+	this.onChange( "setAuction", auction  );
 };
 
 /**
@@ -183,7 +177,7 @@ Bridge.Auction.prototype.getAuction = function() {
 };
 
 /**
- * Set this contract (and generate an auction ) from a specified contract string
+ * Set the contract (and generate an auction ) from a specified contract string
  * @param {string} contract - the contract in string format
  */
 Bridge.Auction.prototype.setContract = function( contract ) {
@@ -227,6 +221,8 @@ Bridge.Auction.prototype.setContract = function( contract ) {
 	this.addCall( 'p' );
 	this.addCall( 'p' );
 	this.addCall( 'p' );
+	this.onChange( "setContract", contract  );
+	this.onChange( "setAuction", this.getAuction()  );
 };	
 
 /**
@@ -550,29 +546,6 @@ Bridge.Auction.prototype.toJSON = function( ) {
  * Raise an event
  */
 Bridge.Auction.prototype.onChange = function( operation, parameter ) {
-	Bridge._triggerEvent( this, operation, parameter );
-	if ( this.triggerEvents && ( !this.deal || this.deal.triggerEvents ) ) {
-		if ( Bridge.options.enableDebug ) {
-			console.log( "auction:changed " + operation + " - " + parameter );
-			console.log( "bidding-box:changed " + operation + " - " + parameter );
-		}
-		// Raise the event and pass this object so handler can have access to information.
-		$( document ).trigger( "auction:changed",  [ this, operation, parameter ]);
-		$( document ).trigger( "bidding-box:changed",  [ this, operation, parameter ]);	
-		var id = this.getID();
-		if ( id ) {
-			$( document ).trigger( id + ":auction:changed",  [ this, operation, parameter ]);
-			$( document ).trigger( id + ":bidding-box:changed",  [ this, operation, parameter ]);				
-		}
-		
-	}
-	if ( this.deal && this.deal.triggerEvents ) {
-		if ( Bridge.options.enableDebug ) console.log( "deal:changed " + operation + " - " + parameter );
-		$( document ).trigger( "deal:changed",  [ this.deal, operation, parameter ]);	
-		var id = this.deal.getID();
-		if ( id ) {
-			$( document ).trigger( id + ":deal:changed",  [ this.deal, operation, parameter ]);	
-		}
-	}
+	Bridge._triggerEvents( this, operation, parameter );
 };
 

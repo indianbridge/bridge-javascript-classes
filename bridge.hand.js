@@ -2,8 +2,8 @@
  * Defines Hand class and all methods associated with it.
  */
  
-// Check if namespace has been defined.
-if ( !Bridge ) var Bridge = {};
+// Get Namespace.
+var Bridge = Bridge || {};
 
 /**
  * Creates a new Bridge Hand.
@@ -14,24 +14,30 @@ if ( !Bridge ) var Bridge = {};
  */
 Bridge.Hand = function( direction, deal ) {
 	Bridge._checkDirection( direction );
-	
+	 
+	/**
+	 * The deal that this hand belongs to.
+	 * @member {object}
+	 */
+	this.deal = deal;	
+		
 	/**
 	 * Optional Unique id to identify this hand.
 	 * @member {string}
 	 */
-	this.id = null;
+	this.id = Bridge._generateID( deal ) + '-' + direction;
+	
+	/**
+	 * The type of this object.
+	 * @member {string}
+	 */
+	this.type = "Hand";
 	 
 	/**
 	 * The direction of this hand
 	 * @member {string}
 	 */
 	this.direction = direction;
-	 
-	/**
-	 * The deal that this hand belongs to.
-	 * @member {object}
-	 */
-	this.deal = deal;	 
 	 
 	/**
 	 * The name of person holding this hand
@@ -69,26 +75,12 @@ Bridge.Hand = function( direction, deal ) {
 	this.numCards = 0;
 	 
 	/** Is this the active hand? */
-	this._isActive = false;
-	 
-	// Should an event be raised if anything changes.
-	this.triggerEvents = true;		 
-
+	this._isActive = false;	 
 };
 
 //
 // Getters and Setters
 //
-
-/**
- * Enable trigger of events when hand changes.
- */
-Bridge.Hand.prototype.enableEventTrigger = function() { this.triggerEvents = true; }
-
-/**
- * Disable trigger of events when hand changes.
- */
-Bridge.Hand.prototype.disableEventTrigger = function() { this.triggerEvents = false; }
 
 /** Make this the active hand. */
 Bridge.Hand.prototype.makeActive = function() {
@@ -235,7 +227,10 @@ Bridge.Hand.prototype.addCard = function( suit, rank ) {
 		this.deal.cards[ suit ][ rank ].assign( this.direction );
 	}
 	this.numCards++;
-	this.onChange( "addCard", suit + rank );
+	this.onChange( "addCard", {
+		"suit": suit,
+		"rank": rank
+	});
 };
 
 
@@ -263,7 +258,10 @@ Bridge.Hand.prototype.removeCard = function( suit, rank ) {
 	if ( this.deal ) {
 		this.deal.cards[ suit ][ rank ].unAssign();
 	}
-	this.onChange( "removeCard", suit + rank );
+	this.onChange( "removeCard", {
+		"suit": suit,
+		"rank": rank
+	});
 };
 
 
@@ -432,6 +430,7 @@ Bridge.Hand.prototype.fromString = function( handString ) {
 				break;											
 		}	
 	}	
+	this.onChange( "setHand", handString );
  };
  
 /**
@@ -486,24 +485,13 @@ Bridge.Hand.prototype.fromJSON = function( handString ) {
 	this.setHand( handString.hand );
 };
 
+
 /**
  * Something in this hand has changed.
- * Raise an event, call all registered change callbacks etc.
+ * Raise an event
  */
 Bridge.Hand.prototype.onChange = function( operation, parameter ) {
-	if ( this.triggerEvents && ( !this.deal || this.deal.triggerEvents ) ) {
-		if ( Bridge.options.enableDebug ) console.log( "hand:changed " + operation + " - " + parameter );
-		// Raise the event and pass this object so handler can have access to information.
-		$( document ).trigger( "hand:changed",  [ this, operation, parameter ]);	
-		var id = this.getID();
-		if ( id ) $( document ).trigger( id + ":hand:changed",  [ this, operation, parameter ]);
-	}
-	if ( this.deal && this.deal.triggerEvents ) {
-		if ( Bridge.options.enableDebug ) console.log( "deal:changed " + operation + " - " + parameter );
-		$( document ).trigger( "deal:changed",  [ this.deal, operation, parameter ]);
-		var id = this.deal.getID();
-		if ( id ) $( document ).trigger( id + ":deal:changed",  [ this.deal, operation, parameter ]);
-	}
+	Bridge._triggerEvents( this, operation, parameter );
 };
 
 

@@ -2,8 +2,8 @@
  * Defines Deal class and all methods associated with it.
  */
  
-// Check if namespace has been defined.
-if ( !Bridge ) var Bridge = {};
+// Get Namespace.
+var Bridge = Bridge || {};
 
 /**
  * Creates a new Bridge Deal.
@@ -17,6 +17,12 @@ Bridge.Deal = function( id ) {
 	 * @member {string}
 	 */
 	this.id = id || Bridge._generateID();
+	
+	/**
+	 * The type of this object.
+	 * @member {string}
+	 */
+	this.type = "Deal";
 		
 	/**
 	 * The 52 card objects
@@ -83,25 +89,11 @@ Bridge.Deal = function( id ) {
 	 * @member {object}
 	 */
 	this.play = new Bridge.Play( this );
-	
-	// Should an event be raised if anything changes.
-	this.triggerEvents = true;	
 };
 
 //
 // Getters and Setters
 //
-
-/**
- * Enable trigger of events when deal changes.
- */
-Bridge.Deal.prototype.enableEventTrigger = function() { this.triggerEvents = true; }
-
-/**
- * Disable trigger of events when deal changes.
- */
-Bridge.Deal.prototype.disableEventTrigger = function() { this.triggerEvents = false; }
-
 
 /** 
  * Get the hand for the specified direction
@@ -144,7 +136,7 @@ Bridge.Deal.prototype.getBoard = function() { return this.board; }
 Bridge.Deal.prototype.setBoard = function( board ) {
 	var boardNum = parseInt( board );
 	if ( isNaN( boardNum ) || String( boardNum ) !== String( board ) || boardNum < 1 ) {
-		Bridge.Utilities.reportError( board + " is not a valid board number", "In setBoard");
+		Bridge._reportError( board + " is not a valid board number", "In setBoard");
 	}
 	this.board = boardNum;
 	this.onChange( "setBoard", this.board );
@@ -351,6 +343,7 @@ Bridge.Deal.prototype.assignRest = function() {
 		}		
 		this.getHand( direction ).addCard( card[0], card[1] );		
 	}, this);
+	this.onChange( "assignRest", unassigned );
 };
 
 /**
@@ -414,6 +407,19 @@ Bridge.Deal.prototype.fromString = function( deal ) {
 	if ( numHandsSpecified === 3 ) {
 		this.assignRest();
 	}	
+	// Set up trump and leader for play
+	this.getPlay().initialize();
+	// Load the play after auction.
+	_.each( parameters, function( value, key ) {
+		switch ( key ) {
+			case 'p' :
+				this.getPlay().fromString( value );
+				break;								
+			default :
+				break;
+		}
+	}, this);
+	this.onChange( "setDeal", deal );
 };
 
 /**
@@ -481,7 +487,10 @@ Bridge.Deal.prototype.fromJSON = function( json ) {
 		};
 	}
 	if ( _.has( json, "auction" ) ) this.getAuction().fromJSON( json.auction );
+	// Set up trump and leader for play
+	this.getPlay().initialize();
 	if ( _.has( json, "play" ) ) this.getPlay().fromJSON( json.play );
+	this.onChange( "setDeal", this.toString() );
 };
 
 /**
@@ -542,11 +551,6 @@ Bridge.Deal.prototype.fromLIN = function( lin ) {
 				}
 				this.getAuction().addCall( bid, null, annotation );
 				break;
-			case "pc" :
-				Bridge._checkIndex( tokens, i+1, prefix + "processing pc - " );
-				var play = tokens[ i + 1 ].slice(0,2);
-				this.getPlay().addCard( play[0], play[1] ); 
-				break;
 			case "sv" :
 				Bridge._checkIndex( tokens, i+1, prefix + "processing sv - " );
 				var vulnerability = tokens[ i + 1 ];
@@ -556,17 +560,30 @@ Bridge.Deal.prototype.fromLIN = function( lin ) {
 				break;
 		}
 	}
+	// Set up trump and leader for play
+	this.getPlay().initialize();
+	// Load the play after auction.
+	for ( var i = 0; i < tokens.length; ++i ) {
+		if ( _.startsWith( tokens[i].toLowerCase(), "board" ) ) {
+			this.setBoard( tokens[i].trim().slice(5).trim() );
+		}
+		switch ( tokens[i].toLowerCase() ) {
+			case "pc" :
+				Bridge._checkIndex( tokens, i+1, prefix + "processing pc - " );
+				var play = tokens[ i + 1 ].slice(0,2);
+				this.getPlay().addCard( play[0], play[1] ); 
+				break;
+			default:
+				break;
+		}
+	}
+	this.onChange( "setDeal", this.toString() );
 };
 
 /**
  * Something in this deal has changed.
- * Raise corresponding events.
+ * Raise an event
  */
 Bridge.Deal.prototype.onChange = function( operation, parameter ) {
-	if ( this.triggerEvents ) {
-		if ( Bridge.options.enableDebug ) console.log( "deal:changed " + operation + " - " + parameter );
-		$( document ).trigger( "deal:changed",  [ this, operation, parameter ]);	
-		var id = this.getID();
-		if ( id ) $( document ).trigger( id + ":deal:changed",  [ this, operation, parameter ]);
-	}
+	Bridge._triggerEvents( this, operation, parameter );
 };

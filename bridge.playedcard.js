@@ -2,8 +2,8 @@
  * Defines Played Card class and all methods associated with it.
  */
  
-// Check if namespace has been defined.
-if ( !Bridge ) var Bridge = {};
+// Get Namespace.
+var Bridge = Bridge || {};
 
 /**
  * Creates a new Bridge Trick.
@@ -154,11 +154,41 @@ Bridge.PlayedCard.prototype.getTrump = function() {
 };
 
 /**
+ * Set the trump
+ * Allowed only for dummy play number 0
+ * @param {string} trump - the new trump suit
+ */
+Bridge.PlayedCard.prototype.setTrump = function( trump ) {
+	var prefix = "In PlayedCard.setTrump";
+	Bridge._checkRequiredArgument( trump );
+	Bridge._checkStrain( trump );
+	if ( this.getPlayNumber() !== 0 ) {
+		Bridge._reportError( "Cannot update trump for Playnumber : " + this.getPlayNumber() + " ", prefix );
+	}
+	this.trump = trump;
+};
+
+/**
  * Get the leader
  * @return {string} the leade
  */
 Bridge.PlayedCard.prototype.getLeader = function() {
 	return this.leader;
+};
+
+/**
+ * Set the leader
+ * @param {string} leader - the new leader
+ */
+Bridge.PlayedCard.prototype.setLeader = function( leader ) {
+	var prefix = "In PlayedCard.setLeader";
+	Bridge._checkRequiredArgument( leader );
+	Bridge._checkDirection( leader);
+	if ( this.getPlayNumber() !== 0 ) {
+		Bridge._reportError( "Cannot update leader for Playnumber : " + this.getPlayNumber() + " ", prefix );
+	}
+	this.leader = leader;
+	this.nextToPlay = leader;
 };
 
 /**

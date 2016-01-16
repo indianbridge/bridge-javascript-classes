@@ -2,8 +2,8 @@
  * Defines Play class and all methods associated with it.
  */
  
-// Check if namespace has been defined.
-if ( !Bridge ) var Bridge = {};
+// Get Namespace.
+var Bridge = Bridge || {};
 
 /**
  * Creates a new Bridge Play.
@@ -20,10 +20,16 @@ Bridge.Play = function( deal ) {
 	this.deal = deal;
 	
 	/**
-	 * Optional Unique id to identify this play.
+	 * A unique id to identify this play.
 	 * @member {string}
 	 */
-	this.id = ( deal ? deal.getID() : null );	
+	this.id = Bridge._generateID( deal );
+	
+	/**
+	 * The type of this object.
+	 * @member {string}
+	 */
+	this.type = "Play";
 
 	/**
 	 * The cards that are in this play
@@ -78,10 +84,7 @@ Bridge.Play = function( deal ) {
 	 * What is the trump suit?
 	 * @member {string}
 	 */
-	this.trump = 'n';
-	 
-	// Should an event be raised if anything changes.
-	this.triggerEvents = true;		
+	this.trump = 'n';	
 	
 	this.initialize(); 
 
@@ -112,6 +115,7 @@ Bridge.Play.prototype.setTrump = function( trump ) {
 	Bridge._checkRequiredArgument( trump );
 	Bridge._checkStrain( trump )
 	this.trump = trump;
+	this.plays[0].setTrump( trump );
 };
 
 /**
@@ -130,6 +134,7 @@ Bridge.Play.prototype.setLeader = function( leader ) {
 	Bridge._checkRequiredArgument( leader );
 	Bridge._checkDirection( leader)
 	this.leader = leader;
+	this.plays[0].setLeader( leader );
 };
 
 /**
@@ -282,15 +287,15 @@ Bridge.Play.prototype.addCard = function( suit, rank, annotation ) {
 	var previousCard = this.plays[ this.lastPlayIndex ];
 	
 	// Create a new play card and add it to play
-	var play = new Bridge.PlayedCard( playNumber, card, previousCard, annotation );
-	this.plays[ this.lastPlayIndex + 1 ] = play;
+	var playedCard = new Bridge.PlayedCard( playNumber, card, previousCard, annotation );
+	this.plays[ this.lastPlayIndex + 1 ] = playedCard;
 	this.lastPlayIndex++;
 	
 	// Mark card as played
 	this.cardAdded[ suit ][ rank ] = true;
 	
 	// Trigger events if enabled
-	this.onChange( "addCard", play );		
+	this.onChange( "addCard", playedCard );		
 	
 };
 
@@ -334,13 +339,13 @@ Bridge.Play.prototype.playCardTillIndex_ = function( index ) {
 	}
 	while ( this.currentPlayIndex < index ) {
 		this.currentPlayIndex++;
-		var play = this.plays[ this.currentPlayIndex ];
+		var playedCard = this.plays[ this.currentPlayIndex ];
 		this.cardPlayed[ play.getSuit() ][ play.getRank() ] = true;
 		
 		// Trigger events if enabled
-		this.onChange( "playCard", play );
+		this.onChange( "playCard", playedCard );
 	}
-	this.onChange( "playCard:completed", play );
+	this.onChange( "playCardCompleted", playedCard );
 };
 
 /**
@@ -380,14 +385,14 @@ Bridge.Play.prototype.undoPlayCardTillIndex_ = function( index ) {
 		Bridge._reportError( "Cannot rewind because current play number is at or lesser than specified play number " + index, prefix );
 	}
 	while ( this.currentPlayIndex > index ) {
-		var play = this.plays[ this.currentPlayIndex ];
+		var playedCard = this.plays[ this.currentPlayIndex ];
 		this.currentPlayIndex--;
 		this.cardPlayed[ play.getSuit() ][ play.getRank() ] = false;
 		
 		// Trigger events if enabled
-		this.onChange( "undoPlayCard", play );
+		this.onChange( "undoPlayCard", playedCard );
 	}
-	this.onChange( "undoPlayCard:completed", play );
+	this.onChange( "undoPlayCardCompleted", playedCard );
 };
 
 /**
@@ -480,26 +485,12 @@ Bridge.Play.prototype.toJSON = function( ) {
 
 /**
  * Something in this play has changed.
- * Raise an event, call all registered change callbacks etc.
+ * Raise an event
  */
 Bridge.Play.prototype.onChange = function( operation, parameter ) {
-	if ( this.triggerEvents && !this.deal || this.deal.triggerEvents ) {
-		// Trigger play events
-		if ( Bridge.options.enableDebug ) console.log( "play:changed " + operation + " - " + parameter );
-		// Raise the event and pass this object so handler can have access to information.
-		$( document ).trigger( "play:changed",  [ this, operation, parameter ]);	
-		var id = this.getID();
-		if ( id ) $( document ).trigger( id + ":play:changed",  [ this, operation, parameter ]);
-			
-	}
-	if ( this.deal && this.deal.triggerEvents ) {
-		// Trigger deal events
-		if ( Bridge.options.enableDebug ) console.log( "deal:changed " + operation + " - " + parameter );
-		$( document ).trigger( "deal:changed",  [ this.deal, operation, parameter ]);
-		var id = this.deal.getID();
-		if ( id ) $( document ).trigger( id + ":deal:changed",  [ this.deal, operation, parameter ]);
-	}
+	Bridge._triggerEvents( this, operation, parameter );
 };
+
 
 
 

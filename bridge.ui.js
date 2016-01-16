@@ -1,3 +1,6 @@
+// Get Namespace.
+var Bridge = Bridge || {};
+
 /**
  * Generate a html display of this deal.
  * @return {string} HTML representation of this deal.
@@ -290,9 +293,6 @@ Bridge.Hand.prototype.toHTML = function( config, isCallback ) {
 	});
 	var tags = Bridge.getSpanConfig( prefix );
 	_.defaults( config.tags, tags);	
-	if ( config.registerChangeHandler && !config.idPrefix ) {
-		Bridge._reportError( "idPrefix is required if change handler has to registered" );
-	}
 
 	var headerHTML = "";
 	var rowClasses = Bridge._generateClasses( prefix, [ "row", "info" ] );
@@ -413,23 +413,39 @@ Bridge.Hand.prototype.toHTML = function( config, isCallback ) {
 	
 	if ( config.containerID ) Bridge.embedHTML( config.containerID, html );
 	if ( !isCallback && config.registerChangeHandler ) {
-		var id = config.idPrefix + "-" + config.prefix;
-		var event = "hand:changed." + id;
-		$( document ).off( event );
-		$( document ).on( event, { config: _.cloneDeep( config ), hand: this, id: id, event: event, direction: this.getDirection() }, function( e, hand ) {
-			if ( hand !== e.data.hand ) return;
-			var id = e.data.id;
-			if ( $( '#' + id ).length === 0 ) {
-				// block has been removed. Turn off event handler.
-				var event = e.data.event;
-				$( document ).off( event );
-				return;
-			}
-			hand.toHTML( e.data.config, true );
-		});
+		Bridge._registerChangeHandler( this, config );
 	}	
 	return html;
 };
+
+/**
+ * Register a callback handler.
+ * @param {object} owner - the object registering the handler
+ * @param {object} config - config object passed to the handler
+ */
+Bridge._registerChangeHandler = function( owner, config ) {
+	if ( !config.containerID ) {
+		Bridge._reportError( "Registering Change Handler is useless unless you are embedding in a container", prefix );
+	}
+	var items = [
+		owner.getID(),
+		owner.type,
+		Bridge.CONSTANTS.eventName
+	];
+	var event = items.join( Bridge.CONSTANTS.eventNameDelimiter ) + '.' + config.containerID;
+	$( document ).off( event );
+	$( document ).on( event, { config: _.cloneDeep( config ), owner: owner, id: config.containerID, event: event }, function( e, args ) {
+		if ( args.raisedBy !== e.data.owner ) return;
+		var id = e.data.id;
+		if ( $( '#' + id ).length === 0 ) {
+			// block has been removed. Turn off event handler.
+			var event = e.data.event;
+			$( document ).off( event );
+			return;
+		}
+		e.data.owner.toHTML( e.data.config, true );
+	});
+}
 
 /**
  * Utility to generate a BBO style auction diagram.
@@ -605,6 +621,28 @@ Bridge.Auction.prototype.toHTML = function( config, isCallback ) {
 	var html = Bridge._generateHTMLModule( config, headerHTML, contentHTML, footerHTML );
 	if ( config.containerID ) Bridge.embedHTML( config.containerID, html );
 	if ( !isCallback && config.registerChangeHandler ) {
+		if ( !config.containerID ) {
+			Bridge._reportError( "Registering Change Handler is useless unless you are embedding in a container", prefix );
+		}
+		var items = [
+			this.getID(),
+			this.type,
+			Bridge.CONSTANTS.eventName
+		];
+		var event = items.join( Bridge.CONSTANTS.eventNameDelimiter ) + '.' + config.containerID;
+		$( document ).off( event );
+		$( document ).on( event, { config: _.cloneDeep( config ), owner: this, id: config.containerID, event: event, direction: this.getDirection() }, function( e, args ) {
+			var owner = args.raisedBy;
+			if ( hand !== e.data.hand ) return;
+			var id = e.data.id;
+			if ( $( '#' + id ).length === 0 ) {
+				// block has been removed. Turn off event handler.
+				var event = e.data.event;
+				$( document ).off( event );
+				return;
+			}
+			hand.toHTML( e.data.config, true );
+		});
 		var id = config.idPrefix + "-" + config.prefix;
 		var event = "auction:changed." + id;
 		$( document ).on( event, { config: _.cloneDeep( config ), auction: this, id: id, event: event }, function( e, auction ) {
