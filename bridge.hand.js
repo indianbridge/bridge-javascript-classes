@@ -25,7 +25,7 @@ Bridge.Hand = function( direction, deal ) {
 	 * Optional Unique id to identify this hand.
 	 * @member {string}
 	 */
-	this.id = Bridge._generateID( deal ) + '-' + direction;
+	this.id = deal ? deal.id : Bridge.IDManager.getID();
 	
 	/**
 	 * The type of this object.

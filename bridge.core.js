@@ -709,3 +709,36 @@ Bridge._checkIndex = function( items, index, context ) {
 		Bridge._reportError( "array does not have item at index " + index, context );
 	}
 };
+
+/**
+ * Maintains a list of used IDs and generates a new one on demand.
+ */
+Bridge.IDManager = {
+	usedIDs: {}
+};
+
+/**
+ * Generate a new ID.
+ * Check if an id exists and throw an exception if it does
+ * @param {string} id - a string identifier.
+ * @return {string} a new id if none already specified. 
+ * @throws id already exists
+ */
+Bridge.IDManager.getID = function( id ) {
+	if ( !id ) {
+		var date = new Date();
+		var base_id = date.toJSON();
+		id = base_id;
+		var counter = 1;
+		while ( id in Bridge.IDManager.usedIDs ) {
+			id = base_id + '-' + counter;
+		}
+		return id;
+	}
+	var prefix = "In Bridge.IDManager.getID";
+	if ( id in Bridge.IDManager.usedIDs ) {
+		Bridge._reportError( id + " is an already existing ID.", prefix );
+	}
+	return id;
+
+};

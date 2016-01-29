@@ -1,0 +1,21 @@
+.container {
+
+}
+
+.item {
+	display: inline-block;
+	width: 37px;
+	height: 50px;
+	background-image: url(img/cards/sa.png);
+	background-repeat: no-repeat;
+	background-size: contain;
+}
+
+.item2 {
+	display: inline-block;
+	width: 37px;
+	height: 50px;
+	background-image: url(img/cards/sk.png);
+	background-repeat: no-repeat;
+	background-size: contain;
+}

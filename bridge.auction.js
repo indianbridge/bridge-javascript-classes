@@ -23,7 +23,7 @@ Bridge.Auction = function( deal ) {
 	 * A unique id to identify this auction.
 	 * @member {string}
 	 */
-	this.id = Bridge._generateID( deal );
+	this.id = deal ? deal.id : Bridge.IDManager.getID();
 	
 	/**
 	 * The type of this object.

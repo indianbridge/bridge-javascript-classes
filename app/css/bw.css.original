@@ -1,0 +1,734 @@
+
+.ghand {
+    page-break-inside: avoid;
+    position: relative;
+    font-family: Arial
+}
+.ghand.plain .diagram,
+.ghand.light .diagram {
+    background: none !important
+}
+.ghand.plain .handinfo,
+.ghand.light .handinfo {
+    background: none !important
+}
+.ghand.plain .suit,
+.ghand.light .suit {
+    background: none !important
+}
+.ghand.plain .bids_wrapper,
+.ghand.light .bids_wrapper {
+    background: none !important
+}
+.ghand.plain .auction,
+.ghand.light .auction {
+    font-weight: normal !important;
+    font-family: "proxima-nova", arial, clean, sans-serif !important;
+    width: 100%
+}
+.ghand.plain .auction .direction,
+.ghand.plain .auction .bid,
+.ghand.plain .auction .call,
+.ghand.plain .auction .spacer,
+.ghand.light .auction .direction,
+.ghand.light .auction .bid,
+.ghand.light .auction .call,
+.ghand.light .auction .spacer {
+    width: 25% !important
+}
+.ghand.plain .auction .direction,
+.ghand.light .auction .direction {
+    font-style: italic
+}
+.ghand.plain .auction .bid,
+.ghand.plain .auction .call,
+.ghand.plain .auction .spacer,
+.ghand.light .auction .bid,
+.ghand.light .auction .call,
+.ghand.light .auction .spacer {
+    height: 30px !important;
+    line-height: 30px !important;
+    font-size: 25px !important
+}
+.ghand.plain .suit,
+.ghand.light .suit {
+    height: 32px !important;
+    line-height: 32px !important;
+    font-size: 28px !important;
+    white-space: nowrap !important
+}
+.ghand.plain .suit .cards,
+.ghand.light .suit .cards {
+    float: left !important;
+    height: 32px !important
+}
+.ghand.plain span.bw_spades,
+.ghand.plain span.bw_diams,
+.ghand.plain span.bw_hearts,
+.ghand.plain span.bw_clubs,
+.ghand.light span.bw_spades,
+.ghand.light span.bw_diams,
+.ghand.light span.bw_hearts,
+.ghand.light span.bw_clubs {
+    font-size: 1.2em !important;
+    line-height: 0 !important
+}
+.ghand.plain .diagram,
+.ghand.light .diagram {
+    width: auto !important
+}
+.ghand.plain .hand,
+.ghand.light .hand {
+    width: auto !important;
+    font-weight: normal !important
+}
+.ghand.plain .cards,
+.ghand.light .cards {
+    width: auto !important;
+    position: static !important
+}
+.ghand.plain .cards div,
+.ghand.light .cards div {
+    position: static !important
+}
+.ghand .diagram {
+    overflow: hidden;
+    *zoom: 1;
+    position: relative;
+    width: 100%;
+    background: #228b22
+}
+.ghand .diagram .final_result {
+    display: none;
+    position: absolute;
+    right: 2px;
+    bottom: 66px;
+    background: #9cc;
+    padding: 3px;
+    height: 31px;
+    line-height: 22px;
+    text-align: center;
+    font-size: 18px;
+    width: 128px;
+    -moz-box-sizing: border-box;
+    -webkit-box-sizing: border-box;
+    box-sizing: border-box;
+    border: 1px solid white
+}
+.ghand .diagram .claim {
+    display: none;
+    position: absolute;
+    right: 2px;
+    bottom: 99px;
+    background: #9cc;
+    padding: 3px;
+    height: 31px;
+    line-height: 22px;
+    text-align: center;
+    font-size: 15px;
+    width: 128px;
+    -moz-box-sizing: border-box;
+    -webkit-box-sizing: border-box;
+    box-sizing: border-box;
+    border: 1px solid white
+}
+.ghand .direction {
+    float: left;
+    text-align: center;
+    background-color: #336799;
+    font-size: 20px;
+    color: white;
+    width: 20px;
+    height: 26px;
+    margin-left: 1px;
+    margin-top: 1px
+}
+.ghand .direction.white {
+    background-color: white;
+    color: black
+}
+.ghand .direction.red {
+    background-color: #cc0000
+}
+.ghand .auction {
+    overflow: hidden;
+    *zoom: 1;
+    font-weight: bold;
+    font-family: "Arial";
+    width: 128px;
+    font-size: 17px
+}
+.ghand .auction .directions {
+    overflow: hidden;
+    *zoom: 1
+}
+.ghand .auction .directions .direction {
+    width: 32px;
+    margin: 0;
+    height: 28px
+}
+.ghand .auction .directions .direction.smaller {
+    width: 27px
+}
+.ghand .auction .directions .scrollbar_filler {
+    width: 20px;
+    height: 28px;
+    float: left
+}
+.ghand .auction .directions .scrollbar_filler.white {
+    background-color: white
+}
+.ghand .auction .directions .scrollbar_filler.red {
+    background-color: #cc0000
+}
+.ghand .auction .bids_wrapper {
+    min-height: 100px;
+    overflow-y: auto;
+    overflow-x: hidden;
+    background: #9cc
+}
+.ghand .auction .bids_wrapper.scrolling {
+    height: 100px
+}
+.ghand .auction .bids_wrapper .bid {
+    width: 32px;
+    float: left;
+    height: 25px;
+    line-height: 25px;
+    text-align: center;
+    vertical-align: center;
+    color: black
+}
+.ghand .auction.long .bid {
+    width: 27px !important
+}
+.ghand .play_annotation {
+    height: 50px;
+    background: white;
+    border: 1px solid black;
+    font-size: 10px;
+    padding: 3px;
+    overflow-y: auto
+}
+.ghand .contract_info {
+    position: absolute;
+    bottom: 2px;
+    right: 2px;
+    box-sizing: border-box;
+    padding: 0 5px;
+    width: 128px;
+    font-size: 18px;
+    line-height: 30px;
+    border: 1px solid white;
+    background: #9cc
+}
+.ghand .board {
+    position: absolute;
+    left: 39px;
+    top: 39px;
+    width: 50px;
+    height: 50px;
+    font-size: 40px;
+    line-height: 50px;
+    text-align: center;
+    background: #9cc
+}
+.ghand .board.bigboard {
+    font-size: 25px !important
+}
+.ghand .board .red {
+    background-color: #cc0000;
+    color: white
+}
+.ghand .board .white {
+    background-color: white
+}
+.ghand .board .north,
+.ghand .board .south {
+    width: 50px;
+    height: 15px;
+    line-height: 15px;
+    position: absolute;
+    left: 0;
+    font-size: 14px;
+    font-weight: bold
+}
+.ghand .board .east,
+.ghand .board .west {
+    width: 15px;
+    height: 50px;
+    position: absolute;
+    top: 0;
+    font-size: 14px;
+    font-weight: bold
+}
+.ghand .board .north {
+    top: -17px
+}
+.ghand .board .south {
+    bottom: -17px
+}
+.ghand .board .east {
+    right: -17px
+}
+.ghand .board .west {
+    left: -17px
+}
+.ghand .hand {
+    font-weight: bold;
+    font-family: "Arial";
+    width: 128px;
+    height: 128px;
+    font-size: 20px
+}
+.ghand .hand .handinfo {
+    overflow: hidden;
+    *zoom: 1;
+    height: 28px;
+    background-color: white
+}
+.ghand .hand .handinfo .player_name {
+    white-space: nowrap;
+    overflow: hidden;
+    -ms-text-overflow: ellipsis;
+    -o-text-overflow: ellipsis;
+    text-overflow: ellipsis;
+    text-align: left;
+    font-weight: normal;
+    color: black;
+    font-size: 20px;
+    margin-left: 5px
+}
+.ghand .hand .suit {
+    overflow: hidden;
+    *zoom: 1;
+    background: #E2E1B5;
+    text-align: left;
+    height: 25px;
+    letter-spacing: 1px;
+    line-height: 25px;
+    font-size: 20px;
+    position: relative
+}
+.ghand .hand .suit div.suitsym {
+    float: left;
+    width: 26px;
+    text-align: center
+}
+.ghand .hand .suit .cards {
+    height: 25px;
+    width: 102px;
+    position: relative;
+    left: 24px;
+    top: 2px
+}
+.ghand .hand .suit .cards div {
+    position: absolute;
+    bottom: 0px
+}
+.ghand .hand .suit .played {
+    color: #A0A0A0 !important
+}
+.ghand .call_alert {
+    position: relative;
+    background-color: #ffce00;
+    color: black;
+    text-decoration: none;
+    border: 0
+}
+.ghand .call_alert:hover {
+    background-color: #ff0
+}
+.ghand .longsuit {
+    text-align: left;
+    vertical-align: middle;
+    font-size: 14px;
+    font-weight: bold;
+    height: 22px;
+    padding-left: 2px;
+    padding-right: 2px;
+    letter-spacing: 1px
+}
+.ghand .freaksuit {
+    text-align: left;
+    vertical-align: middle;
+    font-size: 10px;
+    font-weight: bold;
+    height: 22px;
+    padding-left: 2px;
+    padding-right: 2px;
+    letter-spacing: 1px
+}
+.ghand .played_cards .played_card {
+    display: none;
+    background: white;
+    border: 1px solid black;
+    width: 50px;
+    height: 25px;
+    text-align: center;
+    line-height: 25px;
+    font-size: 18px
+}
+.ghand .played_cards .north {
+    position: absolute;
+    left: 172px;
+    top: 135px
+}
+.ghand .played_cards .south {
+    position: absolute;
+    left: 172px;
+    top: 230px
+}
+.ghand .played_cards .east {
+    position: absolute;
+    right: 135px;
+    top: 184px
+}
+.ghand .played_cards .west {
+    position: absolute;
+    left: 135px;
+    top: 184px
+}
+.ghand .playdata {
+    display: none
+}
+.ghand.fright {
+    float: right;
+    margin: 0.75em
+}
+.ghand.fleft {
+    float: left;
+    margin: 0.75em
+}
+.ghand.onehand .diagram {
+    width: 128px;
+    padding: 2px
+}
+.ghand.onehand .diagram .hand+.auction {
+    margin-top: 2px
+}
+.ghand .auction_whiteout {
+    background: white;
+    position: absolute;
+    width: 130px;
+    height: 130px
+}
+.ghand .compass {
+    width: 130px;
+    height: 130px;
+    background: url('/images/compass.png?1440613283&1188eb7ebe48') no-repeat 50%;
+    position: absolute
+}
+.ghand.twohands .diagram {
+    width: 262px
+}
+.ghand.twohands .diagram .hand {
+    position: absolute
+}
+.ghand.westeast .diagram {
+    padding-top: 132px
+}
+.ghand.westeast .diagram .hand.west {
+    left: 2px;
+    top: 2px
+}
+.ghand.westeast .diagram .hand.east {
+    right: 2px;
+    top: 2px
+}
+.ghand.westeast .diagram .auction {
+    margin: 0px auto 2px
+}
+.ghand.northeast .diagram {
+    height: 262px
+}
+.ghand.northeast .diagram .compass {
+    left: 0px;
+    bottom: 0px
+}
+.ghand.northeast .diagram .hand.north {
+    left: 2px;
+    top: 2px
+}
+.ghand.northeast .diagram .hand.east {
+    right: 2px;
+    bottom: 2px
+}
+.ghand.northeast .diagram .auction {
+    position: absolute;
+    right: 2px;
+    top: 2px
+}
+.ghand.northeast .diagram .auction_whiteout {
+    right: 0;
+    top: 0
+}
+.ghand.eastsouth .diagram {
+    height: 262px
+}
+.ghand.eastsouth .diagram .compass {
+    left: 0px;
+    top: 0px
+}
+.ghand.eastsouth .diagram .hand.east {
+    right: 2px;
+    top: 2px
+}
+.ghand.eastsouth .diagram .hand.south {
+    left: 2px;
+    bottom: 2px
+}
+.ghand.eastsouth .diagram .auction {
+    position: absolute;
+    right: 2px;
+    bottom: 2px
+}
+.ghand.eastsouth .diagram .auction_whiteout {
+    right: 0;
+    bottom: 0
+}
+.ghand.westsouth .diagram {
+    height: 262px
+}
+.ghand.westsouth .diagram .compass {
+    top: 0px;
+    right: 0px
+}
+.ghand.westsouth .diagram .hand.west {
+    left: 2px;
+    top: 2px
+}
+.ghand.westsouth .diagram .hand.south {
+    right: 2px;
+    bottom: 2px
+}
+.ghand.westsouth .diagram .auction {
+    position: absolute;
+    left: 2px;
+    bottom: 2px
+}
+.ghand.westsouth .diagram .auction_whiteout {
+    left: 0;
+    bottom: 0
+}
+.ghand.westnorth .diagram {
+    height: 262px
+}
+.ghand.westnorth .diagram .compass {
+    bottom: 0px;
+    right: 0px
+}
+.ghand.westnorth .diagram .hand.north {
+    right: 2px;
+    top: 2px
+}
+.ghand.westnorth .diagram .hand.west {
+    left: 2px;
+    bottom: 2px
+}
+.ghand.westnorth .diagram .auction {
+    position: absolute;
+    left: 2px;
+    top: 2px
+}
+.ghand.westnorth .diagram .auction_whiteout {
+    left: 0;
+    top: 0
+}
+.ghand.northsouth .diagram {
+    min-height: 262px
+}
+.ghand.northsouth .diagram .hand.north {
+    left: 2px;
+    top: 2px
+}
+.ghand.northsouth .diagram .hand.south {
+    left: 2px;
+    top: 132px
+}
+.ghand.northsouth .diagram .auction {
+    right: 2px;
+    top: 2px;
+    position: absolute
+}
+.ghand.fourhands {
+    width: 392px
+}
+.ghand.fourhands .diagram {
+    height: 392px
+}
+.ghand.fourhands.play_controls {
+    height: 427px
+}
+.ghand.fourhands.annotated_play_controls {
+    height: 477px
+}
+.ghand.fourhands .hand {
+    position: absolute
+}
+.ghand.fourhands .hand.north {
+    top: 2px;
+    left: 132px
+}
+.ghand.fourhands .hand.west {
+    left: 2px;
+    top: 132px
+}
+.ghand.fourhands .hand.east {
+    right: 2px;
+    top: 132px
+}
+.ghand.fourhands .hand.south {
+    bottom: 2px;
+    left: 132px
+}
+.ghand.fourhands .auction {
+    position: absolute;
+    right: 2px;
+    top: 2px
+}
+.ghand.fourhands .ghand_controls {
+    background: #FFDBA8;
+    height: 30px;
+    padding: 3px;
+    width: 384px;
+    border: 1px solid black;
+    position: absolute;
+    bottom: -2px;
+    text-align: left
+}
+.hand_diagram_small {
+    width: 212px;
+    height: 212px;
+    float: left;
+    border: 1px solid #aaa;
+    margin: 15px;
+    position: relative;
+    -moz-box-sizing: border-box;
+    -webkit-box-sizing: border-box;
+    box-sizing: border-box
+}
+.hand_diagram_small div {
+    position: absolute
+}
+.hand_diagram_small .north,
+.hand_diagram_small .south {
+    left: 85px
+}
+.hand_diagram_small .east,
+.hand_diagram_small .west {
+    top: 74px
+}
+.hand_diagram_small .north {
+    top: 5px
+}
+.hand_diagram_small .south {
+    bottom: 5px
+}
+.hand_diagram_small .west {
+    left: 5px
+}
+.hand_diagram_small .east {
+    right: 5px
+}
+.hand_diagram_small .board_number {
+    left: 5px;
+    top: 5px;
+    font-size: 1.75em;
+    position: relative;
+    float: left;
+    -moz-box-sizing: border-box;
+    -webkit-box-sizing: border-box;
+    box-sizing: border-box
+}
+.hand_diagram_small .board_info {
+    left: 5px;
+    top: 30px;
+    font-size: .75em
+}
+.hand_diagram_small .board_info.no_board_number {
+    top: 5px
+}
+.hand_diagram_small .board_comments {
+    left: 5px;
+    bottom: 5px
+}
+.hand_diagram_small .board_comments img {
+    position: relative;
+    top: 5px
+}
+.hand_diagram_small .board_comments .comment_count {
+    font-size: 1.5em;
+    text-align: center
+}
+.hand_diagram_small .board_questions {
+    left: 5px;
+    bottom: 5px
+}
+.hand_diagram_small .board_questions img {
+    position: relative;
+    top: 5px
+}
+.hand_diagram_small .board_questions .question_count {
+    font-size: 1.5em;
+    text-align: center
+}
+.hand_diagram_small.selected {
+    border: 5px solid green
+}
+.hand_diagram_small.selected .hand_selector {
+    opacity: 1;
+    background-clip: content-box;
+    background-origin: content-box;
+    background-attachment: scroll;
+    background-size: auto
+}
+.hand_diagram_small .hand_selector {
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 24px;
+    height: 24px;
+    cursor: pointer;
+    padding: 9px;
+    opacity: .4;
+    background-clip: content-box;
+    background-origin: content-box;
+    background-attachment: scroll;
+    background-size: auto
+}
+.hand_diagram_small .hand_selector:hover {
+    opacity: 1
+}
+.hand_diagram_small .hand_selector.dormant {
+    visibility: hidden
+}
+.hand_diagram_small .hand_selector.active {
+    visibility: visible
+}
+.handset_wrapper {
+    position: relative
+}
+.handset_wrapper .module_header {
+    margin-top: 10px
+}
+.handset_wrapper .bulk_actions {
+    display: none;
+    position: absolute;
+    top: 0;
+    right: 0;
+    height: 53px;
+    border: 1px solid #444;
+    padding: 10px;
+    line-height: 30px;
+    box-sizing: border-box;
+    border-radius: 10px;
+    background: pink
+}
+.bids_wrapper.single_bid {
+    float: left;
+    margin-right: 20px;
+    height: 30px;
+    line-height: 30px;
+    font-size: 1.75em
+}

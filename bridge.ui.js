@@ -254,7 +254,7 @@ Bridge.Hand.prototype.toBBODiagram = function( config ) {
 	var prefix = config.prefix
 	if( _.has( config.classes , prefix ) ) config.classes[ prefix ].push( "bbo" );
 	else config.classes[ prefix ] = [ "bbo" ];
-	config.tags = Bridge.getTableConfig( config.prefix );	
+	config.tags = Bridge.getDivConfig( config.prefix );	
 	return this.toHTML( config );
 };
 
@@ -291,7 +291,7 @@ Bridge.Hand.prototype.toHTML = function( config, isCallback ) {
 		text: true,
 		emptySuit: true	
 	});
-	var tags = Bridge.getSpanConfig( prefix );
+	var tags = Bridge.getDivConfig( prefix );
 	_.defaults( config.tags, tags);	
 
 	var headerHTML = "";
@@ -423,7 +423,7 @@ Bridge.Hand.prototype.toHTML = function( config, isCallback ) {
  * @param {object} owner - the object registering the handler
  * @param {object} config - config object passed to the handler
  */
-Bridge._registerChangeHandler = function( owner, config ) {
+Bridge._registerChangeHandler = function( owner, config, callback ) {
 	if ( !config.containerID ) {
 		Bridge._reportError( "Registering Change Handler is useless unless you are embedding in a container", prefix );
 	}
@@ -500,11 +500,8 @@ Bridge.Auction.prototype.toHTML = function( config, isCallback ) {
 	_.defaults( config.show, {
 		direction: false
 	});
-	var tags = Bridge.getSpanConfig( prefix );	
-	_.defaults( config.tags, tags );	
-	if ( config.registerChangeHandler && !config.idPrefix ) {
-		Bridge._reportError( "idPrefix is required if change handler has to registered" );
-	}	
+	var tags = Bridge.getDivConfig( prefix );	
+	_.defaults( config.tags, tags );		
 	
 	// Header
 	var headerHTML = "";
@@ -621,41 +618,7 @@ Bridge.Auction.prototype.toHTML = function( config, isCallback ) {
 	var html = Bridge._generateHTMLModule( config, headerHTML, contentHTML, footerHTML );
 	if ( config.containerID ) Bridge.embedHTML( config.containerID, html );
 	if ( !isCallback && config.registerChangeHandler ) {
-		if ( !config.containerID ) {
-			Bridge._reportError( "Registering Change Handler is useless unless you are embedding in a container", prefix );
-		}
-		var items = [
-			this.getID(),
-			this.type,
-			Bridge.CONSTANTS.eventName
-		];
-		var event = items.join( Bridge.CONSTANTS.eventNameDelimiter ) + '.' + config.containerID;
-		$( document ).off( event );
-		$( document ).on( event, { config: _.cloneDeep( config ), owner: this, id: config.containerID, event: event, direction: this.getDirection() }, function( e, args ) {
-			var owner = args.raisedBy;
-			if ( hand !== e.data.hand ) return;
-			var id = e.data.id;
-			if ( $( '#' + id ).length === 0 ) {
-				// block has been removed. Turn off event handler.
-				var event = e.data.event;
-				$( document ).off( event );
-				return;
-			}
-			hand.toHTML( e.data.config, true );
-		});
-		var id = config.idPrefix + "-" + config.prefix;
-		var event = "auction:changed." + id;
-		$( document ).on( event, { config: _.cloneDeep( config ), auction: this, id: id, event: event }, function( e, auction ) {
-			if ( e.data.auction !== auction ) return;
-			var id = e.data.id;
-			if ( $( '#' + id ).length === 0 ) {
-				// block has been removed. Turn off event handler.
-				var event = e.data.event;
-				$( document ).off( event );
-				return;
-			}
-			auction.toHTML( e.data.config, true );
-		});
+		Bridge._registerChangeHandler( this, config );
 	}	
 	return html;
 };
@@ -885,16 +848,24 @@ Bridge.Deal.prototype.toCardDeck = function( config, isCallback ) {
 			}
 		});				
 		if ( !isCallback ) {
-			var event = "hand:changed." + id;
+			if ( !config.containerID ) {
+				Bridge._reportError( "Registering Change Handler is useless unless you are embedding in a container", prefix );
+			}
+			var items = [
+				this.getID(),
+				"Hand",
+				Bridge.CONSTANTS.eventName
+			];
+			var event = items.join( Bridge.CONSTANTS.eventNameDelimiter ) + '.' + config.containerID;
 			$( document ).off( event );
-			$( document ).on( event, { deal: this, config: _.cloneDeep(config), id: id, event:event }, function( e, hand ) {
+			$( document ).on( event, { config: _.cloneDeep( config ), id: config.containerID, event: event }, function( e, args ) {
 				var id = e.data.id;
 				if ( $( '#' + id ).length === 0 ) {
 					// block has been removed. Turn off event handler.
 					var event = e.data.event;
 					$( document ).off( event );
 					return;
-				}				
+				}
 				e.data.deal.toCardDeck( e.data.config, true );
 			});
 		}		

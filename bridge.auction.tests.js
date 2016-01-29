@@ -6,6 +6,7 @@ QUnit.test( "Constructor", function( assert ) {
 	assert.equal( auction.nextToCall, "n", "Default nextToCall" );	
 	assert.equal( auction.calls.length, 0, "no calls" );
 	assert.deepEqual( auction.contracts.length, 0, "no contracts" );	
+	assert.ok( auction.id, "id should not be null" );
 });
 
 QUnit.test( "Getter and Setter", function( assert ) {

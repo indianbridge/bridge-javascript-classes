@@ -11,11 +11,14 @@ QUnit.test( "Constructor", function( assert ) {
 	assert.deepEqual( deal.vulnerability, "-", "vulnerability is default" );
 	assert.deepEqual( deal.scoring, "KO", "vulnerability is default" );
 	assert.deepEqual( deal.notes, "", "notes is default" );
+	assert.ok( deal.id, "id should not be null" );
 	
 	for( var direction in Bridge.directions ) {
 		assert.ok( deal.hands[ direction ], "Hand objects should exist" );
+		assert.equal( deal.id, deal.hands[ direction ].id, "deal and hand ids match" );
 	}
 	assert.ok( deal.auction, "Default Auction should exist" );
+	assert.equal( deal.id, deal.auction.id, "deal and auction ids match" );
 });
 
 QUnit.test( "Setters and Getters", function( assert ) {

@@ -26,6 +26,7 @@ QUnit.test( "Constructor", function( assert ) {
 		}		
 		assert.deepEqual( hand.cards, cards, "Hand has suits but no cards in any suit initially" );
 		assert.deepEqual( hand.numCards, 0, "No cards initially" );
+		assert.ok( hand.id, "id should not be null" );
 	}
 	
 });

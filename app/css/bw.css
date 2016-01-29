@@ -1,0 +1,85 @@
+.suit-hearts, .suit-diamonds { color: #CB0000; }
+
+.hand {
+    width: 128px;
+    font-size: 20px;
+    border: 1px solid #228b22;
+}
+
+.hand .info {
+    white-space: nowrap;
+    width: 100%
+    background-color: #FFFFFF;
+}
+
+.hand .info .direction {
+	display: inline-block;
+    background: #336799;
+    color: #FFFFFF;
+    height: 100%;
+    width: 18%;
+    text-align: center;
+    text-transform: uppercase;
+}
+
+.hand .info .name {
+	display: inline-block;
+	height: 100%;
+}
+
+.hand .cards-block {
+	background-color: #E2E1B5;
+}
+
+.hand .cards-block .suit-row {
+	width: 100%;
+}
+
+.hand .cards-block .suit-row .suit {
+	display: inline-block;
+    width: 18%;
+    height: 100%;
+    text-align: center;
+}
+
+.hand .cards-block .suit-row .cards-row {
+	display: inline-block;
+	letter-spacing: 1px;
+}
+
+.auction {
+    width: 128px;
+    font-size: 20px;
+    border: 1px solid #228b22;
+}
+
+.auction .directions {
+    white-space: nowrap;
+    width: 100%
+    background-color: #FFFFFF;
+}
+
+.auction .directions .direction {
+	display: inline-block;
+	width: 25%;
+	font-weight: bold;
+	text-align: center;
+	text-transform: uppercase;
+}
+
+.auction .bids {
+	width: 100%;
+	white-space: nowrap;
+	background: #9cc;
+	font-size: 17px;
+}
+
+.auction .bids .bid-row {
+	width: 100%;
+}
+
+.auction .bids .bid-row .bid {
+	display: inline-block;
+	width: 25%;
+	text-align: center;
+}

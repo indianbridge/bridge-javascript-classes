@@ -16,7 +16,7 @@ Bridge.Deal = function( id ) {
 	 * Optional Unique id to identify this deal.
 	 * @member {string}
 	 */
-	this.id = id || Bridge._generateID();
+	this.id = Bridge.IDManager.getID( id );
 	
 	/**
 	 * The type of this object.
