@@ -1,7 +1,7 @@
 /**
  * Defines Hand class and all methods associated with it.
  */
- 
+
 // Get Namespace.
 var Bridge = Bridge || {};
 
@@ -14,37 +14,44 @@ var Bridge = Bridge || {};
  */
 Bridge.Hand = function( direction, deal ) {
 	Bridge._checkDirection( direction );
-	 
+
 	/**
 	 * The deal that this hand belongs to.
 	 * @member {object}
 	 */
-	this.deal = deal;	
-		
+	this.deal = deal;
+	this.parent = deal;
+
 	/**
 	 * Optional Unique id to identify this hand.
 	 * @member {string}
 	 */
 	this.id = deal ? deal.id : Bridge.IDManager.getID();
-	
+
 	/**
 	 * The type of this object.
 	 * @member {string}
 	 */
 	this.type = "Hand";
-	 
+
+	/**
+	 * Should events be triggered for this object.
+	 * @member {bool}
+	 */
+	this.triggerEvents = true;
+
 	/**
 	 * The direction of this hand
 	 * @member {string}
 	 */
 	this.direction = direction;
-	 
+
 	/**
 	 * The name of person holding this hand
 	 * @member {string}
-	 */	 
+	 */
 	this.name = Bridge.directions[ direction ].name;
-	 
+
 	/**
 	 * The actual cards in this hand
 	 * @member {object}
@@ -56,7 +63,7 @@ Bridge.Hand = function( direction, deal ) {
 			this.cards[ suit ][ rank ] = false;
 		}
 	}
-	 
+
 	/**
 	 * Whether the card should be show as x or not
 	 */
@@ -66,16 +73,16 @@ Bridge.Hand = function( direction, deal ) {
 		for( var rank in Bridge.ranks ) {
 			this.showAsX[ suit ][ rank ] = false;
 		}
-	}	
-	 
+	}
+
 	/**
 	 * The number of cards this hand has
 	 * @member {number}
-	 */	 	 
+	 */
 	this.numCards = 0;
-	 
+
 	/** Is this the active hand? */
-	this._isActive = false;	 
+	this._isActive = false;
 };
 
 //
@@ -146,7 +153,7 @@ Bridge.Hand.prototype.getHand = function() {
 };
 
 /**
- * Set a unique id 
+ * Set a unique id
  * @param {string} id - a unique identifier
  */
 Bridge.Hand.prototype.setID = function( id ) {
@@ -163,6 +170,14 @@ Bridge.Hand.prototype.getID = function() {
 };
 
 /**
+ * Is this hand active?
+ * @return {boolean} true if this hand is active, false otherwise
+ */
+Bridge.Hand.prototype.isActive = function() {
+  return this._isActive;
+}
+
+/**
  * Get the cards in a specific suit
  * @return {string} the cards in string format
  */
@@ -174,7 +189,7 @@ Bridge.Hand.prototype.getCards = function( suit ) {
 			if ( this.showAsX[ suit ][ rank ] ) output += 'x';
 			else output += rank;
 		}
-	}, this);	
+	}, this);
 	return output;
 };
 
@@ -202,7 +217,7 @@ Bridge.Hand.prototype.addCard = function( suit, rank ) {
 				if ( ! this.cards[suit][newRank] ) {
 					rank = newRank;
 					showAsX = true;
-					i = -1;					
+					i = -1;
 				}
 			}
 		}
@@ -213,7 +228,7 @@ Bridge.Hand.prototype.addCard = function( suit, rank ) {
 	}
 	if ( this.cards[ suit ][ rank ] ) {
 		Bridge._reportError( suit + rank + " is already assigned to " + this.direction + ". Cannot add again", prefix );
-	} 	
+	}
 	// If deal is specified then check if this card has been assigned
 	if ( this.deal ) {
 		var card = this.deal.cards[ suit ][ rank ];
@@ -295,13 +310,14 @@ Bridge.Hand.prototype.clearCards = function() {
  * name - string - name of player holding this hand<br/>
  * hand - string - hand in BBO Handviewer string format<br/>
  * id - string - unique id for this hand<br/>
+ * active - boolean - is this hand active<br/>
  * @param {string} property - the property to set
  * @param {string} value - the value to set the property to
  */
 Bridge.Hand.prototype.set = function( property, value ) {
 	var prefix = "In Hand.set";
 	Bridge._checkRequiredArgument( property, "Property", prefix );
-	Bridge._checkRequiredArgument( value, "Value for Property " + property, prefix );	
+	Bridge._checkRequiredArgument( value, "Value for Property " + property, prefix );
 	switch ( property ) {
 		case "name" :
 			this.setName( value );
@@ -312,6 +328,9 @@ Bridge.Hand.prototype.set = function( property, value ) {
 		case "id" :
 			this.setID( value );
 			break;
+    case "active" :
+      value ? this.makeActive() : this.makeInactive();
+      break;
 		default :
 			Bridge._reportError( "Unknown property " + property, prefix );
 	}
@@ -325,6 +344,7 @@ Bridge.Hand.prototype.set = function( property, value ) {
  * id - string - a unique id for this hand<br/>
  * count - number - the number of cards this hand has<br/>
  * hand - string - hand in BBO Handviewer string format<br/>
+ * active - boolean - is this hand active<br/>
  * @param {string} property - the property to get
  * @return {string} the value of requested property
  * @throws unknown property
@@ -348,6 +368,9 @@ Bridge.Hand.prototype.get = function( property ) {
 		case "hand" :
 			return this.getHand();
 			break;
+    case "active" :
+      return this.isActive();
+      break;
 		default :
 			Bridge._reportError( "Unknown property " + property, prefix );
 	}
@@ -367,8 +390,8 @@ Bridge.Hand.prototype.toString = function() {
 				if ( this.showAsX[ suit ][ rank ] ) item += 'x';
 				else item += rank;
 			}
-		}, this);	
-		if ( item ) output += suit + item;	
+		}, this);
+		if ( item ) output += suit + item;
 	}, this);
 	return output;
 };
@@ -393,22 +416,22 @@ Bridge.Hand.prototype.fromString = function( handString ) {
 		var currentChar = handString.charAt( i );
 		switch( currentChar ) {
 			// Check if it specifies suit
-			case 'c' :				
+			case 'c' :
 			case 'd' :
 			case 'h' :
-			case 's' :	
+			case 's' :
 				currentSuit = currentChar;
 				if ( seenSuits[ currentSuit ] ) {
 					Bridge._reportError( ' suit ' + currentSuit + ' has already been seen before!', prefix );
 				}
 				seenSuits[ currentSuit ] = true;
-				break;	
-			
+				break;
+
 			// Special handing for numeric 10
 			case '1' :
 				if ( currentSuit === '' ) {
 					Bridge._reportError( currentChar + ' was found when a suit was expected!', prefix );
-				}			
+				}
 				if ( i < handString.length - 1 && handString.charAt( i+1 ) === '0') {
 					currentRank = 't';
 					i++;
@@ -427,12 +450,12 @@ Bridge.Hand.prototype.fromString = function( handString ) {
 				}
 				currentRank = currentChar;
 				this.addCard( currentSuit, currentRank );
-				break;											
-		}	
-	}	
+				break;
+		}
+	}
 	this.onChange( "setHand", handString );
  };
- 
+
 /**
  * Does this hand have any cards in the given suit?
  * @param {string} suit the suit to check cards in
@@ -441,10 +464,10 @@ Bridge.Hand.prototype.fromString = function( handString ) {
 Bridge.Hand.prototype._hasCards = function( suit ) {
 	for( var rank in Bridge.ranks ) {
 		if ( this.cards[ suit ][ rank ] ) return true;
-	}	
+	}
 	return false;
-}; 
- 
+};
+
 /**
  * Get the suit order for this hand by alternating colors
  * @return {array} an array of suits in alternating color order if possible
@@ -452,7 +475,7 @@ Bridge.Hand.prototype._hasCards = function( suit ) {
 Bridge.Hand.prototype.getAlternatingSuitOrder = function() {
 	var numSuits = 0;
 	var hasCards = {};
-	_.each( Bridge.suitOrder, function( suit ) {	
+	_.each( Bridge.suitOrder, function( suit ) {
 		hasCards[ suit ] = this._hasCards( suit );
 		if ( hasCards[ suit ] ) numSuits++;
 	}, this );
@@ -460,20 +483,20 @@ Bridge.Hand.prototype.getAlternatingSuitOrder = function() {
 	if ( numSuits === 4 ) return [ 's', 'h', 'c', 'd' ];
 	if ( hasCards[ 's' ] && hasCards[ 'c' ] ) return Bridge.suitOrder;
 	else return [ 'h', 's', 'c', 'd' ];
-}; 
- 
+};
+
 /**
  * Generate a json format of this hand
  * @return {object} json representation of this hand.
  */
-Bridge.Hand.prototype.toJSON= function() { 
+Bridge.Hand.prototype.toJSON= function() {
 	var output = {};
 	output.direction = this.direction;
 	output.name = this.name;
 	output.hand = this.getHand();
 	return output;
 };
- 
+
  /**
  * Parse a hand given in json format
  * @param {object} hand - the hand in json format
@@ -493,9 +516,3 @@ Bridge.Hand.prototype.fromJSON = function( handString ) {
 Bridge.Hand.prototype.onChange = function( operation, parameter ) {
 	Bridge._triggerEvents( this, operation, parameter );
 };
-
-
-
-
-
-

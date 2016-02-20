@@ -1,0 +1,394 @@
+.suit-hearts, .suit-diamonds { color: #CB0000; }
+.vulnerable {
+  background-color: #CB0000;
+  color: white;
+}
+
+.bw .vulnerable {
+  background-color: #CC0000;
+}
+
+.bw .hand-diagram, .bbo .hand-diagram {
+    width: 128px;
+    font-size: 20px;
+    border: 1px solid #228b22;
+}
+
+.bw .hand-diagram-header, .bbo .hand-diagram-header {
+    white-space: nowrap;
+    width: 100%
+    background-color: #FFFFFF;
+}
+
+.bw .hand-diagram-header .hand-diagram-field-direction, .bbo .hand-diagram-header .hand-diagram-field-direction {
+	display: inline-block;
+    background: #336799;
+    color: #FFFFFF;
+    height: 100%;
+    width: 18%;
+    text-align: center;
+    text-transform: uppercase;
+}
+
+.bw .hand-diagram-header .hand-diagram-field-name, .bbo .hand-diagram-header .hand-diagram-field-name {
+	display: inline-block;
+	padding-left: 2%;
+	height: 100%;
+}
+
+.bw .hand-diagram-header .hand-diagram-row-info:hover, .bbo .hand-diagram-header .hand-diagram-row-info:hover {
+  background-color: #99CCCC;
+}
+
+.bw .hand-diagram-content {
+	background-color: #E2E1B5;
+}
+
+.bbo .hand-diagram-content {
+	background-color: #CBCBCB
+}
+
+.bw .hand-diagram-content .hand-diagram-row, .bbo .hand-diagram-content .hand-diagram-row {
+	width: 100%;
+}
+
+.bw .hand-diagram-content .hand-diagram-field-suit, .bbo .hand-diagram-content .hand-diagram-field-suit {
+	display: inline-block;
+    width: 18%;
+    height: 100%;
+    text-align: center;
+}
+
+.bw .hand-diagram-content .hand-diagram-column-cards, .bbo .hand-diagram-content .hand-diagram-column-cards {
+	display: inline-block;
+	letter-spacing: 1px;
+}
+
+.bw .auction-diagram, .bbo .auction-diagram {
+    width: 128px;
+    font-size: 20px;
+    border: 1px solid #228b22;
+}
+
+.bw .auction-diagram .auction-diagram-row-directions, .bbo .auction-diagram .auction-diagram-row-directions {
+    white-space: nowrap;
+    width: 100%
+    background-color: #FFFFFF;
+}
+
+.bw .auction-diagram .auction-diagram-field-direction, .bbo .auction-diagram .auction-diagram-field-direction {
+	display: inline-block;
+	width: 25%;
+	font-weight: bold;
+	text-align: center;
+	text-transform: uppercase;
+}
+
+.bw .auction-diagram .auction-diagram-content, .bbo .auction-diagram .auction-diagram-content {
+	width: 100%;
+	white-space: nowrap;
+	background: #9cc;
+	font-size: 17px;
+}
+
+.bw .auction-diagram .auction-diagram-content .auction-diagram-row, .bbo .auction-diagram .auction-diagram-content .auction-diagram-row {
+	width: 100%;
+}
+
+.bw .auction-diagram .auction-diagram-content .auction-diagram-field, .bbo .auction-diagram .auction-diagram-content .auction-diagram-field {
+	display: inline-block;
+	width: 25%;
+	text-align: center;
+}
+
+.bw.full .bidding-box {
+	width: 300px;
+}
+
+.bw.full .bidding-box-row {
+    color: #222;
+    margin: 0;
+    padding: 0;
+    outline: none;
+    border: 0;
+    margin:auto;
+    text-align: center;
+}
+
+.bw.full .bidding-box-field {
+	display: inline-block;
+    -moz-box-sizing: border-box;
+    -webkit-box-sizing: border-box;
+    box-sizing: border-box;
+    cursor: pointer;
+    font-size: 20px;
+    height: 35px;
+    line-height: 35px;
+    text-align: center;
+    -moz-border-radius-topleft: 5px;
+    -webkit-border-top-left-radius: 5px;
+    border-top-left-radius: 5px;
+    -moz-border-radius-topright: 5px;
+    -webkit-border-top-right-radius: 5px;
+    border-top-right-radius: 5px;
+    border: 1px solid black;
+    margin-right: -1px;
+    margin-bottom: -5px;
+    background: #eee;
+}
+
+.bw.full .bidding-box-field-calls { width: 20%; }
+.bw.full .bidding-box-row-utilities .bidding-box-field {
+	width: 30%;
+	font-size: 16px;
+}
+.bw.full .bidding-box-row-special-bids .bidding-box-field {
+	width: 25%;
+	font-size: 16px;
+}
+.bw.full .bidding-box-field-calls-p, .bw.full .bidding-box-field-calls-allpass { color: green; }
+.bw.full .bidding-box-field-calls-x { color: red; }
+.bw.full .bidding-box-field-calls-r { color: blue; }
+
+.bw.full .disabled {
+	cursor: not-allowed;
+	opacity: 0.2;
+}
+
+.bw.full .bidding-box-content .disabled {
+	visibility: hidden;
+}
+
+
+.bw.full .bidding-box-row.disabled {
+	display: none;
+}
+
+.bw.full .bidding-box-field-calls[data-bid="n"] { color: blue; }
+.bw.full .bidding-box-field-calls[data-bid="s"] { color: black; }
+.bw.full .bidding-box-field-calls[data-bid="h"] { color: red; }
+.bw.full .bidding-box-field-calls .suit-hearts {color: red; }
+.bw.full .bidding-box-field-calls[data-bid="d"] { color: orange; }
+.bw.full .bidding-box-field-calls .suit-diamonds {color: orange; }
+.bw.full .bidding-box-field-calls[data-bid="c"] { color: green; }
+
+.bw.concise .bidding-box {
+	width: 300px;
+}
+
+.bw.concise .bidding-box-row { text-align:center; margin:auto; }
+.bw.concise .bidding-box-header {
+  visibility: hidden;
+  display: none;
+}
+.bw.concise .bidding-box-field {
+    display: inline-block;
+    text-align: center;
+    font-size: 24px;
+    height: 40px;
+    line-height:40px;
+    vertical-align:middle;
+    font-weight: bold;
+    border: 1px solid blue;
+    background: #ccf;
+    -moz-border-radius: 3px;
+    -webkit-border-radius: 3px;
+    border-radius: 3px;
+    cursor: pointer;
+}
+
+.bw.concise .bidding-box-field-level { width: 13%; }
+.bw.concise .bidding-box-field-level.selected { background: #cc0; }
+.bw.concise .bidding-box-field-calls { width: 11.5%; }
+
+.bw.concise .bidding-box-field-level-0 {
+	display:none;
+	visibility:hidden;
+	width: 0%;
+}
+
+.bw.concise .bidding-box-field-calls-p, .bw.concise .bidding-box-field-calls-allpass { color: green; }
+.bw.concise .bidding-box-field-calls-x { color: red; }
+.bw.concise .bidding-box-field-calls-r { color: blue; }
+
+
+.bw.concise .bidding-box-row-utilities .bidding-box-field {
+	width: 30%;
+}
+
+.bw.concise .disabled {
+	cursor: not-allowed;
+	opacity: 0.2;
+}
+
+.bbo.full .bidding-box {
+	width: 300px;
+}
+
+.bbo.full .bidding-box-row {
+    color: #222;
+    margin: 0;
+    padding: 0;
+    outline: none;
+    border: 0;
+    margin:auto;
+    text-align: center;
+}
+
+.bbo.full .bidding-box-field {
+	display: inline-block;
+    -moz-box-sizing: border-box;
+    -webkit-box-sizing: border-box;
+    box-sizing: border-box;
+    cursor: pointer;
+    font-size: 20px;
+    height: 35px;
+    line-height: 35px;
+    text-align: center;
+    -moz-border-radius-topleft: 5px;
+    -webkit-border-top-left-radius: 5px;
+    border-top-left-radius: 5px;
+    -moz-border-radius-topright: 5px;
+    -webkit-border-top-right-radius: 5px;
+    border-top-right-radius: 5px;
+    border: 1px solid black;
+    margin-right: -1px;
+    margin-bottom: -5px;
+    background: #eee;
+}
+
+.bbo.full .bidding-box-field-calls { width: 20%; }
+.bbo.full .bidding-box-row-utilities .bidding-box-field {
+	width: 30%;
+	font-size: 16px;
+}
+.bbo.full .bidding-box-row-special-bids .bidding-box-field {
+	width: 25%;
+	font-size: 16px;
+}
+.bbo.full .bidding-box-field-calls-p, .bbo.full .bidding-box-field-calls-allpass { color: green; }
+.bbo.full .bidding-box-field-calls-x { color: red; }
+.bbo.full .bidding-box-field-calls-r { color: blue; }
+
+.bbo.full .disabled {
+	cursor: not-allowed;
+	opacity: 0.2;
+}
+
+.bbo.full .bidding-box-content .disabled {
+	visibility: hidden;
+}
+
+.bbo.full .bidding-box-row.disabled {
+	display: none;
+}
+
+.bbo.full .bidding-box-field-calls[data-bid="n"] { color: blue; }
+.bbo.full .bidding-box-field-calls[data-bid="s"] { color: black; }
+.bbo.full .bidding-box-field-calls[data-bid="h"] { color: red; }
+.bbo.full .bidding-box-field-calls .suit-hearts {color: red; }
+.bbo.full .bidding-box-field-calls[data-bid="d"] { color: orange; }
+.bbo.full .bidding-box-field-calls .suit-diamonds {color: orange; }
+.bbo.full .bidding-box-field-calls[data-bid="c"] { color: green; }
+
+.bbo.concise .bidding-box {
+	width: 328px;
+  border-radius: 13px;
+  border: 1px solid black;
+  background-color: #CCCC9A;
+  background: -webkit-linear-gradient(#CCCC9A, #ACAC7A);
+  background: -o-linear-gradient(#CCCC9A, #ACAC7A);
+  background: -moz-linear-gradient(#CCCC9A, #ACAC7A);
+  background: linear-gradient(#CCCC9A, #ACAC7A);
+}
+
+.bbo.concise .bidding-box-row { text-align:center; margin:auto; }
+.bbo.concise .bidding-box-field {
+    display: inline-block;
+    vertical-align: middle;
+    height: 38px;
+    border-radius: 9px;
+    background-color: #FFFFFF;
+    background: -webkit-linear-gradient(#FFFFFF, #DFDFDF);
+    background: -o-linear-gradient(#FFFFFF, #DFDFDF);
+    background: -moz-linear-gradient(#FFFFFF, #DFDFDF);
+    background: linear-gradient(#FFFFFF, #DFDFDF);
+    color: #000000;
+    margin: 0px;
+    padding: 0px;
+    align-items: flex-start;
+    text-align: center;
+    cursor: default;
+    box-sizing: border-box;
+    border: 2px outset buttonface;
+    text-rendering: auto;
+    letter-spacing: normal;
+    word-spacing: normal;
+    text-transform: none;
+    text-indent: 0px;
+    text-shadow: none;
+    font: 25px BlinkMacSystemFont;
+}
+
+.bbo.concise .bidding-box-field-level { width: 14%; }
+.bbo.concise .bidding-box-field-level.selected {
+    background-color: #FFCE00;
+    background: -webkit-linear-gradient(#FFCE00, #DFAE00);
+    background: -o-linear-gradient(#FFCE00, #DFAE00);
+    background: -moz-linear-gradient(#FFCE00, #DFAE00);
+    background: linear-gradient(#FFCE00, #DFAE00);
+    color: #000000;
+}
+.bbo.concise .bidding-box-field-calls { width: 11.5%; }
+
+.bbo.concise .bidding-box-field-level-0 {
+	display:none;
+	visibility:hidden;
+	width: 0%;
+}
+
+.bbo.concise .bidding-box-field-calls-abstain, .bbo.concise .bidding-box-content .bidding-box-field-calls-p, .bbo.concise .bidding-box-content .bidding-box-field-calls-x, .bbo.concise .bidding-box-content .bidding-box-field-calls-r {
+  visibility: hidden;
+  display: none;
+}
+
+.bbo.concise .bidding-box-field-calls-p, .bbo.concise .bidding-box-field-calls-allpass {
+  background-color: #106610;
+  background: -webkit-linear-gradient(#106610, #004600);
+  background: -o-linear-gradient(#106610, #004600);
+  background: -moz-linear-gradient(#106610, #004600);
+  background: linear-gradient(#106610, #004600);
+  color: #FFFFFF;
+  margin: 0px;
+  padding: 0px;
+}
+.bbo.concise .bidding-box-field-calls-x {
+  background-color: #CB0000;
+  background: -webkit-linear-gradient(#CB0000, #AB0000);
+  background: -o-linear-gradient(#CB0000, #AB0000);
+  background: -moz-linear-gradient(#CB0000, #AB0000);
+  background: linear-gradient(#CB0000, #AB0000);
+  color: #FFFFFF;
+  margin: 0px;
+  padding: 0px;
+}
+.bbo.concise .bidding-box-field-calls-r {
+  background-color: #4377A9;
+  background: -webkit-linear-gradient(#4377A9, #235789); /* For Safari 5.1 to 6.0 */
+  background: -o-linear-gradient(#4377A9, #235789); /* For Opera 11.1 to 12.0 */
+  background: -moz-linear-gradient(#4377A9, #235789); /* For Firefox 3.6 to 15 */
+  background: linear-gradient(#4377A9, ##235789); /* Standard syntax */
+  color: #FFFFFF;
+  margin: 0px;
+  padding: 0px;
+}
+
+
+.bbo.concise .bidding-box-header .bidding-box-field {
+	width: 32%;
+}
+
+.bbo.concise .disabled {
+	visibility: hidden;
+  display: none;
+}

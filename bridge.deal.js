@@ -23,6 +23,12 @@ Bridge.Deal = function( id ) {
 	 * @member {string}
 	 */
 	this.type = "Deal";
+	
+	/**
+	 * Should events be triggered for this object.
+	 * @member {bool}
+	 */
+	this.triggerEvents = true;
 		
 	/**
 	 * The 52 card objects

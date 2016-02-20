@@ -18,6 +18,7 @@ Bridge.Auction = function( deal ) {
 	 * @member {object}
 	 */
 	this.deal = deal;
+	this.parent = deal;
 	
 	/**
 	 * A unique id to identify this auction.
@@ -30,6 +31,13 @@ Bridge.Auction = function( deal ) {
 	 * @member {string}
 	 */
 	this.type = "Auction";
+	
+	
+	/**
+	 * Should events be triggered for this object.
+	 * @member {bool}
+	 */
+	this.triggerEvents = true;
 	
 	/**
 	 * The dealer for this auction.
@@ -381,6 +389,14 @@ Bridge.Auction.prototype.addAllPass = function() {
  */
 Bridge.Auction.prototype.clearCalls = function() {
 	while ( this.calls.length > 0 ) this.removeCall();
+};
+
+/**
+ * Abstain was called.
+ * Just raise an event and do not do anything.
+ */
+Bridge.Auction.prototype.abstain = function() {
+	this.onChange( "abstained", {} );
 };
 
 /**

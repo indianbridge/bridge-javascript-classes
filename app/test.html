@@ -5,52 +5,37 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Bridge Hand Generator</title>
-    <link rel="stylesheet" type="text/css" href="css/bw.css">
+    <link rel="stylesheet" type="text/css" href="css/bhp.css">
     <!-- jQuery -->
     <script src="js/jquery.min.js"></script>
-    <script src="js/lodash.min.js"></script> 
-    
+    <script src="js/lodash.min.js"></script>
+
   </head>
   <body>
 	<h1>Bridge Hand Creator/Viewer/Player</h1>
-	<div id="hand"></div>
-	<div id="auction"></div>
-	<script src="js/handlebars.min.js"></script> 
-	<script src="../bridge.core.js"></script>  
-	<script src="../bridge.deal.js"></script>  
-	<script src="../bridge.hand.js"></script>  
-	<script src="../bridge.call.js"></script>  
-	<script src="../bridge.contract.js"></script>  
-	<script src="../bridge.auction.js"></script>  
-	<script src="../bridge.card.js"></script> 
-	<script src="../bridge.play.js"></script> 
-	<script src="../bridge.playedcard.js"></script> 
-	<script src="../bridge.ui.js"></script>   
-	<script src="../bridge.templates.js"></script>  
-	<script src="js/test.js"></script>  
-	
-	<script id="bw-one-hand" type="text/x-handlebars-template">
-		<div class="hand">
-			<div class="info">
-				<div class="direction">{{direction}}</div>
-				<div class="name">{{name}}</div>
-			</div>
-			<div class="cards-block">
-				{{#each hand}}
-				<div class="suit-row">
-					<div class="suit">{{{this.suit}}}</div>
-					<div class="cards-row">{{#each this.cards}}{{this}}{{/each}}</div>
-				</div>
-				{{/each}}
-			</div>
-		</div>
-	</script>
-	
-	<script id="bw-auction" type="text/x-handlebars-template">
-		<div class="auction">
-			<div class="directions">{{#each directions}}<div class="direction">{{{this}}}</div>{{/each}}</div>
-			<div class="bids">{{#each bids}}<div class="bid-row">{{#each this}}<div class="bid">{{{this}}}</div>{{/each}}</div>{{/each}}</div>
-		</div>
-	</script>
+	<div id="hand1"></div>
+	<hr/>
+  <div id="card-deck1"></div>
+  <hr/>
+	<div id="hand2"></div>
+	<hr/>
+	<div id="auction1"></div>
+	<hr/>
+	<div id="auction2"></div>
+	<hr/>
+	<div id="bidding-box1"></div>
+	<hr/>
+	<div id="bidding-box2"></div>
+	<script src="../bridge.core.js"></script>
+	<script src="../bridge.deal.js"></script>
+	<script src="../bridge.hand.js"></script>
+	<script src="../bridge.call.js"></script>
+	<script src="../bridge.contract.js"></script>
+	<script src="../bridge.auction.js"></script>
+	<script src="../bridge.card.js"></script>
+	<script src="../bridge.play.js"></script>
+	<script src="../bridge.playedcard.js"></script>
+	<script src="../bridge.ui.js"></script>
+	<script src="js/test.js"></script>
   </body>
 </html>

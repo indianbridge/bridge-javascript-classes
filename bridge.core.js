@@ -18,7 +18,7 @@ if ( typeof _ === "undefined" ) {
  * @property {object} vulnerabilities - The list of possible vulnerabilities
  */
 var Bridge = {
-	directions : { 
+	directions : {
 		'n' : { name : 'North', lho: 'e', rho: 'w', cho: 's', index: 1, html: 'North' },
 		'e' : { name : 'East',  lho: 's', rho: 'n', cho: 'w', index: 2, html: 'East' },
 		's' : { name : 'South', lho: 'w', rho: 'e', cho: 'n', index: 3, html: 'South' },
@@ -27,42 +27,42 @@ var Bridge = {
 	directionOrder: [],
 
 	suits : {
-		's' : { name : 'Spades', index : 0, html : '<span class="suit-spades">&spades;</span>' }, 
-		'h' : { name : 'Hearts', index : 1, html : '<span class="suit-hearts">&hearts;</span>' }, 
-		'd' : { name : 'Diamonds', index : 2, html : '<span class="suit-diamonds">&diams;</span>' }, 
+		's' : { name : 'Spades', index : 0, html : '<span class="suit-spades">&spades;</span>' },
+		'h' : { name : 'Hearts', index : 1, html : '<span class="suit-hearts">&hearts;</span>' },
+		'd' : { name : 'Diamonds', index : 2, html : '<span class="suit-diamonds">&diams;</span>' },
 		'c' : { name : 'Clubs', index : 3, html : '<span class="suit-clubs">&clubs;</span>' }
 	},
 	suitOrder: [],
-	
+
 	calls : {
-		'n' : { name : 'No Trump', index : 0, isStrain: true, bid: true, text: "NT", html : '<span class="suit-NT">NT</span>' }, 
-		's' : { name : 'Spades', index : 1, isStrain: true, bid: true, text: "&spades;", html : '<span class="suit-spades">&spades;</span>' }, 
-		'h' : { name : 'Hearts', index : 2, isStrain: true, bid: true, text: "&hearts;", html : '<span class="suit-hearts">&hearts;</span>' }, 
-		'd' : { name : 'Diamonds', index : 3, isStrain: true, bid: true, text: "&diams;", html : '<span class="suit-diamonds">&diams;</span>' }, 
-		'c' : { name : 'Clubs', index : 4, isStrain: true, bid: true, text: "&clubs;", html : '<span class="suit-clubs">&clubs;</span>' },	
-		'p' : { name : 'Pass', index : 7, isStrain: false, bid: false, text: "P", html : '<span class="bid-pass">P</span>' }, 
-		'x' : { name : 'Double', index : 6, isStrain: false, bid: false, text: "X", html : '<span class="bid-double">X</span>' }, 
+		'n' : { name : 'No Trump', index : 0, isStrain: true, bid: true, text: "NT", html : '<span class="suit-NT">NT</span>' },
+		's' : { name : 'Spades', index : 1, isStrain: true, bid: true, text: "&spades;", html : '<span class="suit-spades">&spades;</span>' },
+		'h' : { name : 'Hearts', index : 2, isStrain: true, bid: true, text: "&hearts;", html : '<span class="suit-hearts">&hearts;</span>' },
+		'd' : { name : 'Diamonds', index : 3, isStrain: true, bid: true, text: "&diams;", html : '<span class="suit-diamonds">&diams;</span>' },
+		'c' : { name : 'Clubs', index : 4, isStrain: true, bid: true, text: "&clubs;", html : '<span class="suit-clubs">&clubs;</span>' },
+		'p' : { name : 'Pass', index : 7, isStrain: false, bid: false, text: "P", html : '<span class="bid-pass">P</span>' },
+		'x' : { name : 'Double', index : 6, isStrain: false, bid: false, text: "X", html : '<span class="bid-double">X</span>' },
 		'r' : { name : 'Redouble', index : 5, isStrain: false, bid: false, text: "XX", html : '<span class="bid-redouble">XX</span>' }
-	},	
+	},
 	callOrder: [],
 
-	ranks : { 
-		'a' : { name : 'Ace',	index : 0, html: 'A' }, 
-		'k' : { name : 'King',	index : 1, html: 'K' }, 
-		'q' : { name : 'Queen',	index : 2, html: 'Q' }, 
-		'j' : { name : 'Jack',	index : 3, html: 'J' }, 
-		't' : { name : 'Ten',	index : 4, html: 'T' }, 
-		'9' : { name : 'Nine',	index : 5, html: '9' }, 
-		'8' : { name : 'Eight',	index : 6, html: '8' }, 
-		'7' : { name : 'Seven',	index : 7, html: '7' }, 
-		'6' : { name : 'Six',	index : 8, html: '6' }, 
-		'5' : { name : 'Five',	index : 9, html: '5' }, 
-		'4' : { name : 'Four',	index : 10, html: '4' }, 
-		'3' : { name : 'Three',	index : 11, html: '3' }, 
-		'2' : { name : 'Two',	index : 12, html: '2' }
+	ranks : {
+		'a' : { name : 'Ace',	index : 0, html: '<span class="rank-a rank-14 rank-1">A</span>' },
+		'k' : { name : 'King',	index : 1, html: '<span class="rank-k rank-13">K</span>' },
+		'q' : { name : 'Queen',	index : 2, html: '<span class="rank-q rank-12">Q</span>' },
+		'j' : { name : 'Jack',	index : 3, html: '<span class="rank-j rank-11">J</span>' },
+		't' : { name : 'Ten',	index : 4, html: '<span class="rank-t rank-10">T</span>' },
+		'9' : { name : 'Nine',	index : 5, html: '<span class="rank-9">9</span>' },
+		'8' : { name : 'Eight',	index : 6, html: '<span class="rank-8">8</span>' },
+		'7' : { name : 'Seven',	index : 7, html: '<span class="rank-7">7</span>' },
+		'6' : { name : 'Six',	index : 8, html: '<span class="rank-6">6</span>' },
+		'5' : { name : 'Five',	index : 9, html: '<span class="rank-5">5</span>' },
+		'4' : { name : 'Four',	index : 10, html: '<span class="rank-4">4</span>' },
+		'3' : { name : 'Three',	index : 11, html: '<span class="rank-3">3</span>' },
+		'2' : { name : 'Two',	index : 12, html: '<span class="rank-2">2</span>' }
 	},
 	rankOrder: [],
-	
+
 	vulnerabilities : {
 		'-' : { name: 'None', index: 0, html: 'None' },
 		'n' : { name: 'NS', index: 0, html: 'North-South' },
@@ -80,7 +80,7 @@ var Bridge = {
 Bridge._addKey = function( list ) {
 	for( var item in list ) {
 		list[ item ].key = item;
-	}	
+	}
 };
 
 /**
@@ -109,7 +109,7 @@ Bridge._checkListMembership = function( element, list, listName, context ) {
 	if ( !_.has( list, element ) ) {
 		var message = element + ' is not a valid ' + listName;
 		Bridge._reportError( message, context );
-	}	
+	}
 };
 
 /**
@@ -127,7 +127,7 @@ Bridge._belongsTo = function( element, list ) {
  * Check to see if a required argument is provided
  * @param {*} value - The reuired argument
  * @param {string} name - The name of the argument for printing
- * @param {string} [context] - The context ( for example the method ) of this call 
+ * @param {string} [context] - The context ( for example the method ) of this call
  * @private
  * @throws {Error} required value is not specified
  */
@@ -181,27 +181,23 @@ Bridge.options = {
 	log: {
 		EVENT: { name: "events", enabled: true }
 	},
-	// Which object events to trigger
-	triggerEvents: {
-		"deal": true,
-		"hand": true,
-		"auction": true,
-		"play": true
-	}
+	// Global flag to determine if events will be triggered or not.
+	// Setting this to false will disable all events for all deals
+	triggerEvents: true
 };
 
 /**
  * Convenience function to enable all event triggers.
  */
 Bridge.enableAllEventTriggers = function() {
-	_.each( Bridge.options.triggerEvents, function(value, key, obj) { obj[key] = true; });
+	Bridge.options.triggerEvents = true;
 };
 
 /**
  * Convenience function to disable all event triggers.
  */
 Bridge.disableAllEventTriggers = function() {
-	_.each( Bridge.options.triggerEvents, function(value, key, obj) { obj[key] = false; });
+	Bridge.options.triggerEvents = false;
 };
 
 /**
@@ -212,7 +208,7 @@ Bridge.CONSTANTS = {
 	// The delimiter used in event names
 	eventNameDelimiter: ':',
 	// Name of event raised by all objects
-	eventName: "event"	
+	eventName: "event"
 };
 
 /**
@@ -222,7 +218,13 @@ Bridge.CONSTANTS = {
  * @param {mixed} parameters - Any relevant parameters used in the operation
  */
 Bridge._triggerEvents = function( raiser, operation, parameters ) {
-	if ( Bridge.options.triggerEvents[ raiser.type ] ||  Bridge.options.triggerEvents[ raiser.type.toLowerCase() ] ) {
+	var triggerEvents = Bridge.options.triggerEvents;
+	var obj = raiser;
+	while ( obj ) {
+		triggerEvents = triggerEvents && obj.triggerEvents;
+		obj = obj.parent;
+	}
+	if ( triggerEvents ) {
 		var delimiter = Bridge.CONSTANTS.eventNameDelimiter;
 		var prefix = raiser.type || '';
 		var eventName = prefix + delimiter + Bridge.CONSTANTS.eventName;
@@ -241,15 +243,15 @@ Bridge._triggerEvents = function( raiser, operation, parameters ) {
 Bridge._triggerOneEvent = function( eventName, raiser, operation, parameters ) {
 	var delimiter = Bridge.CONSTANTS.eventNameDelimiter;
 	$( document ).trigger( eventName,  {
-		"raisedBy": raiser, 
-		"action": operation, 
+		"raisedBy": raiser,
+		"action": operation,
 		"parameters": parameters
 	});
 	Bridge._log( eventName + " - " + operation, Bridge.options.log.EVENT );
 	eventName = raiser.id + delimiter + eventName;
 	$( document ).trigger( eventName,  {
-		"raisedBy": raiser, 
-		"action": operation, 
+		"raisedBy": raiser,
+		"action": operation,
 		"parameters": parameters
 	});
 	Bridge._log( eventName + " - " + operation, Bridge.options.log.EVENT );
@@ -265,7 +267,7 @@ Bridge._triggerOneEvent = function( eventName, raiser, operation, parameters ) {
  */
 Bridge._log = function( message, logClass ) {
 	if ( logClass.enabled ) {
-		if ( console ) console.log( logClass.name + " : " + message );	
+		if ( console ) console.log( logClass.name + " : " + message );
 	}
 };
 
@@ -323,7 +325,7 @@ Bridge.getPartner = function( direction ) { return Bridge.directions[ direction 
 
 /**
  * Check if two directions are opponents.
- * No check is performed since it is assumed caller will check this is a valid direction. 
+ * No check is performed since it is assumed caller will check this is a valid direction.
  * @param {string} direction1 - the first direction
  * @param {string} direction2 - the second direction
  * @return true if direction1 and direction2 are opponents, false otherwise
@@ -334,7 +336,7 @@ Bridge.areOpponents = function( direction1, direction2 ) {
 
 /**
  * Check if two directions are partners.
- * No check is performed since it is assumed caller will check this is a valid direction. 
+ * No check is performed since it is assumed caller will check this is a valid direction.
  * @param {string} direction1 - the first direction
  * @param {string} direction2 - the second direction
  * @return true if direction1 and direction2 are opponents, false otherwise
@@ -351,7 +353,7 @@ Bridge.arePartners = function( direction1, direction2 ) {
  */
 Bridge.makeIdentifier = function(text) {
   return text.trim().replace(/[^a-zA-Z0-9]+/g,'_');
-}; 
+};
 
 /**
  * Assign a default value to variable if it is not defined.
@@ -420,7 +422,7 @@ Bridge._getParameters = function( text, delimiter1, delimiter2 ) {
 	if ( delimiter2 ) {
 		queryString = queryString.split( delimiter2 )[0];
 	}
-	return Bridge._parseParameterValues( queryString, '&', '=' );	
+	return Bridge._parseParameterValues( queryString, '&', '=' );
 };
 
 /**
@@ -550,7 +552,7 @@ Bridge.isStrain = function( suit ) {
 Bridge._checkCard = function( card, context ) {
 	if ( !card || card.length !== 2 ) {
 		Bridge._reportError( "Card " + card + " does not have length 2", context );
-	}	
+	}
 	var suit = card[0];
 	Bridge._checkSuit( suit, context );
 	var rank = card[1];
@@ -598,7 +600,7 @@ Bridge._checkLevel = function( level, context ) {
 	var levelNum = parseInt( level );
 	if ( isNaN( levelNum ) || String( levelNum ) !== String( level ) || levelNum < 1 || levelNum > 7 ) {
 		Bridge._reportError( level + ' is not a valid level', context );
-	}	
+	}
 };
 
 /**
@@ -610,7 +612,7 @@ Bridge.isLevel = function( level ) {
 	var levelNum = parseInt( level );
 	if ( isNaN( levelNum ) || String( levelNum ) !== String( level ) || levelNum < 1 || levelNum > 7 ) {
 		return false;
-	}	
+	}
 	return true;
 };
 
@@ -628,7 +630,7 @@ Bridge._checkBid = function( bid, context ) {
 		var suit = bid[0];
 		Bridge._checkCall( suit, context );
 		if ( Bridge.isStrain( suit ) ) {
-			Bridge._reportError( "Invalid bid " + bid, context );			
+			Bridge._reportError( "Invalid bid " + bid, context );
 		}
 		return;
 	}
@@ -721,14 +723,14 @@ Bridge.IDManager = {
  * Generate a new ID.
  * Check if an id exists and throw an exception if it does
  * @param {string} id - a string identifier.
- * @return {string} a new id if none already specified. 
+ * @return {string} a new id if none already specified.
  * @throws id already exists
  */
 Bridge.IDManager.getID = function( id ) {
 	if ( !id ) {
 		var date = new Date();
 		var base_id = date.toJSON();
-		id = base_id;
+		id = Bridge.makeIdentifier( base_id );
 		var counter = 1;
 		while ( id in Bridge.IDManager.usedIDs ) {
 			id = base_id + '-' + counter;
