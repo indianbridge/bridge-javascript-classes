@@ -293,7 +293,7 @@ Bridge.Hand.prototype.toBWHandDiagram = function( config ) {
  * This is used to determine whether enable click handlers or not (no if callback) default value is false
  * @return {string} HTML representation of this deal.
  */
-Bridge.Hand.prototype.toHTML = function( config, isCallback ) {
+Bridge.Hand.prototype.toHTML = function toHTML( config, isCallback ) {
 	isCallback = Bridge.assignDefault( isCallback, false );
 	config = Bridge.assignDefault( config, {} );
 	_.defaults( config, {
@@ -442,7 +442,9 @@ Bridge.Hand.prototype.toHTML = function( config, isCallback ) {
 	var footerHTML = "";
 
 	var html = Bridge._generateHTMLModule( config, headerHTML, contentHTML, footerHTML );
-	return Bridge._embed( this, config, html, isCallback );
+	html = Bridge._embed( config, html, isCallback );
+	Bridge._registerChangeHandler( this, config, arguments.callee.name );
+	return html;
 };
 
 /**
@@ -452,31 +454,19 @@ Bridge.Hand.prototype.toHTML = function( config, isCallback ) {
  * @param {function} callback - the callback method to call
  */
 Bridge._registerChangeHandler = function( owner, config, callback ) {
-	var rootID = config.rootID;
-	if ( !rootID ) {
-		Bridge._reportError( "Registering Change Handler is useless unless you have rootID" );
-	}
-	var items = [
-		owner.getID(),
-		owner.type,
-		Bridge.CONSTANTS.eventName
-	];
-	var event = items.join( Bridge.CONSTANTS.eventNameDelimiter ) + '.' + rootID;
+	// No op is flag is not set
+	if ( !config.registerChangeHandler ) return;
+	var event = owner.getID() + Bridge.CONSTANTS.eventNameDelimiter + Bridge.CONSTANTS.eventName + '.' + config.rootID;
 	$( document ).off( event );
 	$( document ).on( event, { config: _.cloneDeep( config ), owner: owner, callback: callback, id: config.rootID, event: event }, function( e, args ) {
-		if ( args.raisedBy !== e.data.owner ) return;
 		var id = e.data.id;
 		if ( $( '#' + id ).length === 0 ) {
-			// block has been removed. Turn off event handler.
+			// block is not in dom. Turn off event handler.
+			Bridge._logDebug( "Turning off event " + e.data.event );
 			$( document ).off( e.data.event );
 			return;
 		}
-		if ( e.data.callback ) {
-			e.data.owner[e.data.callback]( e.data.config, true );
-		}
-		else {
-			e.data.owner.toHTML( e.data.config, true );
-		}
+		e.data.owner[e.data.callback]( e.data.config, true );
 	});
 };
 
@@ -528,7 +518,7 @@ Bridge.Auction.prototype.toBBOAuctionDiagram = function( config ) {
  * This is used to determine whether enable click handlers or not (no if callback) default value is false
  * @return {string} html representation of this auction.
  */
-Bridge.Auction.prototype.toHTML = function( config, isCallback ) {
+Bridge.Auction.prototype.toHTML = function toHTML( config, isCallback ) {
 	isCallback = Bridge.assignDefault( isCallback, false );
 	config = Bridge.assignDefault( config, {} );
 	_.defaults( config, {
@@ -664,18 +654,26 @@ Bridge.Auction.prototype.toHTML = function( config, isCallback ) {
 	var footerHTML = "";
 
 	var html = Bridge._generateHTMLModule( config, headerHTML, contentHTML, footerHTML );
-	return Bridge._embed( this, config, html, isCallback );
+	html = Bridge._embed( config, html, isCallback );
+	Bridge._registerChangeHandler( this, config, arguments.callee.name );
+	return html;
 };
 
 /**
- * Convenience method to embed html and register handler.
+ * Convenience method to embed html.
  */
-Bridge._embed = function( caller, config, base_html, isCallback, callbackMethod ) {
-	var html = ( isCallback ? base_html : Bridge._addWrapper( config, base_html ) );
-	if ( !isCallback && config.containerID ) Bridge.embedHTML( config.containerID, html );
-	if ( isCallback && config.registerChangeHandler && config.rootID ) Bridge.embedHTML( config.rootID, html );
-	if ( !isCallback && config.registerChangeHandler ) {
-		Bridge._registerChangeHandler( caller, config, callbackMethod );
+Bridge._embed = function( config, base_html, isCallback ) {
+	if ( isCallback ) {
+		// This is a callback so rootID should already be set.
+		if ( config.rootID ) Bridge.embedHTML( config.rootID, base_html );
+		// No need to register change handler again since we set it up the first time this was called.
+	}
+	else {
+		// not a callback so this is the first time this is being called.
+		// Add a wrapper with a rootID which can be used in callbacks.
+		var html = Bridge._addWrapper( config, base_html );
+		// Embed in container if requested in config.
+		if ( config.containerID ) Bridge.embedHTML( config.containerID, html );
 	}
 	return html;
 };
@@ -776,7 +774,9 @@ Bridge.Deal.prototype._getCardDeckHtml = function() {
 			if ( !assignedTo ) assignedTo = "";
 			var classes = [ 'rank' ];
 			classes.push( assignedTo ? "assigned" : "unassigned" );
-			html += "<div class='" + classes.join(' ') + "' data-suit='" + suit + "' data-rank='" + rank + "' data-assigned_to='" + assignedTo + "'>";
+			var handName = Bridge.directions[ ( assignedTo ? assignedTo : this.getActiveHand() ) ].name;
+			var title = ( assignedTo ? "Unassign from " : "Assign to " ) + handName;
+			html += "<div class='" + classes.join(' ') + "' title='" + title + "' data-suit='" + suit + "' data-rank='" + rank + "' data-assigned_to='" + assignedTo + "'>";
 			html += Bridge.suits[ suit ].html + Bridge.ranks[ rank ].html;
 			if ( assignedTo ) {
 				html += "<span class='assigned-to' data-direction='" + assignedTo + "'>(" + assignedTo.toUpperCase() + ")</span>";
@@ -799,7 +799,7 @@ Bridge.Deal.prototype._getCardDeckHtml = function() {
  * This is used to determine whether enable click handlers or not (no if callback) default value is false
  * @return {string} html generated for bidding box
  */
-Bridge.Deal.prototype.toCardDeck = function( config, isCallback ) {
+Bridge.Deal.prototype.toCardDeck = function toCardDeck( config, isCallback ) {
 	isCallback = Bridge.assignDefault( isCallback, false );
 	config = Bridge.assignDefault( config, {} );
 	_.defaults( config, {
@@ -809,8 +809,9 @@ Bridge.Deal.prototype.toCardDeck = function( config, isCallback ) {
 		data: {},
 		classes: {},
 		idPrefix: null,
+		rootID: Bridge.IDManager.getID(),
 		containerID: null,
-		registerChangeHandler: false
+		registerChangeHandler: true
 	});
 	var prefix = config.prefix;
 	// Since lodash does not have recursive defaults we need this hack
@@ -821,7 +822,7 @@ Bridge.Deal.prototype.toCardDeck = function( config, isCallback ) {
 		assignedTo: true,
 		reset: false
 	});
-	var tags = Bridge.getTableConfig( prefix );
+	var tags = Bridge.getDivConfig( prefix );
 	_.defaults( config.tags, tags);
 
 	// Header
@@ -877,7 +878,7 @@ Bridge.Deal.prototype.toCardDeck = function( config, isCallback ) {
 			contentHTML += Bridge._openTag( tag, config, classes, data );
 			if ( config.show.text ) contentHTML += Bridge.suits[ suit ].html + Bridge.ranks[ rank ].html;
 			if ( config.show.assignedTo ) {
-				if ( assignedTo ) contentHTML += "(" + assignedTo.toUpperCase() + ")";
+				if ( assignedTo ) contentHTML += "<span class='assigned-to'>(" + assignedTo.toUpperCase() + ")</span>";
 			}
 			contentHTML += Bridge._closeTag( tag );
 			contentHTML += Bridge._closeTag( columnTag );
@@ -909,11 +910,10 @@ Bridge.Deal.prototype.toCardDeck = function( config, isCallback ) {
 		footerHTML += Bridge._closeTag( rowTag );
 	}
 	var html = Bridge._generateHTMLModule( config, headerHTML, contentHTML, footerHTML );
-	if ( config.containerID ) {
-		Bridge.embedHTML( config.containerID, html );
-		$( document ).trigger( "card-deck:updated" );
-	}
-	if ( config.registerChangeHandler ) {
+	html = Bridge._embed( config, html, isCallback );
+	Bridge._registerChangeHandler( this, config, arguments.callee.name );
+	return html;
+	/*if ( !isCallback && config.registerChangeHandler ) {
 		var id = "card-deck1";
 		$(  "#" + id ).on( "click", "." + config.prefix + "-field-cards", { deal: this } , function( e ) {
 			try {
@@ -940,30 +940,8 @@ Bridge.Deal.prototype.toCardDeck = function( config, isCallback ) {
 				alert( err.message );
 			}
 		});
-		if ( !isCallback ) {
-			if ( !config.containerID ) {
-				Bridge._reportError( "Registering Change Handler is useless unless you are embedding in a container", prefix );
-			}
-			var items = [
-				this.getID(),
-				"Hand",
-				Bridge.CONSTANTS.eventName
-			];
-			var event = items.join( Bridge.CONSTANTS.eventNameDelimiter ) + '.' + config.containerID;
-			$( document ).off( event );
-			$( document ).on( event, { config: _.cloneDeep( config ), id: config.containerID, event: event }, function( e, args ) {
-				var id = e.data.id;
-				if ( $( '#' + id ).length === 0 ) {
-					// block has been removed. Turn off event handler.
-					var event = e.data.event;
-					$( document ).off( event );
-					return;
-				}
-				e.data.deal.toCardDeck( e.data.config, true );
-			});
-		}
 	}
-	return html;
+	return html;*/
 };
 
 /**
@@ -1021,7 +999,7 @@ Bridge.Auction.prototype.toBBOBiddingBox = function( config ) {
  * This is used to determine whether enable click handlers or not (no if callback) default value is false
  * @return {string} html generated for bidding box
  */
-Bridge.Auction.prototype.toBiddingBox = function( config, isCallback ) {
+Bridge.Auction.prototype.toBiddingBox = function toBiddingBox( config, isCallback ) {
 	isCallback = Bridge.assignDefault( isCallback, false );
 	config = Bridge.assignDefault( config, {} );
 	_.defaults( config, {
@@ -1062,8 +1040,11 @@ Bridge.Auction.prototype.toBiddingBox = function( config, isCallback ) {
 		var html = this._createFullBiddingBox( config );
 	}
 	var html = Bridge._embed( this, config, html, isCallback, "toBiddingBox" );
+	html = Bridge._embed( config, html, isCallback );
+	Bridge._registerChangeHandler( this, config, arguments.callee.name );
+	return html;
 
-	if ( config.registerChangeHandler && !isCallback ) {
+	/*if ( config.registerChangeHandler && !isCallback ) {
 		var id = config.rootID;
 		$( "#" + id ).on( "click", "." + config.prefix + "-field-level.enabled", { auction: this }, function( e ) {
 			var level = $( this ).data( "level" );
@@ -1084,7 +1065,7 @@ Bridge.Auction.prototype.toBiddingBox = function( config, isCallback ) {
 			}
 		});
 	}
-	return html;
+	return html;*/
 };
 
 /**

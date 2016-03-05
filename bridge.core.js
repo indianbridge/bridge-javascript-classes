@@ -179,7 +179,8 @@ Bridge.options = {
 	useContextInErrorMessage: false,
 	// Which classes of logs to enable
 	log: {
-		EVENT: { name: "events", enabled: true }
+		EVENT: { name: "events", enabled: true },
+		DEBUG: { name: "debug", enabled: false }
 	},
 	// Global flag to determine if events will be triggered or not.
 	// Setting this to false will disable all events for all deals
@@ -218,20 +219,35 @@ Bridge.CONSTANTS = {
  * @param {mixed} parameters - Any relevant parameters used in the operation
  */
 Bridge._triggerEvents = function( raiser, operation, parameters ) {
-	var triggerEvents = Bridge.options.triggerEvents;
-	var obj = raiser;
-	while ( obj ) {
-		triggerEvents = triggerEvents && obj.triggerEvents;
-		obj = obj.parent;
-	}
-	if ( triggerEvents ) {
+	// Raise only one event based on id which should be the same for all
+	// objects (hand, auction, play etc.) in a deal.
+	if ( Bridge.options.triggerEvents ) {
 		var delimiter = Bridge.CONSTANTS.eventNameDelimiter;
-		var prefix = raiser.type || '';
-		var eventName = prefix + delimiter + Bridge.CONSTANTS.eventName;
-		Bridge._triggerOneEvent( eventName, raiser, operation, parameters );
-		eventName = prefix + delimiter + operation;
-		Bridge._triggerOneEvent( eventName, raiser, operation, parameters );
+		var eventName = raiser.id + delimiter + Bridge.CONSTANTS.eventName;
+		$( document ).trigger( eventName,  {
+			"raisedBy": raiser,
+			"action": operation,
+			"parameters": parameters
+		});
+		Bridge._logEvent( eventName + " - " + operation );
 	}
+	/*var triggerEvents = Bridge.options.triggerEvents;
+	var obj = raiser;
+	while ( raiser ) {
+		if ( triggerEvents ) {
+			var delimiter = Bridge.CONSTANTS.eventNameDelimiter;
+			var prefix = raiser.type || '';
+			var eventName = prefix + delimiter + Bridge.CONSTANTS.eventName;
+			Bridge._triggerOneEvent( eventName, raiser, operation, parameters );
+			eventName = prefix + delimiter + operation;
+			Bridge._triggerOneEvent( eventName, raiser, operation, parameters );
+			triggerEvents = triggerEvents && obj.triggerEvents;
+			raiser = raiser.parent;
+		}
+		else {
+			return;
+		}
+	}*/
 };
 
 /**
@@ -247,14 +263,14 @@ Bridge._triggerOneEvent = function( eventName, raiser, operation, parameters ) {
 		"action": operation,
 		"parameters": parameters
 	});
-	Bridge._log( eventName + " - " + operation, Bridge.options.log.EVENT );
+	Bridge._logEvent( eventName + " - " + operation );
 	eventName = raiser.id + delimiter + eventName;
 	$( document ).trigger( eventName,  {
 		"raisedBy": raiser,
 		"action": operation,
 		"parameters": parameters
 	});
-	Bridge._log( eventName + " - " + operation, Bridge.options.log.EVENT );
+	Bridge._logEvent( eventName + " - " + operation );
 };
 
 
@@ -266,10 +282,20 @@ Bridge._triggerOneEvent = function( eventName, raiser, operation, parameters ) {
  * @param {string} logClass - the class that this log message belongs to
  */
 Bridge._log = function( message, logClass ) {
-	if ( logClass.enabled ) {
-		if ( console ) console.log( logClass.name + " : " + message );
+	if ( !logClass || logClass.enabled ) {
+		if ( $.type(logClass) === "string" ) var name = logClass;
+		else var name = logClass.name || "unknown";
+		if ( console ) console.log( name + " : " + message );
 	}
 };
+
+Bridge._logEvent = function( message ) {
+	Bridge._log( message, Bridge.options.log.EVENT );
+}
+
+Bridge._logDebug = function( message ) {
+	Bridge._log( message, Bridge.options.log.DEBUG );
+}
 
 /**
  * Does the first rank beat the second rank?

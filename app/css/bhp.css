@@ -117,24 +117,24 @@
 
 .bw.full .bidding-box-field {
 	display: inline-block;
-    -moz-box-sizing: border-box;
-    -webkit-box-sizing: border-box;
-    box-sizing: border-box;
-    cursor: pointer;
-    font-size: 20px;
-    height: 35px;
-    line-height: 35px;
-    text-align: center;
-    -moz-border-radius-topleft: 5px;
-    -webkit-border-top-left-radius: 5px;
-    border-top-left-radius: 5px;
-    -moz-border-radius-topright: 5px;
-    -webkit-border-top-right-radius: 5px;
-    border-top-right-radius: 5px;
-    border: 1px solid black;
-    margin-right: -1px;
-    margin-bottom: -5px;
-    background: #eee;
+  -moz-box-sizing: border-box;
+  -webkit-box-sizing: border-box;
+  box-sizing: border-box;
+  cursor: pointer;
+  font-size: 20px;
+  height: 35px;
+  line-height: 35px;
+  text-align: center;
+  -moz-border-radius-topleft: 5px;
+  -webkit-border-top-left-radius: 5px;
+  border-top-left-radius: 5px;
+  -moz-border-radius-topright: 5px;
+  -webkit-border-top-right-radius: 5px;
+  border-top-right-radius: 5px;
+  border: 1px solid black;
+  margin-right: -1px;
+  margin-bottom: -5px;
+  background: #eee;
 }
 
 .bw.full .bidding-box-field-calls { width: 20%; }
@@ -391,4 +391,60 @@
 .bbo.concise .disabled {
 	visibility: hidden;
   display: none;
+}
+
+.bw .card-deck {
+  width: 400px;
+}
+
+.bw .card-deck-content {
+  padding-bottom: 5px;
+}
+
+.bw .card-deck-header {
+  background: #cc0;
+}
+
+.bw .card-deck-content, .bw .card-deck-header {
+  margin:auto;
+  text-align: center;
+  -moz-box-sizing: border-box;
+  -webkit-box-sizing: border-box;
+  box-sizing: border-box;
+  -moz-border-radius-topleft: 5px;
+  -webkit-border-top-left-radius: 5px;
+  border-radius: 5px;
+  -moz-border-radius: 5px;
+  -webkit-border-radius: 5px;
+  border: 1px solid black;
+}
+
+.bw .card-deck-field-cards {
+  display: inline-block;
+  -moz-box-sizing: border-box;
+  -webkit-box-sizing: border-box;
+  box-sizing: border-box;
+  cursor: pointer;
+  width: 7%;
+  height: 35px;
+  line-height: 35px;
+  text-align: center;
+  -moz-border-radius-topleft: 5px;
+  -webkit-border-top-left-radius: 5px;
+  border-top-left-radius: 5px;
+  -moz-border-radius-topright: 5px;
+  -webkit-border-top-right-radius: 5px;
+  border-top-right-radius: 5px;
+  border: 1px solid black;
+  margin-right: -1px;
+  margin-bottom: -5px;
+  background: #eee;
+}
+
+.bw .card-deck-field-cards.assigned {
+  opacity: 0.2;
+}
+
+.bw .card-deck .assigned-to {
+  display:none;
 }

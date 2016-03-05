@@ -1,7 +1,7 @@
 /**
  * Defines Deal class and all methods associated with it.
  */
- 
+
 // Get Namespace.
 var Bridge = Bridge || {};
 
@@ -11,25 +11,25 @@ var Bridge = Bridge || {};
  * @memberof Bridge
  */
 Bridge.Deal = function( id ) {
-	
+
 	/**
 	 * Optional Unique id to identify this deal.
 	 * @member {string}
 	 */
 	this.id = Bridge.IDManager.getID( id );
-	
+
 	/**
 	 * The type of this object.
 	 * @member {string}
 	 */
 	this.type = "Deal";
-	
+
 	/**
 	 * Should events be triggered for this object.
 	 * @member {bool}
 	 */
 	this.triggerEvents = true;
-		
+
 	/**
 	 * The 52 card objects
 	 * @member {object}
@@ -40,68 +40,74 @@ Bridge.Deal = function( id ) {
 		for( var rank in Bridge.ranks ) {
 			this.cards[ suit ][ rank ] = new Bridge.Card( suit, rank );
 		}
-	}	
-	
+	}
+
 	/**
 	 * The 4 hands in this deal
 	 * @member {object}
-	 */	
+	 */
 	this.hands = {};
 	for( var direction in Bridge.directions ) {
 		this.hands[ direction ] = new Bridge.Hand( direction, this );
-	}		
-	
+	}
+
 	/** The currently active hand. */
 	this._activeHand = 'n';
-	
+
 	/**
 	 * The board number of this deal.
 	 * @member {number}
 	 */
 	this.board = 1;
-	
+
 	/**
 	 * The vulnerability of this deal.
 	 * @member {string}
 	 */
 	this.vulnerability = "-";
-	
+
 	/**
 	 * The dealer of this deal.
 	 * @member {string}
 	 */
 	this.dealer = "n";
-	
+
 	/**
 	 * The form of scoring for this deal.
 	 * @member {string}
 	 */
-	this.scoring = "KO";	
-	
+	this.scoring = "KO";
+
 	/**
 	 * Any notes associated with this deal.
 	 * @member {string}
 	 */
-	this.notes = "";	
-	
+	this.notes = "";
+
 	/**
 	 * The auction associated with this deal.
 	 * @member {object}
 	 */
-	this.auction = new Bridge.Auction( this );	
-	
+	this.auction = new Bridge.Auction( this );
+
 	/**
 	 * The play associated with this deal
 	 * @member {object}
 	 */
 	this.play = new Bridge.Play( this );
+
+  /**
+	 * Should events be triggered for this object.
+	 * @member {bool}
+	 */
+	this.triggerEvents = true;
 };
 
 //
 // Getters and Setters
 //
 
-/** 
+/**
  * Get the hand for the specified direction
  * @param {string} direction - the direction whose hand is needed
  * @return {object} the hand object.
@@ -203,7 +209,7 @@ Bridge.Deal.prototype.setScoring = function( scoring ) {
 
 
 /**
- * Set a unique id 
+ * Set a unique id
  * @param {string} id - a unique identifier
  */
 Bridge.Deal.prototype.setID = function( id ) {
@@ -282,7 +288,7 @@ Bridge.Deal.prototype.set = function( property, value ) {
 			break;
 		case "notes" :
 			this.setNotes( value );
-			break;	
+			break;
 		case "id" :
 			this.setID( value );
 		default :
@@ -313,7 +319,7 @@ Bridge.Deal.prototype.get = function( property ) {
 		case "auction" :
 			return this.getAuction();
 		case "play" :
-			return this.getPlay();			
+			return this.getPlay();
 		case "id" :
 			return this.getID();
 		default :
@@ -333,7 +339,7 @@ Bridge.Deal.prototype.assignRest = function() {
 				unassigned.push( suit + rank );
 			}
 		}
-	}		
+	}
 	if ( _.isEmpty( unassigned ) ) return;
 	unassigned = _.shuffle( unassigned );
 	var assignedCardCount = 0;
@@ -345,9 +351,9 @@ Bridge.Deal.prototype.assignRest = function() {
 			direction = Bridge.getLHO( direction );
 			if ( fullDirection === direction ) {
 				Bridge._reportError( "Unable to assign remaining cards" );
-			}		
-		}		
-		this.getHand( direction ).addCard( card[0], card[1] );		
+			}
+		}
+		this.getHand( direction ).addCard( card[0], card[1] );
 	}, this);
 	this.onChange( "assignRest", unassigned );
 };
@@ -361,7 +367,7 @@ Bridge.Deal.prototype.fromString = function( deal ) {
 	_.each( deal.split( '&' ), function( pairs ) {
 		var values = pairs.split( '=' );
 		parameters[ values[0] ] = decodeURIComponent( values[1] );
-	});	
+	});
 	var numHandsSpecified = 0;
 	_.each( parameters, function( value, key ) {
 		switch ( key ) {
@@ -373,10 +379,10 @@ Bridge.Deal.prototype.fromString = function( deal ) {
 				break;
 			case 'v' :
 				this.set( 'vulnerability', value );
-				break;		
+				break;
 			case 't' :
 				this.set( 'notes', value );
-				break;	
+				break;
 			case 'a' :
 				var auction = this.getAuction();
 				if ( value[0] === '-' ) {
@@ -397,22 +403,22 @@ Bridge.Deal.prototype.fromString = function( deal ) {
 				hand.setHand( value );
 				if ( hand.getCount()  === 13 ) {
 					numHandsSpecified++;
-				}	
-				break;	
+				}
+				break;
 			case 'nn' :
 			case 'en' :
 			case 'sn' :
 			case 'wn' :
 				var hand = this.getHand( key[0] );
-				hand.setName( value );	
-				break;									
+				hand.setName( value );
+				break;
 			default :
 				break;
 		}
 	}, this);
 	if ( numHandsSpecified === 3 ) {
 		this.assignRest();
-	}	
+	}
 	// Set up trump and leader for play
 	this.getPlay().initialize();
 	// Load the play after auction.
@@ -420,7 +426,7 @@ Bridge.Deal.prototype.fromString = function( deal ) {
 		switch ( key ) {
 			case 'p' :
 				this.getPlay().fromString( value );
-				break;								
+				break;
 			default :
 				break;
 		}
@@ -448,7 +454,7 @@ Bridge.Deal.prototype.toString = function( expandedFormat ) {
 		items.push( direction + "n=" + hand.getName() );
 	};
 	var auctionString = this.getAuction().toString();
-	if ( auctionString ) items.push ( "a=" + auctionString );	
+	if ( auctionString ) items.push ( "a=" + auctionString );
 	var playString = this.getPlay().toString();
 	if ( playString ) items.push( "p=" + playString );
 	return items.join( "&" );
@@ -542,8 +548,8 @@ Bridge.Deal.prototype.fromLIN = function( lin ) {
 					var direction = Bridge.getLHO( direction );
 					var hand = hands[j]
 					this.getHand( direction ).setHand( hand );
-				}	
-				this.assignRest();			
+				}
+				this.assignRest();
 				break;
 			case "mb" :
 				Bridge._checkIndex( tokens, i+1, prefix + "processing mb - " );
@@ -577,7 +583,7 @@ Bridge.Deal.prototype.fromLIN = function( lin ) {
 			case "pc" :
 				Bridge._checkIndex( tokens, i+1, prefix + "processing pc - " );
 				var play = tokens[ i + 1 ].slice(0,2);
-				this.getPlay().addCard( play[0], play[1] ); 
+				this.getPlay().addCard( play[0], play[1] );
 				break;
 			default:
 				break;

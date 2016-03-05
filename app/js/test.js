@@ -1,12 +1,17 @@
 
 $(function() {
 	try {
+		Bridge.options.log.DEBUG.enabled = true;
 		var deal = new Bridge.Deal();
 		deal.fromString( "s=sakqhakqdakxcakqj&v=b&a=pp1dp1np2cp3hp3nppp" );
 		var hand = deal.getHand( 's' );
 		var auction = deal.getAuction();
+		var test = hand.toBBOHandDiagram();
 		$("#hand1").html(hand.toBBOHandDiagram());
-		$("#card-deck1").html(deal._getCardDeckHtml());
+		deal.getAuction().toBBOAuctionDiagram({containerID: "auction1"});
+		auction.removeCall();
+		//deal.toCardDeck( {containerID: "card-deck1"} );
+		hand.removeCard('s','k');
 		//deal.toCardDeck({containerID:"card-deck1",registerChangeHandler:true});
 		/*var deal2 = new Bridge.Deal();
 		deal2.fromString( "s=sakqhakqdakx&v=n&a=pp1s" );
