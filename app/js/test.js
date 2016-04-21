@@ -1,19 +1,24 @@
-
+//_.templateSettings.variable = "bt";
 $(function() {
 	try {
 		Bridge.options.log.DEBUG.enabled = true;
 		var deal = new Bridge.Deal();
-		deal.fromString( "s=sakqhakqdakxcakqj&v=b&a=pp1dp1np2cp3hp3nppp" );
+		deal.fromString( "s=sakqhakxcakqj&v=b&a=pp1dp1np2cp3hp3nppp" );
 		var hand = deal.getHand( 's' );
-		var auction = deal.getAuction();
-		var test = hand.toBBOHandDiagram();
-		$("#hand1").html(hand.toBBOHandDiagram());
-		deal.getAuction().toBBOAuctionDiagram({containerID: "auction1"});
+
+		$("#hand1").html( hand.toHTML() );
+		//hand.triggerEvents = false;
+		//$("#hand1").html(hand.toHTML());
+		//hand.removeCard('s','k');
+
+		/*var auction = deal.getAuction();
+		$("#hand1").html(deal.getHand( 's' ).toBBOHandDiagram());
+		//deal.getAuction().toBBOAuctionDiagram({containerID: "auction1"});
 		auction.removeCall();
 		//deal.toCardDeck( {containerID: "card-deck1"} );
 		hand.removeCard('s','k');
-		//deal.toCardDeck({containerID:"card-deck1",registerChangeHandler:true});
-		/*var deal2 = new Bridge.Deal();
+		deal.toCardDeck({containerID:"card-deck1",registerChangeHandler:true});
+		var deal2 = new Bridge.Deal();
 		deal2.fromString( "s=sakqhakqdakx&v=n&a=pp1s" );
 		deal2.getHand('s').toBWHandDiagram( {
 			containerID: "hand2"

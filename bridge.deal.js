@@ -64,13 +64,14 @@ Bridge.Deal = function( id ) {
 	 * The vulnerability of this deal.
 	 * @member {string}
 	 */
-	this.vulnerability = "-";
+	this.vulnerability = '-';
 
 	/**
 	 * The dealer of this deal.
 	 * @member {string}
 	 */
-	this.dealer = "n";
+	this.dealer = 'n';
+	this.getHand( 'n' ).makeActive();
 
 	/**
 	 * The form of scoring for this deal.

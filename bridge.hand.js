@@ -79,7 +79,8 @@ Bridge.Hand = function( direction, deal ) {
 	 * The number of cards this hand has
 	 * @member {number}
 	 */
-	this.numCards = 0;
+	this.numCards = { "all": 0 };
+	for( var suit in Bridge.suits ) this.numCards[ suit ] = 0;
 
 	/** Is this the active hand? */
 	this._isActive = false;
@@ -129,10 +130,15 @@ Bridge.Hand.prototype.getName = function() {
 
 /**
  * Get the count of number of cards in this hand
+ * @param {string} suit optional suit to get count for
  * @return {number} the number of cards held by this hand
  */
-Bridge.Hand.prototype.getCount = function() {
-	return this.numCards;
+Bridge.Hand.prototype.getCount = function( suit ) {
+	if ( suit ) {
+		Bridge._checkSuit( suit );
+		return this.numCards[ suit ];
+	}
+	return this.numCards[ "all" ];
 };
 
 /**
@@ -241,7 +247,8 @@ Bridge.Hand.prototype.addCard = function( suit, rank ) {
 	if ( this.deal ) {
 		this.deal.cards[ suit ][ rank ].assign( this.direction );
 	}
-	this.numCards++;
+	this.numCards[ "all" ]++;
+	this.numCards[ suit ]++;
 	this.onChange( "addCard", {
 		"suit": suit,
 		"rank": rank
@@ -269,7 +276,8 @@ Bridge.Hand.prototype.removeCard = function( suit, rank ) {
 		Bridge._reportError( suit + rank + " is not assigned to " + this.direction + ". Cannot remove", prefix );
 	}
 	this.cards[ suit ][ rank ] = false;
-	this.numCards--;
+	this.numCards[ "all" ]--;
+	this.numCards[ suit ]--;
 	if ( this.deal ) {
 		this.deal.cards[ suit ][ rank ].unAssign();
 	}

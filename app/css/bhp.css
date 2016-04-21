@@ -1,4 +1,10 @@
 .suit-hearts, .suit-diamonds { color: #CB0000; }
+
+cards[data-empty] {
+  visibility: hidden;
+  display: none;
+}
+
 .vulnerable {
   background-color: #CB0000;
   color: white;
@@ -20,20 +26,29 @@
     background-color: #FFFFFF;
 }
 
+.bw .hand-diagram-header .active, .bbo .hand-diagram-header .active {
+    background-color: #FFCE00;
+}
+
 .bw .hand-diagram-header .hand-diagram-field-direction, .bbo .hand-diagram-header .hand-diagram-field-direction {
 	display: inline-block;
-    background: #336799;
-    color: #FFFFFF;
-    height: 100%;
-    width: 18%;
-    text-align: center;
-    text-transform: uppercase;
+  background: #336799;
+  color: #FFFFFF;
+  height: 100%;
+  width: 18%;
+  text-align: center;
+  text-transform: uppercase;
+}
+
+.bw .hand-diagram-header .hand-diagram-field-direction.clickable, .bbo .hand-diagram-header .hand-diagram-field-direction.clickable {
+	cursor: pointer;
 }
 
 .bw .hand-diagram-header .hand-diagram-field-name, .bbo .hand-diagram-header .hand-diagram-field-name {
 	display: inline-block;
 	padding-left: 2%;
 	height: 100%;
+  width:auto;
 }
 
 .bw .hand-diagram-header .hand-diagram-row-info:hover, .bbo .hand-diagram-header .hand-diagram-row-info:hover {

@@ -286,6 +286,117 @@ Bridge.Hand.prototype.toBWHandDiagram = function( config ) {
  	return this._toStandardHandDiagram( config, "bbo" );
  };
 
+
+
+
+/**
+ * Get the generator for this field.
+ */
+Bridge.getGenerator = function getGenerator( type, config, generators, fieldName ) {
+	generators = generators || {};
+	if ( generators[ fieldName ] ) return generators[ fieldName ];
+	if ( generators[ type ] && generators[ type ][ fieldName ] ) return generators[ type ][ fieldName ];
+	if ( config && config.generator ) return config.generator;
+	return null;
+};
+
+
+Bridge.Hand.prototype.getTemplateData = function getTemplateData( type, config, generators ) {
+  config = config || {};
+	var out = {};
+	if ( config[ type ] ) {
+		for ( var fieldName in config[ type ].fields ) {
+			var generator = Bridge.getGenerator( type, config[ type ].fields[ fieldName ], generators, fieldName );
+			if ( generator ) out[ fieldName ] = generator( this, config, fieldName );
+		}
+	}
+	return out;
+}
+
+Bridge.Hand.getFieldHTML = function getFieldHTML( hand, config, fieldName ) {
+	if ( ! config ) return '';
+	var fieldConfig = config.hand.fields[ fieldName ];
+	if ( !fieldConfig ) return '';
+	var clickable = ( fieldConfig.click ? true : false );
+	var fieldValue = hand.get( fieldName );
+	var title = ( clickable ? fieldConfig.title : '' );
+	var html = "<" + fieldName + "' title='" + title + "' data-clickable='" + clickable.toString() + "' data-" + fieldName + "='" +  fieldValue + "'>";
+	html += fieldValue;
+	html += "</" + fieldName + ">";
+	return html;
+};
+
+Bridge.Hand.getCardsHTML = function getCardsHTML( hand, config, fieldName ) {
+	if ( ! config ) return '';
+	var fieldConfig = config.hand.fields[ fieldName ];
+	if ( !fieldConfig ) return '';
+	var html = ""
+	var suitOrder = ( fieldConfig.alternateSuitColor ? hand.getAlternatingSuitOrder() : Bridge.suitOrder );
+	_.each( suitOrder, function( suit ) {
+		var count = hand.getCount( suit );
+		html += "<cards data-count='" + count + "'" + ( count <= 0 ? " data-empty":"" ) + ">";
+		html += "<suit data-suit='" + suit + "'>";
+		html += Bridge.suits[ suit ].html;
+		html += "</suit>";
+		html += "<ranks>";
+		_.each( Bridge.rankOrder, function( actualRank ) {
+			if ( hand.cards[ suit ][ actualRank ] ) {
+				var rank = hand.showAsX[ suit ][ actualRank ] ? 'x' : actualRank;
+				var rankHTML = hand.showAsX[ suit ][ actualRank ] ? 'x' : Bridge.ranks[ rank ].html;
+				var suitIndex = 3 - Bridge.suits[ suit ].index;
+				if ( rank === 'x' ) var rankIndex = 13;
+				else var rankIndex = 12 - Bridge.ranks[ rank ].index;
+				var cardIndex = suitIndex * 14 + rankIndex;
+				html += "<rank data-suit='" + suit + "' data-rank='" + rank + "'>";
+				html += rankHTML;
+				html += "</rank>";
+			}
+		}, hand);
+		html += "</ranks>";
+		html += "</cards>"
+	}, hand);
+	return html;
+};
+
+/**
+ * A Registry of html generators.
+ */
+Bridge.defaultConfig = {
+	"hand": {
+		"template": _.template( Bridge.templates.hand.inline ),
+		"fields": {
+			"direction": {
+				"generator": Bridge.Hand.getFieldHTML,
+				"click": true,
+				"title": "Click to make this hand active",
+			},
+			"name": {
+				"generator": Bridge.Hand.getFieldHTML,
+				"click": false,
+				"title": "Click to change name",
+			},
+			"cards": {
+				"generator": Bridge.Hand.getCardsHTML,
+				"click": false,
+				"title": "Click to change cards",
+			}
+		},
+	}
+};
+
+/**
+ * Generate html based on passed template and config.
+ * If nothing is specified defaults are used.
+ */
+Bridge.Hand.prototype.toHTML = function toHTML( config, isCallback ) {
+	config = config || {};
+	_.defaults( config, Bridge.defaultConfig );
+	var handTemplate = config.hand.template;
+	var templateData = { "data": this.getTemplateData( "hand", config, config.generators ) };
+	var html = handTemplate( templateData );
+	return html;
+};
+
 /**
  * Generate a html display of this hand.
  * @param {object} config configuration parameters for display
@@ -293,7 +404,7 @@ Bridge.Hand.prototype.toBWHandDiagram = function( config ) {
  * This is used to determine whether enable click handlers or not (no if callback) default value is false
  * @return {string} HTML representation of this deal.
  */
-Bridge.Hand.prototype.toHTML = function toHTML( config, isCallback ) {
+Bridge.Hand.prototype.toHTML1 = function toHTML( config, isCallback ) {
 	isCallback = Bridge.assignDefault( isCallback, false );
 	config = Bridge.assignDefault( config, {} );
 	_.defaults( config, {
@@ -307,7 +418,8 @@ Bridge.Hand.prototype.toHTML = function toHTML( config, isCallback ) {
 		rootID: Bridge.IDManager.getID(),
 		rootClass: null,
 		alternateSuitColor: false,
-		registerChangeHandler: true
+		registerChangeHandler: true,
+		registerClickHandler: true
 	});
 	var prefix = config.prefix;
 	// Since lodash does not have recursive defaults we need this hack
@@ -327,6 +439,7 @@ Bridge.Hand.prototype.toHTML = function toHTML( config, isCallback ) {
 
 	var headerHTML = "";
 	var rowClasses = Bridge._generateClasses( prefix, [ "row", "info" ] );
+	if ( this.isActive() ) rowClasses.push( "active" );
 	var rowTag = Bridge._getTag( config, rowClasses );
 	if ( config.show.direction || config.show.name ) {
 		headerHTML += Bridge._openTag( rowTag, config, rowClasses, [] );
@@ -338,8 +451,12 @@ Bridge.Hand.prototype.toHTML = function toHTML( config, isCallback ) {
 			columnTag = Bridge._getTag( config, columnClasses );
 			headerHTML += Bridge._openTag( columnTag, config, columnClasses, [] );
 			var classes = Bridge._generateClasses( prefix, [ "field", field ] );
-			var tag = Bridge._getTag( config, classes );
 			var data = [ "data-" + field + "='" + this.get( field ) + "'" ];
+			if ( config.registerClickHandler ) {
+				classes.push( "clickable" );
+				data.push( "title='Click to make active hand'" );
+			}
+			var tag = Bridge._getTag( config, classes );
 			headerHTML += Bridge._openTag( tag, config, classes, data );
 			headerHTML += this.get( field ).toUpperCase();
 			headerHTML += Bridge._closeTag( tag );
@@ -444,6 +561,20 @@ Bridge.Hand.prototype.toHTML = function toHTML( config, isCallback ) {
 	var html = Bridge._generateHTMLModule( config, headerHTML, contentHTML, footerHTML );
 	html = Bridge._embed( config, html, isCallback );
 	Bridge._registerChangeHandler( this, config, arguments.callee.name );
+
+	if ( !isCallback && config.registerClickHandler ) {
+		var id = config.rootID;
+		var selector = '#' + id + ' .' + config.prefix + "-field-direction";
+		$( document ).on( "click", selector, { hand: this } , function( e ) {
+			var hand = e.data.hand;
+			if ( hand.deal ) {
+				hand.deal.setActiveHand( hand.getDirection() );
+			}
+			else {
+				hand.makeActive();
+			}
+		});
+	}
 	return html;
 };
 
@@ -811,7 +942,8 @@ Bridge.Deal.prototype.toCardDeck = function toCardDeck( config, isCallback ) {
 		idPrefix: null,
 		rootID: Bridge.IDManager.getID(),
 		containerID: null,
-		registerChangeHandler: true
+		registerChangeHandler: true,
+		registerClickHandler: true
 	});
 	var prefix = config.prefix;
 	// Since lodash does not have recursive defaults we need this hack
@@ -912,36 +1044,26 @@ Bridge.Deal.prototype.toCardDeck = function toCardDeck( config, isCallback ) {
 	var html = Bridge._generateHTMLModule( config, headerHTML, contentHTML, footerHTML );
 	html = Bridge._embed( config, html, isCallback );
 	Bridge._registerChangeHandler( this, config, arguments.callee.name );
-	return html;
-	/*if ( !isCallback && config.registerChangeHandler ) {
-		var id = "card-deck1";
+
+	if ( !isCallback && config.registerClickHandler ) {
+		var id = config.rootID;
 		$(  "#" + id ).on( "click", "." + config.prefix + "-field-cards", { deal: this } , function( e ) {
-			try {
-				var suit = $( this ).data( "suit" );
-				var rank = $( this ).data( "rank" );
-				var assignedTo = $( this ).data( "assignedto" );
-				if ( assignedTo ) {
-					e.data.deal.getHand( assignedTo ).removeCard( suit, rank );
-				}
-				else {
-					e.data.deal.getHand( e.data.deal.getActiveHand() ).addCard( suit, rank );
-				}
+			var suit = $( this ).data( "suit" );
+			var rank = $( this ).data( "rank" );
+			var assignedTo = $( this ).data( "assignedto" );
+			if ( assignedTo ) {
+				e.data.deal.getHand( assignedTo ).removeCard( suit, rank );
 			}
-			catch ( err ) {
-				alert( err.message );
+			else {
+				e.data.deal.getHand( e.data.deal.getActiveHand() ).addCard( suit, rank );
 			}
 		});
 		$(  "#" + id ).on( "click", "." + config.prefix + "-field-reset", { deal: this } , function( e ) {
-			try {
-				var deal = e.data.deal;
-				deal.getHand( deal.getActiveHand() ).clearCards();
-			}
-			catch ( err ) {
-				alert( err.message );
-			}
+			var deal = e.data.deal;
+			deal.getHand( deal.getActiveHand() ).clearCards();
 		});
 	}
-	return html;*/
+	return html;
 };
 
 /**
@@ -954,7 +1076,7 @@ Bridge.Deal.prototype.toCardDeck = function toCardDeck( config, isCallback ) {
  * @return {string} the html for this diagram
  */
  Bridge.Auction.prototype._toStandardBiddingBox = function( config, containerClass ) {
-	 config = Bridge.assignDefault( config, {} );
+	config = Bridge.assignDefault( config, {} );
  	if ( config.layout && config.layout === "full" ) {
  		var containerClass = containerClass + " full";
  		var descendingSuitOrder = true;
@@ -1013,7 +1135,8 @@ Bridge.Auction.prototype.toBiddingBox = function toBiddingBox( config, isCallbac
 		idPrefix: null,
 		containerID: null,
 		rootID: Bridge.IDManager.getID(),
-		registerChangeHandler: true
+		registerChangeHandler: true,
+		registerClickHandler: true
 	});
 
 	// Since lodash does not have recursive defaults we need this hack
@@ -1039,33 +1162,26 @@ Bridge.Auction.prototype.toBiddingBox = function toBiddingBox( config, isCallbac
 	else {
 		var html = this._createFullBiddingBox( config );
 	}
-	var html = Bridge._embed( this, config, html, isCallback, "toBiddingBox" );
 	html = Bridge._embed( config, html, isCallback );
 	Bridge._registerChangeHandler( this, config, arguments.callee.name );
-	return html;
 
-	/*if ( config.registerChangeHandler && !isCallback ) {
+	if ( config.registerClickHandler && !isCallback ) {
 		var id = config.rootID;
 		$( "#" + id ).on( "click", "." + config.prefix + "-field-level.enabled", { auction: this }, function( e ) {
 			var level = $( this ).data( "level" );
 			e.data.auction.setSelectedLevel( level );
 		});
 		$(  "#" + id ).on( "click", "." + config.prefix + "-field-calls.enabled", { auction: this }, function( e ) {
-			try {
-				var call = $( this ).data( "call" );
-				var auction = e.data.auction;
-				if ( call === "allpass" ) auction.addAllPass();
-				else if ( call === "undo" ) auction.removeCall();
-				else if ( call === "reset" ) auction.clearCalls();
-				else if ( call === "abstain" ) auction.abstain();
-				else auction.addCall( call );
-			}
-			catch ( err ) {
-				alert( err.message );
-			}
+			var call = $( this ).data( "call" );
+			var auction = e.data.auction;
+			if ( call === "allpass" ) auction.addAllPass();
+			else if ( call === "undo" ) auction.removeCall();
+			else if ( call === "reset" ) auction.clearCalls();
+			else if ( call === "abstain" ) auction.abstain();
+			else auction.addCall( call );
 		});
 	}
-	return html;*/
+	return html;
 };
 
 /**

@@ -19,47 +19,47 @@ if ( typeof _ === "undefined" ) {
  */
 var Bridge = {
 	directions : {
-		'n' : { name : 'North', lho: 'e', rho: 'w', cho: 's', index: 1, html: 'North' },
-		'e' : { name : 'East',  lho: 's', rho: 'n', cho: 'w', index: 2, html: 'East' },
-		's' : { name : 'South', lho: 'w', rho: 'e', cho: 'n', index: 3, html: 'South' },
-		'w' : { name : 'West',  lho: 'n', rho: 's', cho: 'e', index: 0, html: 'West' }
+		'n' : { name : 'North', lho: 'e', rho: 'w', cho: 's', index: 1, html: 'north' },
+		'e' : { name : 'East',  lho: 's', rho: 'n', cho: 'w', index: 2, html: 'east' },
+		's' : { name : 'South', lho: 'w', rho: 'e', cho: 'n', index: 3, html: 'south' },
+		'w' : { name : 'West',  lho: 'n', rho: 's', cho: 'e', index: 0, html: 'west' }
 	},
 	directionOrder: [],
 
 	suits : {
-		's' : { name : 'Spades', index : 0, html : '<span class="suit-spades">&spades;</span>' },
-		'h' : { name : 'Hearts', index : 1, html : '<span class="suit-hearts">&hearts;</span>' },
-		'd' : { name : 'Diamonds', index : 2, html : '<span class="suit-diamonds">&diams;</span>' },
-		'c' : { name : 'Clubs', index : 3, html : '<span class="suit-clubs">&clubs;</span>' }
+		's' : { name : 'Spades', index : 0, text: 'spades', html : '&spades;' },
+		'h' : { name : 'Hearts', index : 1, text: 'hearts', html : '&hearts;' },
+		'd' : { name : 'Diamonds', index : 2, text: 'diamonds', html : '&diams;' },
+		'c' : { name : 'Clubs', index : 3, text: 'clubs', html : '&clubs;' }
 	},
 	suitOrder: [],
 
 	calls : {
-		'n' : { name : 'No Trump', index : 0, isStrain: true, bid: true, text: "NT", html : '<span class="suit-NT">NT</span>' },
-		's' : { name : 'Spades', index : 1, isStrain: true, bid: true, text: "&spades;", html : '<span class="suit-spades">&spades;</span>' },
-		'h' : { name : 'Hearts', index : 2, isStrain: true, bid: true, text: "&hearts;", html : '<span class="suit-hearts">&hearts;</span>' },
-		'd' : { name : 'Diamonds', index : 3, isStrain: true, bid: true, text: "&diams;", html : '<span class="suit-diamonds">&diams;</span>' },
-		'c' : { name : 'Clubs', index : 4, isStrain: true, bid: true, text: "&clubs;", html : '<span class="suit-clubs">&clubs;</span>' },
-		'p' : { name : 'Pass', index : 7, isStrain: false, bid: false, text: "P", html : '<span class="bid-pass">P</span>' },
-		'x' : { name : 'Double', index : 6, isStrain: false, bid: false, text: "X", html : '<span class="bid-double">X</span>' },
-		'r' : { name : 'Redouble', index : 5, isStrain: false, bid: false, text: "XX", html : '<span class="bid-redouble">XX</span>' }
+		'n' : { name : 'No Trump', index : 0, isStrain: true, bid: true, text: "notrump", html : 'nt' },
+		's' : { name : 'Spades', index : 1, isStrain: true, bid: true, text: "spades", html : '&spades;' },
+		'h' : { name : 'Hearts', index : 2, isStrain: true, bid: true, text: "hearts", html : '&hearts;' },
+		'd' : { name : 'Diamonds', index : 3, isStrain: true, bid: true, text: "diamonds", html : '&diams;' },
+		'c' : { name : 'Clubs', index : 4, isStrain: true, bid: true, text: "clubs", html : '&clubs;' },
+		'p' : { name : 'Pass', index : 7, isStrain: false, bid: false, text: "pass", html : 'p' },
+		'x' : { name : 'Double', index : 6, isStrain: false, bid: false, text: "double", html : 'x' },
+		'r' : { name : 'Redouble', index : 5, isStrain: false, bid: false, text: "redouble", html : 'xx' }
 	},
 	callOrder: [],
 
 	ranks : {
-		'a' : { name : 'Ace',	index : 0, html: '<span class="rank-a rank-14 rank-1">A</span>' },
-		'k' : { name : 'King',	index : 1, html: '<span class="rank-k rank-13">K</span>' },
-		'q' : { name : 'Queen',	index : 2, html: '<span class="rank-q rank-12">Q</span>' },
-		'j' : { name : 'Jack',	index : 3, html: '<span class="rank-j rank-11">J</span>' },
-		't' : { name : 'Ten',	index : 4, html: '<span class="rank-t rank-10">T</span>' },
-		'9' : { name : 'Nine',	index : 5, html: '<span class="rank-9">9</span>' },
-		'8' : { name : 'Eight',	index : 6, html: '<span class="rank-8">8</span>' },
-		'7' : { name : 'Seven',	index : 7, html: '<span class="rank-7">7</span>' },
-		'6' : { name : 'Six',	index : 8, html: '<span class="rank-6">6</span>' },
-		'5' : { name : 'Five',	index : 9, html: '<span class="rank-5">5</span>' },
-		'4' : { name : 'Four',	index : 10, html: '<span class="rank-4">4</span>' },
-		'3' : { name : 'Three',	index : 11, html: '<span class="rank-3">3</span>' },
-		'2' : { name : 'Two',	index : 12, html: '<span class="rank-2">2</span>' }
+		'a' : { name : 'Ace',	index : 0, html: 'a' },
+		'k' : { name : 'King',	index : 1, html: 'k' },
+		'q' : { name : 'Queen',	index : 2, html: 'q' },
+		'j' : { name : 'Jack',	index : 3, html: 'j' },
+		't' : { name : 'Ten',	index : 4, html: 't' },
+		'9' : { name : 'Nine',	index : 5, html: '9' },
+		'8' : { name : 'Eight',	index : 6, html: '8' },
+		'7' : { name : 'Seven',	index : 7, html: '7' },
+		'6' : { name : 'Six',	index : 8, html: '6' },
+		'5' : { name : 'Five',	index : 9, html: '5' },
+		'4' : { name : 'Four',	index : 10, html: '4' },
+		'3' : { name : 'Three',	index : 11, html: '3' },
+		'2' : { name : 'Two',	index : 12, html: '2' }
 	},
 	rankOrder: [],
 
@@ -221,7 +221,7 @@ Bridge.CONSTANTS = {
 Bridge._triggerEvents = function( raiser, operation, parameters ) {
 	// Raise only one event based on id which should be the same for all
 	// objects (hand, auction, play etc.) in a deal.
-	if ( Bridge.options.triggerEvents ) {
+	if ( Bridge.options.triggerEvents && raiser.triggerEvents ) {
 		var delimiter = Bridge.CONSTANTS.eventNameDelimiter;
 		var eventName = raiser.id + delimiter + Bridge.CONSTANTS.eventName;
 		$( document ).trigger( eventName,  {

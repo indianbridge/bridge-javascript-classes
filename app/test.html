@@ -5,7 +5,7 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Bridge Hand Generator</title>
-    <link rel="stylesheet" type="text/css" href="css/bhp.css">
+    <link rel="stylesheet" type="text/css" href="../bridge.core.css">
     <!-- jQuery -->
     <script src="js/jquery.min.js"></script>
     <script src="js/lodash.min.js"></script>
@@ -35,7 +35,17 @@
 	<script src="../bridge.card.js"></script>
 	<script src="../bridge.play.js"></script>
 	<script src="../bridge.playedcard.js"></script>
-	<script src="../bridge.ui.js"></script>
+  <script src="../bridge.templates.ecma6.js"></script>
 	<script src="js/test.js"></script>
+  <script type="text/template" id="hand-template">
+    <div class="hand-diagram">
+      <div class="header">
+        <%= data.direction %>
+        <%= data.name %>
+      </div>
+      <div class="content">
+        <%= data.cards %>
+      </div>
+  </script>
   </body>
 </html>
