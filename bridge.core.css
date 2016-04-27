@@ -1,7 +1,7 @@
 .inline suit[data-suit='h'], .inline suit[data-suit='d'] { color: #CB0000; }
-.inline rank { text-transform: uppercase; margin-right: 1px; }
+.inline rank { text-transform: uppercase; }
 .inline rank[data-rank='x'] { text-transform: lowercase;}
-.inline cards { margin-right: 5px; }
+.inline cards { margin-right: 0px; }
 
 /**
  * Bridge Winners Styles
@@ -51,6 +51,10 @@
 .bw cards {
 	width: 100%;
 }
+
+.bw rank { text-transform: uppercase; }
+.bw rank[data-rank='x'] { text-transform: lowercase;}
+.bw rank[data-rank='-'] { display: none; visibility: hidden;}
 
 .bw suit {
 	display: inline-block;

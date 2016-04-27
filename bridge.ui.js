@@ -585,7 +585,7 @@ Bridge.Hand.prototype.toHTML1 = function toHTML( config, isCallback ) {
  * @param {function} callback - the callback method to call
  */
 Bridge._registerChangeHandler = function( owner, config, callback ) {
-	// No op is flag is not set
+	// No op if flag is not set
 	if ( !config.registerChangeHandler ) return;
 	var event = owner.getID() + Bridge.CONSTANTS.eventNameDelimiter + Bridge.CONSTANTS.eventName + '.' + config.rootID;
 	$( document ).off( event );

@@ -469,23 +469,39 @@ Bridge.Hand.prototype.fromString = function( handString ) {
  * @param {string} suit the suit to check cards in
  * @return {boolean} true if this hand has cards in the given suit
  */
-Bridge.Hand.prototype._hasCards = function( suit ) {
-	for( var rank in Bridge.ranks ) {
-		if ( this.cards[ suit ][ rank ] ) return true;
-	}
-	return false;
+Bridge.Hand.prototype.hasCards = function( suit ) {
+	return this.numCards[ suit ] > 0;
 };
 
 /**
- * Get the suit order for this hand by alternating colors
- * @return {array} an array of suits in alternating color order if possible
+ * Get the ranks in this hand for a given suit.
+ * @param { string } suit the suit whose ranks are to be returned.
+ * @return {array} an array of objects with ranks and html for ranks.
  */
-Bridge.Hand.prototype.getAlternatingSuitOrder = function() {
+Bridge.Hand.prototype.getRanks = function( suit ) {
+	if ( this.getCount(suit) <= 0 ) return [ { "rank": '-', "html": '- ' } ];
+	out = [];
+	_.each( Bridge.rankOrder, function( actualRank ) {
+		if ( this.cards[ suit ][ actualRank ] ) {
+			var rank = this.showAsX[ suit ][ actualRank ] ? 'x' : actualRank;
+			var rankHTML = this.showAsX[ suit ][ actualRank ] ? 'x' : Bridge.ranks[ rank ].html;
+			out.push( { "rank": rank, "html": rankHTML } );
+		}
+	}, this);
+	return out;
+};
+
+/**
+ * Get the suit in order for this hand.
+ * @param { bool } alternating should the color suits be alternated.
+ * @return {array} an array of suits in alternating color order if requested
+ */
+Bridge.Hand.prototype.getSuits = function( alternating ) {
+	if ( !alternating ) return Bridge.suitOrder;
 	var numSuits = 0;
 	var hasCards = {};
 	_.each( Bridge.suitOrder, function( suit ) {
-		hasCards[ suit ] = this._hasCards( suit );
-		if ( hasCards[ suit ] ) numSuits++;
+		if ( this.hasCards( suit ) ) numSuits++;
 	}, this );
 	if ( numSuits < 3 ) return Bridge.suitOrder;
 	if ( numSuits === 4 ) return [ 's', 'h', 'c', 'd' ];

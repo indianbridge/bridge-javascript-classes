@@ -2,11 +2,21 @@
 $(function() {
 	try {
 		Bridge.options.log.DEBUG.enabled = true;
+		var config = {
+			"template": "bridgewinners",
+			"alternateSuitColor": false,
+			"containerID": "hand1",
+			"handlers": {
+				"change": true,
+			}
+		}
 		var deal = new Bridge.Deal();
-		deal.fromString( "s=sakqhakxcakqj&v=b&a=pp1dp1np2cp3hp3nppp" );
+		deal.fromString( "s=hakqdakxcakqj&v=b&a=pp1dp1np2cp3hp3nppp" );
 		var hand = deal.getHand( 's' );
 
-		$("#hand1").html( hand.toHTML() );
+		hand.toHTML(config);
+		hand.removeCard('h', 'k');
+		hand.addCard('s', 'a');
 		//hand.triggerEvents = false;
 		//$("#hand1").html(hand.toHTML());
 		//hand.removeCard('s','k');
