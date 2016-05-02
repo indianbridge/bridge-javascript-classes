@@ -28,7 +28,13 @@ Bridge.Deal = function( id ) {
 	 * Should events be triggered for this object.
 	 * @member {bool}
 	 */
-	this.triggerEvents = true;
+	this.raiseEvents = true;
+
+	/**
+	 * Should this object respond to events?
+	 * @member {bool}
+	 */
+	this.respondToEvents = true;
 
 	/**
 	 * The 52 card objects
@@ -101,7 +107,7 @@ Bridge.Deal = function( id ) {
 	 * Should events be triggered for this object.
 	 * @member {bool}
 	 */
-	this.triggerEvents = true;
+	this.raiseEvents = true;
 };
 
 //
@@ -598,5 +604,5 @@ Bridge.Deal.prototype.fromLIN = function( lin ) {
  * Raise an event
  */
 Bridge.Deal.prototype.onChange = function( operation, parameter ) {
-	Bridge._triggerEvents( this, operation, parameter );
+	Bridge._raiseEvents( this, operation, parameter );
 };

@@ -11,12 +11,39 @@ $(function() {
 			}
 		}
 		var deal = new Bridge.Deal();
-		deal.fromString( "s=hakqdakxcakqj&v=b&a=pp1dp1np2cp3hp3nppp" );
+		deal.fromString( "s=hakqdakxcakqj&v=b&a=pp1dp1np2cp3hp3nppxpprpp" );
 		var hand = deal.getHand( 's' );
-
 		hand.toHTML(config);
 		hand.removeCard('h', 'k');
-		hand.addCard('s', 'a');
+		var eventName = Bridge.getEventName([hand.getID(), Bridge.CONSTANTS.changeEventName, "hand", 's']);
+		$(document).trigger( eventName, { "operation" : "addCard", "parameters": {"suit":'s', "rank": 'a'}});
+		//hand.addCard('s', 'a');
+		var auctionConfig = {
+			"template": "bridgewinners",
+			"addQuestionMark": true,
+			"containerID": "auction1",
+			"handlers": {
+				"change": true,
+			}
+		}
+		var auction = deal.getAuction();
+		auction.toHTML(auctionConfig);
+		//auction.removeCall();
+		var eventName = Bridge.getEventName([auction.getID(), Bridge.CONSTANTS.changeEventName, "auction"]);
+		$(document).trigger( eventName, { "operation" : "removeCall", "parameters": {"hand": "sakqhakqdakqca"}});
+		$(document).trigger( eventName, { "operation" : "addCall", "parameters": {"call": "4C"}});
+		//$(document).trigger( eventName, { "operation" : "addAllPass", "parameters": {"call": "4C"}});
+
+		var bbConfig = {
+			"template": "bridgewinners",
+			"addQuestionMark": true,
+			"containerID": "bidding-box1",
+			"handlers": {
+				"change": true,
+			}
+		}
+		auction.showBiddingBox(bbConfig);
+		//$('#auction1').html(_.renderTemplate("auction.calls", {"auction": deal.getAuction(), "config": {}));
 		//hand.triggerEvents = false;
 		//$("#hand1").html(hand.toHTML());
 		//hand.removeCard('s','k');

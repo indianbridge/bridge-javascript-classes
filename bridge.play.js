@@ -1,7 +1,7 @@
 /**
  * Defines Play class and all methods associated with it.
  */
- 
+
 // Get Namespace.
 var Bridge = Bridge || {};
 
@@ -12,24 +12,36 @@ var Bridge = Bridge || {};
  * @param {object} [deal] - the optional deal that this play belongs to
  */
 Bridge.Play = function( deal ) {
-	 
+
 	/**
 	 * The deal that this play belongs to.
 	 * @member {object}
 	 */
 	this.deal = deal;
-	
+
 	/**
 	 * A unique id to identify this play.
 	 * @member {string}
 	 */
 	this.id = Bridge._generateID( deal );
-	
+
 	/**
 	 * The type of this object.
 	 * @member {string}
 	 */
 	this.type = "Play";
+
+  /**
+	 * Should events be triggered for this object.
+	 * @member {bool}
+	 */
+	this.raiseEvents = true;
+
+	/**
+	 * Should this object respond to events?
+	 * @member {bool}
+	 */
+	this.respondToEvents = true;
 
 	/**
 	 * The cards that are in this play
@@ -37,19 +49,19 @@ Bridge.Play = function( deal ) {
 	 */
 	this.plays = [];
 	for( var i = 0; i <= 52; ++i ) this.plays.push( null );
-	
+
 	/**
 	 * The last added play to this play sequence.
 	 * @member {number}
 	 */
 	this.lastPlayIndex = -1;
-	
+
 	/**
 	 * The current play index when trying to play out the hand.
 	 * @member {number}
 	 */
 	this.currentPlayIndex = 0;
-	
+
 	/**
 	 * Which cards have been added to the play
 	 * @member {object}
@@ -61,7 +73,7 @@ Bridge.Play = function( deal ) {
 			this.cardAdded[ suit ][ rank ] = false;
 		}
 	}
-	
+
 	/**
 	 * Which cards have been played in the play
 	 * @member {object}
@@ -73,25 +85,25 @@ Bridge.Play = function( deal ) {
 			this.cardPlayed[ suit ][ rank ] = false;
 		}
 	}
-	
+
 	/**
 	 * Who is the leader (to the first trick)?
 	 * @member {string}
 	 */
 	this.leader = 'w';
-	
+
 	/**
 	 * What is the trump suit?
 	 * @member {string}
 	 */
-	this.trump = 'n';	
-	
-	this.initialize(); 
+	this.trump = 'n';
+
+	this.initialize();
 
 };
 
 /**
- * Set a unique id 
+ * Set a unique id
  * @param {string} id - a unique identifier
  */
 Bridge.Play.prototype.setID = function( id ) {
@@ -166,7 +178,7 @@ Bridge.Play.prototype.getPlay = function() {
  * Get a property in this auction.
  * The properties that can be got are as follows<br/>
  * id - string - an unique id for this play<br/>
- * trump - character [ n s h d c] -  the trump for this play<br/> 
+ * trump - character [ n s h d c] -  the trump for this play<br/>
  * leader - character [ n e s w ] - the leader for this deal<br/>
  * play - string - play as a stirng<br/>
  * @param {string} property - the property to set<br/>
@@ -182,7 +194,7 @@ Bridge.Play.prototype.get = function( property ) {
 			break;
 		case 'trump' :
 			return this.getTrump();
-			break;	
+			break;
 		case "leader" :
 			return this.getLeader();
 			break;
@@ -198,7 +210,7 @@ Bridge.Play.prototype.get = function( property ) {
  * Set a property in this play.
  * The properties that can be set are as follows<br/>
  * id - string - an unique id for this play<br/>
- * trump - character [ n s h d c] -  the trump for this play<br/> 
+ * trump - character [ n s h d c] -  the trump for this play<br/>
  * leader - character [ n e s w ] - the leader for this deal<br/>
  * play - string - play as a stirng<br/>
  * @param {string} property - the property to set<br/>
@@ -264,15 +276,15 @@ Bridge.Play.prototype.getNextToPlay = function() {
  * @param {string} [annotation] - optional annotation for this play
  */
 Bridge.Play.prototype.addCard = function( suit, rank, annotation ) {
-	
+
 	// Identify the card
 	var prefix = "In Bridge.Play.addCard";
 	suit = suit.toLowerCase();
 	rank = rank.toLowerCase();
 	Bridge._checkSuit( suit, prefix );
-	Bridge._checkRank( rank, prefix );	
+	Bridge._checkRank( rank, prefix );
 	var card = ( this.deal ? this.deal.cards[ suit ][ rank ] : new Bridge.Card( suit, rank ) );
-	
+
 	// Find whose turn it is to play
 	var direction = this.getNextToPlay();
 	if ( this.deal && !this.deal.getHand( direction ).hasCard( suit, rank ) ) {
@@ -281,22 +293,22 @@ Bridge.Play.prototype.addCard = function( suit, rank, annotation ) {
 	if ( this.cardAdded[ suit ][ rank ] ) {
 		Bridge._reportError( suit + rank + " is already part of play", prefix );
 	}
-	
+
 	// Get previous card to determine who wins the trick so far
 	var playNumber = this.lastPlayIndex + 1;
 	var previousCard = this.plays[ this.lastPlayIndex ];
-	
+
 	// Create a new play card and add it to play
 	var playedCard = new Bridge.PlayedCard( playNumber, card, previousCard, annotation );
 	this.plays[ this.lastPlayIndex + 1 ] = playedCard;
 	this.lastPlayIndex++;
-	
+
 	// Mark card as played
 	this.cardAdded[ suit ][ rank ] = true;
-	
+
 	// Trigger events if enabled
-	this.onChange( "addCard", playedCard );		
-	
+	this.onChange( "addCard", playedCard );
+
 };
 
 /**
@@ -305,23 +317,23 @@ Bridge.Play.prototype.addCard = function( suit, rank, annotation ) {
 Bridge.Play.prototype.removeCard = function() {
 	var prefix = "In Bridge.Play.removeCard";
 	if ( this.lastPlayIndex > 0 ) {
-		
-		// Remove the card 
+
+		// Remove the card
 		var playedCard = this.plays[ this.lastPlayIndex ];
 		this.plays[ this.lastPlayIndex ] = null;
 		this.lastPlayIndex--;
 		if ( this.currentPlayIndex > this.lastPlayIndex ) {
 			this.currentPlayIndex = this.lastPlayIndex;
 		}
-		
+
 		// Mark the card as unplayed
 		this.cardAdded[ playedCard.getSuit()][ playedCard.getRank() ] = false;
-		
+
 		// Trigger events if enabled
 		this.onChange( "removeCard", playedCard );
 	}
 	else {
-		Bridge._reportError( "No more plays to remove", prefix );		
+		Bridge._reportError( "No more plays to remove", prefix );
 	}
 };
 
@@ -341,7 +353,7 @@ Bridge.Play.prototype.playCardTillIndex_ = function( index ) {
 		this.currentPlayIndex++;
 		var playedCard = this.plays[ this.currentPlayIndex ];
 		this.cardPlayed[ play.getSuit() ][ play.getRank() ] = true;
-		
+
 		// Trigger events if enabled
 		this.onChange( "playCard", playedCard );
 	}
@@ -388,7 +400,7 @@ Bridge.Play.prototype.undoPlayCardTillIndex_ = function( index ) {
 		var playedCard = this.plays[ this.currentPlayIndex ];
 		this.currentPlayIndex--;
 		this.cardPlayed[ play.getSuit() ][ play.getRank() ] = false;
-		
+
 		// Trigger events if enabled
 		this.onChange( "undoPlayCard", playedCard );
 	}
@@ -444,7 +456,7 @@ Bridge.Play.prototype.fromString = function ( play ) {
 		var annotation = null;
 		if ( play[ charIndex ] === '{' ) {
 			var endChar = '}';
-			var returnValue = Bridge._parseContainedText( play, charIndex, endChar, prefix );		
+			var returnValue = Bridge._parseContainedText( play, charIndex, endChar, prefix );
 			annotation = returnValue.text;
 			charIndex = returnValue.position + 1;
 		}
@@ -488,10 +500,5 @@ Bridge.Play.prototype.toJSON = function( ) {
  * Raise an event
  */
 Bridge.Play.prototype.onChange = function( operation, parameter ) {
-	Bridge._triggerEvents( this, operation, parameter );
+	Bridge._raiseEvents( this, operation, parameter );
 };
-
-
-
-
-

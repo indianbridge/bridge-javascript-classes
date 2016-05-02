@@ -35,10 +35,16 @@ Bridge.Hand = function( direction, deal ) {
 	this.type = "Hand";
 
 	/**
-	 * Should events be triggered for this object.
+	 * Should events be raised for this object?
 	 * @member {bool}
 	 */
-	this.triggerEvents = true;
+	this.raiseEvents = true;
+
+	/**
+	 * Should this object respond to events?
+	 * @member {bool}
+	 */
+	this.respondToEvents = true;
 
 	/**
 	 * The direction of this hand
@@ -84,6 +90,9 @@ Bridge.Hand = function( direction, deal ) {
 
 	/** Is this the active hand? */
 	this._isActive = false;
+
+	/** Setup event responder handlers. */
+	this.onChanged();
 };
 
 //
@@ -114,7 +123,8 @@ Bridge.Hand.prototype.getDirection = function() {
  * Set the name of the player holding this hand.
  * @param {string} name - the name of player
  */
-Bridge.Hand.prototype.setName = function( name ) {
+Bridge.Hand.prototype.setName = function(name) {
+	if (_.isObject(name)) name = name.name;
 	Bridge._checkRequiredArgument( name );
 	this.name = name;
 	this.onChange( "setName", name );
@@ -146,6 +156,7 @@ Bridge.Hand.prototype.getCount = function( suit ) {
  * @param {string} hand - the hand in string format
  */
 Bridge.Hand.prototype.setHand = function( hand ) {
+	if (_.isObject(hand)) hand = hand.hand;
 	Bridge._checkRequiredArgument( hand );
 	this.fromString( hand );
 };
@@ -156,15 +167,6 @@ Bridge.Hand.prototype.setHand = function( hand ) {
  */
 Bridge.Hand.prototype.getHand = function() {
 	return this.toString();
-};
-
-/**
- * Set a unique id
- * @param {string} id - a unique identifier
- */
-Bridge.Hand.prototype.setID = function( id ) {
-	Bridge._checkRequiredArgument( id );
-	this.id = id;
 };
 
 /**
@@ -205,6 +207,10 @@ Bridge.Hand.prototype.getCards = function( suit ) {
  * @param {string} rank - The rank of this card
  */
 Bridge.Hand.prototype.addCard = function( suit, rank ) {
+	if (_.isObject(suit)) {
+		rank = suit.rank;
+		suit = suit.suit;
+	}
 	var prefix = "In addCard";
 	Bridge._checkSuit( suit, prefix );
 	var showAsX = false;
@@ -262,6 +268,10 @@ Bridge.Hand.prototype.addCard = function( suit, rank ) {
  * @param {string} rank - The rank of this card
  */
 Bridge.Hand.prototype.removeCard = function( suit, rank ) {
+	if (_.isObject(suit)) {
+		rank = suit.rank;
+		suit = suit.suit;
+	}
 	var prefix = "In removeCard";
 	Bridge._checkSuit( suit, prefix );
 	Bridge._checkRank( rank, prefix );
@@ -332,9 +342,6 @@ Bridge.Hand.prototype.set = function( property, value ) {
 			break;
 		case "hand" :
 			this.setHand( value );
-			break;
-		case "id" :
-			this.setID( value );
 			break;
     case "active" :
       value ? this.makeActive() : this.makeInactive();
@@ -532,11 +539,22 @@ Bridge.Hand.prototype.fromJSON = function( handString ) {
 	this.setHand( handString.hand );
 };
 
+/**
+ * A event requesting a change has been raised. Respond if response is enabled.
+ */
+Bridge.Hand.prototype.onChanged = function() {
+	if (this.respondToEvents) {
+		var eventName = Bridge.getEventName([this.getID(), Bridge.CONSTANTS.changeEventName, 'hand', this.getDirection()]);
+		$( document ).on(eventName, {"hand": this}, function(e, config) {
+			e.data.hand[config.operation](config.parameters);
+		});
+	}
+};
 
 /**
  * Something in this hand has changed.
  * Raise an event
  */
 Bridge.Hand.prototype.onChange = function( operation, parameter ) {
-	Bridge._triggerEvents( this, operation, parameter );
+	Bridge._raiseEvents( this, operation, parameter );
 };

@@ -1,50 +1,94 @@
-.inline suit[data-suit='h'], .inline suit[data-suit='d'] { color: #CB0000; }
-.inline rank { text-transform: uppercase; }
-.inline rank[data-rank='x'] { text-transform: lowercase;}
-.inline cards { margin-right: 0px; }
+.standard suit[data-suit='h'], .standard suit[data-suit='d'] { color: #CB0000; }
+.standard rank { text-transform: uppercase; }
+.standard call { text-transform: uppercase; }
+.standard rank[data-rank='x'] { text-transform: lowercase;}
+.standard cards { margin-right: 0px; }
+
 
 /**
  * Bridge Winners Styles
  */
+.bw auction, .bw auction header, .bw auction content, .bw auction row { display:block; }
+.bw auction {
+  display: block;
+  width: 128px;
+  font-size: 20px;
+  border: 1px solid #228b22;
+}
+.bw auction directions {
+  display: block;
+  white-space: nowrap;
+  width: 100%;
+  background-color: #FFFFFF;
+}
+
+.bw auction directions direction {
+	display: inline-block;
+	width: 25%;
+	font-weight: bold;
+	text-align: center;
+	text-transform: uppercase;
+}
+
+.bw auction calls {
+  display: block;
+	width: 100%;
+	white-space: nowrap;
+	background: #9cc;
+	font-size: 17px;
+}
+
+.bw auction calls row call {
+	display: inline-block;
+	width: 25%;
+	text-align: center;
+  text-transform: uppercase;
+}
+
+.bw auction [data-vulnerable] {
+  background-color: #CB0000;
+  color: white;
+}
+
 .bw suit[data-suit='h'], .bw suit[data-suit='d'] { color: #CB0000; }
-.bw hand, .bw cards, .bw header, .bw content { display:block; }
+.bw hand, .bw cards, .bw hand header, .bw hand content { display:block; }
 .bw hand {
   width: 128px;
   font-size: 20px;
   border: 1px solid #228b22;
 }
-.bw header {
+.bw hand header {
     white-space: nowrap;
     width: 100%
     background-color: #FFFFFF;
 }
 
-.bw direction {
+.bw hand direction {
 	display: inline-block;
   background: #336799;
   color: #FFFFFF;
   height: 100%;
-  width: 18%;
+  width: 25%;
   text-align: center;
   text-transform: uppercase;
 }
 
-.bw direction.clickable {
+.bw hand direction.clickable {
 	cursor: pointer;
 }
 
-.bw name {
+.bw hand name {
 	display: inline-block;
 	padding-left: 2%;
 	height: 100%;
   width:auto;
 }
 
-.bw header:hover {
+.bw hand header:hover {
   background-color: #99CCCC;
 }
 
-.bw content {
+.bw hand content {
 	background-color: #E2E1B5;
 }
 
@@ -56,7 +100,7 @@
 .bw rank[data-rank='x'] { text-transform: lowercase;}
 .bw rank[data-rank='-'] { display: none; visibility: hidden;}
 
-.bw suit {
+.bw hand suit {
 	display: inline-block;
   width: 18%;
   height: 100%;

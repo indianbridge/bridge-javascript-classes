@@ -1,7 +1,7 @@
 /**
  * Defines Auction class and all methods associated with it.
  */
- 
+
 // Define namespace if necessary
 var Bridge = Bridge || {};
 
@@ -12,64 +12,70 @@ var Bridge = Bridge || {};
  * @param {object} deal - The deal that this auction belongs to.
  */
 Bridge.Auction = function( deal ) {
-	
+
 	/**
 	 * The deal that this play belongs to.
 	 * @member {object}
 	 */
 	this.deal = deal;
 	this.parent = deal;
-	
+
 	/**
 	 * A unique id to identify this auction.
 	 * @member {string}
 	 */
 	this.id = deal ? deal.id : Bridge.IDManager.getID();
-	
+
 	/**
 	 * The type of this object.
 	 * @member {string}
 	 */
 	this.type = "Auction";
-	
-	
+
+
 	/**
 	 * Should events be triggered for this object.
 	 * @member {bool}
 	 */
-	this.triggerEvents = true;
-	
+	this.raiseEvents = true;
+
+	/**
+	 * Should this object respond to events?
+	 * @member {bool}
+	 */
+	this.respondToEvents = true;
+
 	/**
 	 * The dealer for this auction.
 	 * @member {string}
 	 */
 	this.dealer = ( deal ? deal.getDealer() : "n" );
-	
+
 	/**
 	 * The vulnerability for this auction.
 	 * @member {string}
 	 */
 	this.vulnerability = ( deal ? deal.getVulnerability() : "-" );
-	
+
 	/**
 	 * Who is next to call?
 	 * @member {string}
 	 */
 	this.nextToCall = this.dealer;
-	
+
 	// these two should be in sync
 	/**
 	 * The calls in this auction
 	 * @member {array}
 	 */
-	this.calls = [];	
+	this.calls = [];
 
 	/**
 	 * The contracts at end of corresponding call.
 	 * @member {array}
 	 */
 	this.contracts = [];
-	
+
 	// If the bidding box uses a split level and suit then we select level first
 	/**
 	 * The currently selected level in bidding box.
@@ -77,12 +83,15 @@ Bridge.Auction = function( deal ) {
 	 * @todo This probably does not belong in this class.
 	 */
 	this.selectedLevel = 0;
-	
+
 	/**
 	 * The current call index when trying to step through the auction.
 	 * @member {number}
 	 */
 	this.currentAuctionIndex = -1;
+
+	/** Setup event responder handlers. */
+	this.onChanged();
 };
 
 //
@@ -111,6 +120,7 @@ Bridge.Auction.prototype.getDealer = function() {
  * @param {string} dealer - the new dealer
  */
 Bridge.Auction.prototype.setDealer = function( dealer ) {
+	if (_.isObject(dealer)) dealer = dealer.dealer;
 	Bridge._checkDirection( dealer );
 	this.dealer = dealer;
 	var direction = dealer;
@@ -131,10 +141,21 @@ Bridge.Auction.prototype.getVulnerability = function() {
 };
 
 /**
+ * Is the given direction vulnerable?
+ * @param {string} direction the direction to check.
+ * @return {boolean} true if direction is vulnerable, false otherwise.
+ */
+Bridge.Auction.prototype.isVulnerable = function isVulnerable(direction) {
+  var vul = this.getVulnerability();
+  return (vul === 'b' || vul === direction || vul === Bridge.getPartner(direction));
+};
+
+/**
  * Set the vulnerability for this auction.
  * @param {string} vulnerability - the new vulnerability
  */
 Bridge.Auction.prototype.setVulnerability = function( vulnerability ) {
+	if (_.isObject(vulnerability)) vulnerability = vulnerability.vulnerability;
 	Bridge._checkVulnerability( vulnerability );
 	this.vulnerability = vulnerability;
 	this.onChange( "setVulnerability", vulnerability );
@@ -152,7 +173,8 @@ Bridge.Auction.prototype.getSelectedLevel = function() {
  * Set the selected level for this auction.
  * @param {number} level - the new selected level
  */
-Bridge.Auction.prototype.setSelectedLevel = function( level ) {
+Bridge.Auction.prototype.setSelectedLevel = function(level) {
+	if (_.isObject(level)) level = level.level;
 	Bridge._checkLevel( level );
 	this.selectedLevel = level;
 	this.onChange( "setSelectedLevel", level );
@@ -171,6 +193,7 @@ Bridge.Auction.prototype.unsetSelectedLevel = function() {
  * @param {string} auction - the auction in string format
  */
 Bridge.Auction.prototype.setAuction = function( auction ) {
+	if (_.isObject(auction)) auction = auction.auction;
 	Bridge._checkRequiredArgument( auction );
 	this.fromString( auction );
 	this.onChange( "setAuction", auction  );
@@ -184,25 +207,68 @@ Bridge.Auction.prototype.getAuction = function() {
 	return this.toString();
 };
 
+
+/**
+ * Get the 4 directions starting from specified start direction.
+ * @param {string} startDirection the optional direction to start from. Defaults to w.
+ * @return {array of string} the order of directions in which bidding will/has proceed.
+ **/
+Bridge.Auction.prototype.getDirectionOrder = function getDirectionOrder(startDirection) {
+  startDirection = startDirection || 'w';
+  directions = [];
+  direction = startDirection;
+  for(var i = 0; i < 4; ++i) {
+    directions.push(direction);
+    direction = Bridge.getLHO(direction);
+  }
+  return directions;
+};
+
+/**
+ * Get the calls in this auction.
+ * @param {string} startDirection the optional direction to start from. Defaults to w.
+ * @param {bool} addQuestionMark should a question mark be added at the end if the auction is not complete.
+ * @return {array of Bridge.Call} the calls.
+ **/
+Bridge.Auction.prototype.getCalls = function getDirectionOrder(startDirection, addQuestionMark) {
+  startDirection = startDirection || 'w';
+  addQuestionMark = addQuestionMark || false;
+  calls = [];
+  direction = startDirection;
+  while(this.dealer !== direction) {
+    calls.push('-');
+    direction = Bridge.getLHO(direction);
+  }
+  calls = calls.concat(this.calls);
+  if ( !this.getContract().isComplete && addQuestionMark ) {
+    calls.push('?');
+  }
+  while(calls.length%4 !== 0) {
+    calls.push('');
+  }
+  return _.chunk(calls, 4);
+};
+
 /**
  * Set the contract (and generate an auction ) from a specified contract string
  * @param {string} contract - the contract in string format
  */
 Bridge.Auction.prototype.setContract = function( contract ) {
+	if (_.isObject(contract)) contract = contract.contract;
 	Bridge._checkRequiredArgument( contract );
 	var prefix = "In Bridge.setContract";
-	var charIndex = 0; 
+	var charIndex = 0;
 	if ( contract.length < charIndex + 1 ) {
 		Bridge._reportError( 'Contract string ' + contract + ' does not specify level!', prefix );
 	}
 	var level = _.parseInt( contract[ charIndex++ ] );
 	if ( contract.length < charIndex + 1 ) {
 		Bridge._reportError( 'Contract string ' + contract + ' does not specify suit!', prefix );
-	}	
+	}
 	var suit = contract[ charIndex++ ].toLowerCase();
 	Bridge._checkBid( level + suit, prefix );
 	if ( !Bridge.isStrain( suit ) ) {
-		Bridge._reportError( 'Contract string ' + contract + ' does not specify a valid suit!', prefix );			
+		Bridge._reportError( 'Contract string ' + contract + ' does not specify a valid suit!', prefix );
 	}
 	var doubled = false;
 	var redoubled = false;
@@ -216,7 +282,7 @@ Bridge.Auction.prototype.setContract = function( contract ) {
 	}
 	if ( contract.length < charIndex + 1 ) {
 		Bridge._reportError( 'Contract string ' + contract + ' does not specify declarer!', prefix );
-	}	
+	}
 	var declarer = contract[ charIndex ].toLowerCase();
 	Bridge._checkDirection( declarer );
 	this.clearCalls();
@@ -231,7 +297,7 @@ Bridge.Auction.prototype.setContract = function( contract ) {
 	this.addCall( 'p' );
 	this.onChange( "setContract", contract  );
 	this.onChange( "setAuction", this.getAuction()  );
-};	
+};
 
 /**
  * Get the final or latest contract
@@ -241,15 +307,6 @@ Bridge.Auction.prototype.getContract = function() {
 	var numCalls = this.calls.length;
 	if ( numCalls === 0 ) return new Bridge.Contract();
 	return this.contracts[ numCalls - 1 ];
-};
-
-/**
- * Set a unique id 
- * @param {string} id - a unique identifier
- */
-Bridge.Auction.prototype.setID = function( id ) {
-	Bridge._checkRequiredArgument( id );
-	this.id = id;
 };
 
 /**
@@ -282,7 +339,7 @@ Bridge.Auction.prototype.get = function( property ) {
 			break;
 		case 'vulnerability' :
 			return this.getVulnerability();
-			break;	
+			break;
 		case "level" :
 			return this.getSelectedLevel();
 			break;
@@ -291,7 +348,7 @@ Bridge.Auction.prototype.get = function( property ) {
 			break;
 		case 'auction' :
 			return this.getAuction();
-			break;		
+			break;
 		case 'id' :
 			return this.getID();
 			break;
@@ -304,7 +361,7 @@ Bridge.Auction.prototype.get = function( property ) {
  * Set a property in this auction.
  * The properties that can be set are as follows<br/>
  * dealer - character [ n e s w ] - the dealer for this auction<br/>
- * level - number between 1 and 7 the selected level 
+ * level - number between 1 and 7 the selected level
  * vulnerability - character [ - n e b ] - the vulnerability for this deal<br/>
  * contract - string - a prespecified contract <br/>
  * auction - string - the auction as a string <br/>
@@ -332,9 +389,6 @@ Bridge.Auction.prototype.set = function( property, value ) {
 		case 'auction' :
 			this.setAuction( value );
 			break;
-		case 'id' :
-			this.setID( value );
-			break;
 		default :
 			Bridge._reportError( 'Unknown deal property ' + property, prefix );
 	}
@@ -347,7 +401,12 @@ Bridge.Auction.prototype.set = function( property, value ) {
  * @param {string} [explanation] - optional explanation for this call
  * @param {string} [annotation] - optional annotation for this call
  */
-Bridge.Auction.prototype.addCall = function( call, explanation, annotation ) {
+Bridge.Auction.prototype.addCall = function(call, explanation, annotation) {
+	if (_.isObject(call)) {
+		explanation = call.explanation;
+		annotation = call.annotation;
+		call = call.call;
+	}
 	var prefix = 'In Auction.addCall';
 	call = call.toLowerCase();
 	Bridge._checkBid( call, prefix );
@@ -428,7 +487,7 @@ Bridge.Auction.prototype.advanceAuctionTillIndex_ = function( index ) {
 	while ( this.currentAuctionIndex < index ) {
 		this.currentAuctionIndex++;
 		var call = this.calls[ this.currentAuctionIndex ];
-		
+
 		// Trigger events if enabled
 		this.onChange( "advanceAuction", call );
 	}
@@ -466,7 +525,7 @@ Bridge.Auction.prototype.rewindAuctionTillIndex_ = function( index ) {
 	while ( this.currentAuctionIndex > index ) {
 		var call = this.calls[ this.currentAuctionIndex ];
 		this.currentAuctionIndex--;
-		
+
 		// Trigger events if enabled
 		this.onChange( "rewindAuction", call );
 	}
@@ -518,7 +577,7 @@ Bridge.Auction.prototype.fromString = function ( auction ) {
 			}
 			else {
 				var endChar = '}';
-				var returnValue = Bridge._parseContainedText( auction, charIndex, endChar, prefix );		
+				var returnValue = Bridge._parseContainedText( auction, charIndex, endChar, prefix );
 				annotation = returnValue.text;
 			}
 			charIndex = returnValue.position + 1;
@@ -558,10 +617,21 @@ Bridge.Auction.prototype.toJSON = function( ) {
 };
 
 /**
+ * A event requesting a change has been raised. Respond if response is enabled.
+ */
+Bridge.Auction.prototype.onChanged = function() {
+	if (this.respondToEvents) {
+		var eventName = Bridge.getEventName([this.getID(), Bridge.CONSTANTS.changeEventName, 'auction']);
+		$(document).on(eventName, {"auction": this}, function(e, config) {
+			e.data.auction[config.operation](config.parameters);
+		});
+	}
+};
+
+/**
  * Something in this auction has changed.
  * Raise an event
  */
 Bridge.Auction.prototype.onChange = function( operation, parameter ) {
-	Bridge._triggerEvents( this, operation, parameter );
+	Bridge._raiseEvents( this, operation, parameter );
 };
-

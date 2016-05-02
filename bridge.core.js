@@ -184,21 +184,21 @@ Bridge.options = {
 	},
 	// Global flag to determine if events will be triggered or not.
 	// Setting this to false will disable all events for all deals
-	triggerEvents: true
+	raiseEvents: true
 };
 
 /**
  * Convenience function to enable all event triggers.
  */
 Bridge.enableAllEventTriggers = function() {
-	Bridge.options.triggerEvents = true;
+	Bridge.options.raiseEvents = true;
 };
 
 /**
  * Convenience function to disable all event triggers.
  */
 Bridge.disableAllEventTriggers = function() {
-	Bridge.options.triggerEvents = false;
+	Bridge.options.raiseEvents = false;
 };
 
 /**
@@ -208,8 +208,20 @@ Bridge.disableAllEventTriggers = function() {
 Bridge.CONSTANTS = {
 	// The delimiter used in event names
 	eventNameDelimiter: ':',
-	// Name of event raised by all objects
-	eventName: "event"
+	// Name of event raised by all objects when something changes.
+	changedEventName: "changed",
+	// Name of event raised when something needs to be changed in an object.
+	changeEventName: "change",
+};
+
+
+/**
+ * Use the event delimiter to create event name.
+ * @param {Array of string} items the items to join to construct event name.
+ * @return {string} the event name with delimiters added.
+ */
+Bridge.getEventName = function getEventName(items) {
+	return items.join(Bridge.CONSTANTS.eventNameDelimiter);
 };
 
 /**
@@ -218,12 +230,12 @@ Bridge.CONSTANTS = {
  * @param {string} operation - the operation (event) that is causing this trigger
  * @param {mixed} parameters - Any relevant parameters used in the operation
  */
-Bridge._triggerEvents = function( raiser, operation, parameters ) {
+Bridge._raiseEvents = function( raiser, operation, parameters ) {
 	// Raise only one event based on id which should be the same for all
 	// objects (hand, auction, play etc.) in a deal.
-	if ( Bridge.options.triggerEvents && raiser.triggerEvents ) {
+	if ( Bridge.options.raiseEvents && raiser.raiseEvents ) {
 		var delimiter = Bridge.CONSTANTS.eventNameDelimiter;
-		var eventName = raiser.id + delimiter + Bridge.CONSTANTS.eventName;
+		var eventName = raiser.id + delimiter + Bridge.CONSTANTS.changedEventName;
 		$( document ).trigger( eventName,  {
 			"raisedBy": raiser,
 			"action": operation,
@@ -231,23 +243,6 @@ Bridge._triggerEvents = function( raiser, operation, parameters ) {
 		});
 		Bridge._logEvent( eventName + " - " + operation );
 	}
-	/*var triggerEvents = Bridge.options.triggerEvents;
-	var obj = raiser;
-	while ( raiser ) {
-		if ( triggerEvents ) {
-			var delimiter = Bridge.CONSTANTS.eventNameDelimiter;
-			var prefix = raiser.type || '';
-			var eventName = prefix + delimiter + Bridge.CONSTANTS.eventName;
-			Bridge._triggerOneEvent( eventName, raiser, operation, parameters );
-			eventName = prefix + delimiter + operation;
-			Bridge._triggerOneEvent( eventName, raiser, operation, parameters );
-			triggerEvents = triggerEvents && obj.triggerEvents;
-			raiser = raiser.parent;
-		}
-		else {
-			return;
-		}
-	}*/
 };
 
 /**

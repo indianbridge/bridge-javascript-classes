@@ -1,7 +1,7 @@
 /**
  * Defines Call class and all methods associated with it.
  */
- 
+
 // Get Namespace.
 var Bridge = Bridge || {};
 
@@ -21,7 +21,7 @@ Bridge.Call = function( call, direction ) {
 	this.explanation = "";
 };
 
-// 
+//
 // Getters and Setters
 /**
  * Get the call in this call object
@@ -111,8 +111,8 @@ Bridge.Call.prototype.setExplanation = function( explanation ) {
  */
 Bridge.Call.prototype.set = function( property, value ) {
 	var prefix = "In Call.set";
-	Bridge._checkRequiredArgument( property, "Property", prefix );	
-	Bridge._checkRequiredArgument( value, "Value for Property " + property, prefix );	
+	Bridge._checkRequiredArgument( property, "Property", prefix );
+	Bridge._checkRequiredArgument( value, "Value for Property " + property, prefix );
 	switch ( property ) {
 		case "direction" :
 			this.setDirection( value );
@@ -139,7 +139,7 @@ Bridge.Call.prototype.set = function( property, value ) {
  */
 Bridge.Call.prototype.get = function( property ) {
 	var prefix = "In Call.get";
-	Bridge._checkRequiredArgument( property, "Property", prefix );	
+	Bridge._checkRequiredArgument( property, "Property", prefix );
 	switch ( property ) {
 		case "call" :
 			return this.getCall();
@@ -170,6 +170,6 @@ Bridge.Call.prototype.toString = function() {
 	}
 	if ( this.annotation ) {
 		output += "{" + this.annotation + "}";
-	}		
+	}
 	return output;
 };
