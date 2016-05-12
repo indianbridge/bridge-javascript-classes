@@ -34,16 +34,16 @@ _.declareTemplate( "hand.cards", `<%
 	});
 %>`);
 
-_.declareTemplate( "hand.standard",`<section class="standard"><hand><content><%
+_.declareTemplate( "hand.concise",`<hand><content><%
 	html = _.renderTemplate("hand.cards", {"hand": hand, "config": config});
-	%><%=html%></content></hand><section>`);
+	%><%=html%></content></hand>`);
 
-_.declareTemplate( "hand.bridgewinners",`<section class="bw"><hand><header><%
+_.declareTemplate( "hand.full",`<hand><header><%
 		%><direction><%= hand.getDirection() %></direction><%
 		%><name><%= hand.getName() %></name><%
 	%></header><content><%
 	html = _.renderTemplate("hand.cards", {"hand": hand, "config": config});
-	%><%=html%></content></hand><section>`);
+	%><%=html%></content></hand>`);
 
 /** AUCTION TEMPLATES */
 _.declareTemplate("auction.directions", `
@@ -85,20 +85,96 @@ _.declareTemplate( "auction.calls", `
   %></calls>
 `);
 
-_.declareTemplate("auction.standard", `<section class="standard"><auction><content><%
+_.declareTemplate("auction.concise", `<auction><content><%
 	html = _.renderTemplate("auction.calls", {"auction": auction, "config": config});
-	%><%=html%></content></auction><section>`);
+	%><%=html%></content></auction>`);
 
-_.declareTemplate("auction.bridgewinners", `<section class="bw"><auction><header><%
+_.declareTemplate("auction.full", `<auction><header><%
     html = _.renderTemplate("auction.directions", {"auction": auction, "config": config});
   %><%=html%></header><content><%
 	  html = _.renderTemplate("auction.calls", {"auction": auction, "config": config});
-	%><%=html%></content></auction><section>`);
+	%><%=html%></content></auction>`);
 
 _.declareTemplate("auction.bidding-box.levels", `<levels><%
+  var selectedLevel = auction.getSelectedLevel();
+  var allowedCalls = auction.getContract().allowedCalls(auction.nextToCall);
+  var minimumAllowedLevel = allowedCalls["minimum_level"];
   _.each( _.range( 1, 8 ), function(level) {
     %><level<%if (level === selectedLevel) {%> data-selected<%}
     if (level >= minimumAllowedLevel) {%> data-enabled<%} else {%> data-disabled<%}
-    %>><%=level%></level><%
+    %> data-operation=setSelectedLevel data-level=<%=level%>><%=level%></level><%
   });
-  %></levels>`)
+  %></levels>`);
+
+_.declareTemplate("auction.bidding-box.calls", `<calls><%
+  var selectedLevel = auction.getSelectedLevel();
+  var allowedCalls = auction.getContract().allowedCalls(auction.nextToCall);
+  var callOrder = ['p', 'x', 'r', 'c', 'd', 'h', 's', 'n'];
+  _.each(callOrder, function(suit) {
+    var call = ( Bridge.isStrain(suit) ? selectedLevel + suit : suit );
+    %><call<%if (allowedCalls[call]) {%> data-enabled<%} else {%> data-disabled<%}
+    %> data-operation=addCall data-call=<%=call%> data-suit=<%=suit%>><%=Bridge.calls[suit].html%></call><%
+  });
+  %></calls>`);
+
+_.declareTemplate("auction.bidding-box.concise", `<bidding-box class="concise"><content><%
+    html = _.renderTemplate("auction.bidding-box.levels", {"auction": auction, "config": config});
+  %><%=html%><%
+    html = _.renderTemplate("auction.bidding-box.calls", {"auction": auction, "config": config});
+  %><%=html%></content></bidding-box>`);
+
+_.declareTemplate("auction.bidding-box.levels+suits", `<calls><%
+  var selectedLevel = auction.getSelectedLevel();
+  var allowedCalls = auction.getContract().allowedCalls(auction.nextToCall);
+  var minimumAllowedLevel = allowedCalls["minimum_level"];
+  _.each( _.range( 1, 8 ), function(level) {
+    %><row data-level="<%=level%>"><%
+    var callOrder = ['c', 'd', 'h', 's', 'n'];
+    _.each(callOrder, function(suit) {
+      var call = level + suit;
+      %><call<%if (allowedCalls[call]) {%> data-enabled<%} else {%> data-disabled<%}
+      %> data-operation=addCall data-call=<%=call%>><%
+      %><level data-level="<%=level%>"><%=level%></level><%
+      %><suit data-suit="<%=suit%>"><%=Bridge.calls[suit].html%></suit></call><%
+    });
+    %></row><%
+  });
+  %></calls>`);
+_.declareTemplate("auction.bidding-box.utilities", `<row><%
+  var allowedCalls = auction.getContract().allowedCalls(auction.nextToCall);
+  var callOrder = [
+    {call: 'p', 'text': 'all pass', 'operation': 'addAllPass'},
+    {call: 'u', 'text': 'undo', 'operation': 'removeCall'},
+    {call: 'u', 'text': 'reset', 'operation': 'clearCalls'},
+  ];
+  _.each(callOrder, function(bid) {
+    var call = bid.call;
+    var text = bid.text;
+    %><call<%if (allowedCalls[call]) {%> data-enabled<%} else {%> data-disabled<%}
+    %> data-operation=<%=bid.operation%> data-call=<%=call%>><%=text%></call><%
+  });
+  %></row>`);
+_.declareTemplate("auction.bidding-box.special_calls", `<row><%
+  var allowedCalls = auction.getContract().allowedCalls(auction.nextToCall);
+  var callOrder = [
+    {call: 'p', 'text': 'pass'},
+    {call: 'x', 'text': 'x'},
+    {call: 'r', 'text': 'xx'},
+  ];
+  _.each(callOrder, function(bid) {
+    var call = bid.call;
+    var text = bid.text;
+    %><call<%if (allowedCalls[call]) {%> data-enabled<%} else {%> data-disabled<%}
+    %> data-operation=addCall data-call=<%=call%>><%=text%></call><%
+  });
+  %></row>`);
+_.declareTemplate("auction.bidding-box.full", `<bidding-box class="full"><header><%
+  html = _.renderTemplate("auction.bidding-box.special_calls", {"auction": auction, "config": config});
+  %><%=html%></header><content><%
+    html = _.renderTemplate("auction.bidding-box.levels+suits", {"auction": auction, "config": config});
+  %><%=html%></content><%
+  if (config.showUtilities) {
+    html = _.renderTemplate("auction.bidding-box.utilities", {"auction": auction, "config": config});
+    %><footer><%=html%></footer><%
+  }
+  %></bidding-box>`);

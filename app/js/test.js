@@ -3,7 +3,8 @@ $(function() {
 	try {
 		Bridge.options.log.DEBUG.enabled = true;
 		var config = {
-			"template": "bridgewinners",
+			"template": "full",
+			"wrapperClass": "bw",
 			"alternateSuitColor": false,
 			"containerID": "hand1",
 			"handlers": {
@@ -11,15 +12,21 @@ $(function() {
 			}
 		}
 		var deal = new Bridge.Deal();
-		deal.fromString( "s=hakqdakxcakqj&v=b&a=pp1dp1np2cp3hp3nppxpprpp" );
+		deal.fromString( "s=hakqdakxcakqj&v=b&a=pp1dp1np2cp3hp3nppxppp" );
+		var deal2 = new Bridge.Deal();
+		deal2.fromString(deal.toString());
 		var hand = deal.getHand( 's' );
+		var hand2 = deal2.getHand( 's' );
 		hand.toHTML(config);
+		config.containerID = "hand2";
+		hand2.toHTML(config);
 		hand.removeCard('h', 'k');
 		var eventName = Bridge.getEventName([hand.getID(), Bridge.CONSTANTS.changeEventName, "hand", 's']);
 		$(document).trigger( eventName, { "operation" : "addCard", "parameters": {"suit":'s', "rank": 'a'}});
 		//hand.addCard('s', 'a');
 		var auctionConfig = {
-			"template": "bridgewinners",
+			"template": "full",
+			"wrapperClass": "bw",
 			"addQuestionMark": true,
 			"containerID": "auction1",
 			"handlers": {
@@ -27,22 +34,31 @@ $(function() {
 			}
 		}
 		var auction = deal.getAuction();
+		var auction2 = deal2.getAuction();
 		auction.toHTML(auctionConfig);
+		auctionConfig.containerID = "auction2";
+		auction2.toHTML(auctionConfig);
 		//auction.removeCall();
 		var eventName = Bridge.getEventName([auction.getID(), Bridge.CONSTANTS.changeEventName, "auction"]);
 		$(document).trigger( eventName, { "operation" : "removeCall", "parameters": {"hand": "sakqhakqdakqca"}});
-		$(document).trigger( eventName, { "operation" : "addCall", "parameters": {"call": "4C"}});
+		//$(document).trigger( eventName, { "operation" : "addCall", "parameters": {"call": "4C"}});
 		//$(document).trigger( eventName, { "operation" : "addAllPass", "parameters": {"call": "4C"}});
 
 		var bbConfig = {
-			"template": "bridgewinners",
+			"template": "full",
+			"wrapperClass": "bw",
 			"addQuestionMark": true,
 			"containerID": "bidding-box1",
+			"showUtilities": true,
 			"handlers": {
 				"change": true,
+				"click": true,
 			}
 		}
 		auction.showBiddingBox(bbConfig);
+		auction.respondToEvents = false;
+		bbConfig.containerID = "bidding-box2";
+		auction2.showBiddingBox(bbConfig);
 		//$('#auction1').html(_.renderTemplate("auction.calls", {"auction": deal.getAuction(), "config": {}));
 		//hand.triggerEvents = false;
 		//$("#hand1").html(hand.toHTML());

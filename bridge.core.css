@@ -8,7 +8,99 @@
 /**
  * Bridge Winners Styles
  */
-.bw auction, .bw auction header, .bw auction content, .bw auction row { display:block; }
+ .bw bidding-box.full {
+   width: 300px;
+   display: block;
+   font-size: 20px;
+   line-height: 35px;
+ }
+
+ .bw bidding-box.full row {
+   display: table;
+   table-layout: fixed;
+   width: 100%;
+   color: #222;
+   margin: 0;
+   padding: 0;
+   outline: none;
+   border: 0;
+   margin:auto;
+   text-align: center;
+ }
+
+ .bw bidding-box.full call {
+ 	 display: table-cell;
+   -moz-box-sizing: border-box;
+   -webkit-box-sizing: border-box;
+   box-sizing: border-box;
+   cursor: pointer;
+   height: 35px;
+   text-align: center;
+   -moz-border-radius-topleft: 5px;
+   -webkit-border-top-left-radius: 5px;
+   border-top-left-radius: 5px;
+   -moz-border-radius-topright: 5px;
+   -webkit-border-top-right-radius: 5px;
+   border-top-right-radius: 5px;
+   border: 1px solid black;
+   margin-right: -1px;
+   margin-bottom: -5px;
+   background: #eee;
+   text-transform: uppercase;
+ }
+
+ .bw bidding-box.full [data-call='p'] { background-color: #067411; color: white;}
+ .bw bidding-box.full [data-call='x'] { background-color: #FD0C11; color: white;}
+ .bw bidding-box.full [data-call='r'] { background-color: #000099; color: white;}
+ .bw bidding-box.full [data-call='u'] { background-color: black; color: white;}
+
+ .bw bidding-box.full [data-disabled] {
+   cursor: not-allowed;
+   opacity: 0.2;
+ }
+
+ .bw bidding-box.concise {
+   display: block;
+ 	 width: 300px;
+   font-size: 24px;
+   height: 88px;
+   line-height:40px;
+ }
+ .bw bidding-box.concise content, .bw bidding-box.concise levels, .bw bidding-box.concise calls {
+   display: block;
+   text-align: center;
+   margin: auto;
+ }
+ .bw bidding-box.concise level, .bw bidding-box.concise call {
+     display: inline-block;
+     text-align: center;
+     height: 45%;
+     vertical-align:middle;
+     font-weight: bold;
+     border: 1px solid blue;
+     background: #ccf;
+     -moz-border-radius: 3px;
+     -webkit-border-radius: 3px;
+     border-radius: 3px;
+     cursor: pointer;
+ }
+ .bw bidding-box.concise level { width: 13%; }
+ .bw bidding-box.concise level[data-selected] { background: #cc0; }
+ .bw bidding-box.concise call {
+   width: 11.5%;
+   text-transform: uppercase;
+ }
+
+
+ .bw bidding-box.concise call[data-suit='p']  { color: green; }
+ .bw bidding-box.concise call[data-suit='x'], .bw bidding-box.concise call[data-suit='h'], .bw bidding-box.concise call[data-suit='d'] { color: #CB0000; }
+ .bw bidding-box.concise call[data-suit='r'] { color: blue; }
+ .bw bidding-box.concise [data-disabled] {
+ 	cursor: not-allowed;
+ 	opacity: 0.2;
+ }
+
+.bw auction, .bw auction header, .bw auction content, .bw auction calls { display:block; }
 .bw auction {
   display: block;
   width: 128px;
@@ -16,30 +108,31 @@
   border: 1px solid #228b22;
 }
 .bw auction directions {
-  display: block;
+  display: table;
+  table-layout: fixed;
   white-space: nowrap;
   width: 100%;
   background-color: #FFFFFF;
 }
 
 .bw auction directions direction {
-	display: inline-block;
-	width: 25%;
+	display: table-cell;
 	font-weight: bold;
 	text-align: center;
 	text-transform: uppercase;
 }
 
-.bw auction calls {
-  display: block;
-	width: 100%;
-	white-space: nowrap;
+.bw auction calls row {
+  display: table;
+  table-layout: fixed;
+  width: 100%;
+  white-space: nowrap;
 	background: #9cc;
 	font-size: 17px;
 }
 
 .bw auction calls row call {
-	display: inline-block;
+	display: table-cell;
 	width: 25%;
 	text-align: center;
   text-transform: uppercase;

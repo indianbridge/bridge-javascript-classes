@@ -40,9 +40,9 @@ var Bridge = {
 		'h' : { name : 'Hearts', index : 2, isStrain: true, bid: true, text: "hearts", html : '&hearts;' },
 		'd' : { name : 'Diamonds', index : 3, isStrain: true, bid: true, text: "diamonds", html : '&diams;' },
 		'c' : { name : 'Clubs', index : 4, isStrain: true, bid: true, text: "clubs", html : '&clubs;' },
-		'p' : { name : 'Pass', index : 7, isStrain: false, bid: false, text: "pass", html : 'p' },
+		'p' : { name : 'Pass', index : 5, isStrain: false, bid: false, text: "pass", html : 'p' },
 		'x' : { name : 'Double', index : 6, isStrain: false, bid: false, text: "double", html : 'x' },
-		'r' : { name : 'Redouble', index : 5, isStrain: false, bid: false, text: "redouble", html : 'xx' }
+		'r' : { name : 'Redouble', index : 7, isStrain: false, bid: false, text: "redouble", html : 'xx' }
 	},
 	callOrder: [],
 

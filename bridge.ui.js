@@ -48,13 +48,34 @@ Bridge.Hand.registerTemplate = function registerTemplate(name, template) {
  * @return {string} the wrapped html
  */
 Bridge._addWrapper = function( config, html ) {
-	if ( config.wrapperID ) return html;
+	if (config.wrapperID) return html;
 	config.wrapperID = Bridge.IDManager.getID();
-	return "<div id='" + config.wrapperID + "'>" + html + "</div>";
+  config.wrapperClass = config.wrapperClass || "standard";
+	return "<section id='" + config.wrapperID + "' class='" + config.wrapperClass + "'>" + html + "</section>";
 };
 
 /**
- * Register a callback handler.
+ * Register a  clickcallback handler.
+ * @param {object} owner - the object registering the handler
+ * @param {object} config - config object passed to the handler
+ * @param {function} callback - the callback method to call
+ */
+Bridge._registerClickHandler = function( owner, config, objectType ) {
+	// No op if flag is not set
+	if (config.handlers && config.handlers.click) {
+    var selector = '#' + config.wrapperID + ' [data-enabled]';
+    $(selector).one("click", {owner: owner}, function(e) {
+      var eventName = Bridge.getEventName([owner.getID(), Bridge.CONSTANTS.changeEventName, objectType]);
+      var operation = $(this).data("operation");
+      if (operation) {
+        $(document).trigger( eventName, { "operation" : operation, "parameters": $(this).data()});
+      }
+    });
+	}
+};
+
+/**
+ * Register a change callback handler.
  * @param {object} owner - the object registering the handler
  * @param {object} config - config object passed to the handler
  * @param {function} callback - the callback method to call
@@ -63,7 +84,7 @@ Bridge._registerChangeHandler = function( owner, config, callback ) {
 	// No op if flag is not set
 	if (config.handlers && config.handlers.change) {
 		var eventName = Bridge.getEventName([owner.getID(), Bridge.CONSTANTS.changedEventName]) + '.' + config.wrapperID;
-		$(document).one(eventName, { config: _.cloneDeep( config ), owner: owner, callback: callback }, function(e, args) {
+		$(document).one(eventName, { config: config, owner: owner, callback: callback }, function(e, args) {
 			var id = e.data.config.wrapperID;
 			if ( $( '#' + id ).length === 0 ) {
 				// block is not in dom. Turn off event handler.
@@ -81,14 +102,27 @@ Bridge._registerChangeHandler = function( owner, config, callback ) {
  * @return {string} the wrapped html. Side effect is embedding of html in containerID if specified.
  */
 Bridge._wrapAndEmbedHTML = function _wrapAndEmbedHTML(html, config) {
- if (config.wrapperID) {
-   $('#' + config.wrapperID).empty().append(html);
- }
- else if (config.containerID) {
-   $('#' + config.containerID).empty().append(Bridge._addWrapper(config, html));
- }
- return html;
-}
+  if (config.wrapperID) {
+    $('#' + config.wrapperID).empty().append(html);
+  }
+  else {
+    html = Bridge._addWrapper(config, html);
+    if (config.containerID) {
+      $('#' + config.containerID).empty().append(html);
+    }
+  }
+  return html;
+};
+
+/**
+ * Make a deep copy of the config.
+ * @param {Object} config the config to clone.
+ * @return a clone of the config.
+ */
+Bridge._cloneConfig = function _cloneConfig(config) {
+  if (config) return _.cloneDeep(config);
+  else return {};
+};
 
 /**
  * Generate html to show hand based on passed template name (which should be registered) and config.
@@ -97,9 +131,10 @@ Bridge._wrapAndEmbedHTML = function _wrapAndEmbedHTML(html, config) {
  * @return {string} html display of this hand using the passed template.
  */
 Bridge.Hand.prototype.showHand = function showHand(config) {
-	config = config || {};
+	config = Bridge._cloneConfig(config);
 	config.template = config.template || "standard";
-	var html = _.renderTemplate("hand." + config.template, { "hand": this, "config": config });
+  var template = "hand." + config.template;
+	var html = _.renderTemplate(template, { "hand": this, "config": config });
   Bridge._wrapAndEmbedHTML(html, config);
 	Bridge._registerChangeHandler(this, config, 'toHTML');
 	return html;
@@ -113,9 +148,10 @@ Bridge.Hand.prototype.toHTML = Bridge.Hand.prototype.showHand;
  * @return {string} html display of this auction using the passed template.
  */
 Bridge.Auction.prototype.showAuction = function showAuction(config) {
-	config = config || {};
+	config = Bridge._cloneConfig(config);
 	config.template = config.template || "standard";
-	var html = _.renderTemplate("auction." + config.template, { "auction": this, "config": config });
+  var template = "auction." + config.template;
+	var html = _.renderTemplate(template, { "auction": this, "config": config });
 	Bridge._wrapAndEmbedHTML(html, config);
 	Bridge._registerChangeHandler(this, config, 'toHTML');
 	return html;
@@ -129,13 +165,12 @@ Bridge.Auction.prototype.toHTML = Bridge.Auction.prototype.showAuction;
  * @return {string} html display of this auction's bidding box using the passed template.
  */
 Bridge.Auction.prototype.showBiddingBox = function showBiddingBox(config) {
-	config = config || {};
+	config = Bridge._cloneConfig(config);
 	config.template = config.template || "standard";
-  var allowedCalls = this.getContract().allowedCalls( this.nextToCall );
-  var selectedLevel = this.getSelectedLevel();
-  var minimumAllowedLevel = allowedCalls[ "minimum_level" ];
-	var html = _.renderTemplate("auction.bidding-box.levels", { "selectedLevel": selectedLevel, "minimumAllowedLevel": minimumAllowedLevel, "config": config });
+  var template = "auction.bidding-box." + config.template;
+	var html = _.renderTemplate(template, { "auction": this, "config": config });
 	Bridge._wrapAndEmbedHTML(html, config);
-	Bridge._registerChangeHandler(this, config, 'toHTML');
+	Bridge._registerChangeHandler(this, config, 'showBiddingBox');
+  Bridge._registerClickHandler(this, config, 'auction');
 	return html;
 };
