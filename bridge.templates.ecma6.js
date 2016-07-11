@@ -17,15 +17,13 @@ _.declareTemplate("hand.cards.suit.ranks", `
 	%></ranks>
 `);
 
-_.declareTemplate("hand.cards.suit", `
-<%count=hand.getCount(suit)%>
-<%empty = (count <= 0) ? "" : "data-empty"%>
-<cards data-count="<%=count%>" <%=empty%>>
-	<suit data-suit="<%=suit%>"><%=Bridge.suits[ suit ].html%></suit><%
+_.declareTemplate("hand.cards.suit", `<%
+	count=hand.getCount(suit);
+	empty = (count <= 0) ? "" : "data-empty";
+	%><cards data-count="<%=count%>" <%=empty%>><%
+	%><suit data-suit="<%=suit%>"><%=Bridge.suits[ suit ].html%></suit><%
 	html = _.renderTemplate("hand.cards.suit.ranks", {"hand": hand, "config": config, "suit": suit});
-	%><%=html%>
-</cards>
-`);
+	%><%=html%></cards>`);
 
 _.declareTemplate( "hand.cards", `<%
 	_.each( hand.getSuits(config.alternateSuitColor), function( suit ) {
@@ -38,12 +36,16 @@ _.declareTemplate( "hand.concise",`<hand><content><%
 	html = _.renderTemplate("hand.cards", {"hand": hand, "config": config});
 	%><%=html%></content></hand>`);
 
-_.declareTemplate( "hand.full",`<hand><header><%
+_.declareTemplate( "hand.full",`<hand<%if (hand.isActive()){%> class="active"<%}%>><header><%
 		%><direction><%= hand.getDirection() %></direction><%
-		%><name><%= hand.getName() %></name><%
+		%><name data-enabled data-direction=<%= hand.getDirection() %> data-operation=setActiveHand><%= hand.getName() %></name><%
 	%></header><content><%
 	html = _.renderTemplate("hand.cards", {"hand": hand, "config": config});
 	%><%=html%></content></hand>`);
+
+_.declareTemplate( "hand.standard",`<%
+	html = _.renderTemplate("hand.full", {"hand": hand, "config": config});
+	%><%=html%>`);
 
 /** AUCTION TEMPLATES */
 _.declareTemplate("auction.directions", `
@@ -94,6 +96,10 @@ _.declareTemplate("auction.full", `<auction><header><%
   %><%=html%></header><content><%
 	  html = _.renderTemplate("auction.calls", {"auction": auction, "config": config});
 	%><%=html%></content></auction>`);
+
+_.declareTemplate( "auction.standard",`<%
+	html = _.renderTemplate("auction.full", {"auction": auction, "config": config});
+	%><%=html%>`);
 
 _.declareTemplate("auction.bidding-box.levels", `<levels><%
   var selectedLevel = auction.getSelectedLevel();
@@ -178,3 +184,71 @@ _.declareTemplate("auction.bidding-box.full", `<bidding-box class="full"><header
     %><footer><%=html%></footer><%
   }
   %></bidding-box>`);
+
+_.declareTemplate("deal.card-deck.standard", `<card-deck><%
+  var activeHand = deal.getActiveHand();
+  %><header>Active Hand: <%=deal.getHand(activeHand).getName()%></header><content><%
+	_.each(Bridge.suitOrder, function(suit) {
+		%><row data-suit=<%=suit%>><%
+		_.each(Bridge.rankOrder, function(rank) {
+			var assignedTo = deal.cards[suit][rank].getDirection();
+			%><card <% if (assignedTo) {
+				if (assignedTo === activeHand) {
+					%>data-enabled data-operation=removeCard data-direction=<%=activeHand%> <%
+				} else {
+					%>data-disabled <%
+				}
+				%>data-assigned=<%=assignedTo%> <%
+			} else {
+				%> data-enabled data-operation=addCard data-direction=<%=activeHand%> <%
+			}
+			%>data-suit=<%=suit%> data-rank=<%=rank%>><%
+			%><suit data-suit=<%=suit%>><%=Bridge.suits[suit].html%></suit><%
+			%><rank data-rank=<%=rank%>><%=Bridge.ranks[rank].html%></rank><%
+			%></card><%
+		});
+		var rank = 'x';
+		%><card data-enabled data-operation=addCard data-direction=<%=activeHand%> <%
+		%>data-suit=<%=suit%> data-rank=<%=rank%>><%
+		%><suit data-suit=<%=suit%>><%=Bridge.suits[suit].html%></suit><%
+		%><rank data-rank=<%=rank%>><%=rank%></rank><%
+		%></card><%
+		%></row><%
+	});
+  %></content></card-deck>`);
+
+_.declareTemplate("deal.standard", `<deal><%
+	%><section><%
+		%><block><%
+		%></block><%
+		%><block><%
+			var hand = deal.getHand('n');
+			html = _.renderTemplate("hand.standard", {"hand": hand, "config": config});
+		%><%=html%></block><%
+		%><block><%
+			html = _.renderTemplate("auction.standard", {"auction": deal.getAuction(), "config": config});
+		%><%=html%></block><%
+	%></section><%
+	%><section><%
+		%><block><%
+			var hand = deal.getHand('w');
+			html = _.renderTemplate("hand.standard", {"hand": hand, "config": config});
+		%><%=html%></block><%
+		%><block><%
+		%></block><%
+		%><block><%
+			var hand = deal.getHand('e');
+			html = _.renderTemplate("hand.standard", {"hand": hand, "config": config});
+		%><%=html%></block><%
+	%></section><%
+	%><section><%
+		%><block><%
+		%></block><%
+		%><block><%
+			var hand = deal.getHand('s');
+			html = _.renderTemplate("hand.standard", {"hand": hand, "config": config});
+		%><%=html%></block><%
+		%><block><%
+		%></block><%
+	%></row><%
+	%></section>`);

@@ -108,6 +108,9 @@ Bridge.Deal = function( id ) {
 	 * @member {bool}
 	 */
 	this.raiseEvents = true;
+
+	/** Setup event responder handlers. */
+	this.onChanged();
 };
 
 //
@@ -134,12 +137,15 @@ Bridge.Deal.prototype.getActiveHand = function() { return this._activeHand; }
  * Set the active hand for this deal.
  * @param {string} direction - the active hand
  */
-Bridge.Deal.prototype.setActiveHand = function( direction ) {
-	Bridge._checkDirection( direction );
-	this.getHand( this.getActiveHand() ).makeInactive();
+Bridge.Deal.prototype.setActiveHand = function setActiveHand(direction) {
+	if (_.isObject(direction)) {
+		direction = direction.direction;
+	}
+	Bridge._checkDirection(direction);
+	this.getHand(this.getActiveHand()).makeInactive();
 	this._activeHand = direction;
-	this.getHand( direction ).makeActive();
-	this.onChange( "setActiveHand", direction );
+	this.getHand(direction).makeActive();
+	this.onChange("setActiveHand", direction);
 };
 
 /**
@@ -262,6 +268,22 @@ Bridge.Deal.prototype.getAuction = function() {
  */
 Bridge.Deal.prototype.getPlay = function() {
 	return this.play;
+};
+
+/**
+ * Add a card to specified hand.
+ * @param {Object} parameters the object containing direction, suit and rank for adding card.
+ */
+Bridge.Deal.prototype.addCard = function(parameters) {
+	this.getHand(parameters.direction).addCard(parameters.suit, parameters.rank);
+};
+
+/**
+ * Remove a card from specified hand.
+ * @param {Object} parameters the object containing direction, suit and rank for adding card.
+ */
+Bridge.Deal.prototype.removeCard = function(parameters) {
+	this.getHand(parameters.direction).removeCard(parameters.suit, parameters.rank);
 };
 
 
@@ -597,6 +619,18 @@ Bridge.Deal.prototype.fromLIN = function( lin ) {
 		}
 	}
 	this.onChange( "setDeal", this.toString() );
+};
+
+/**
+ * A event requesting a change has been raised. Respond if response is enabled.
+ */
+Bridge.Deal.prototype.onChanged = function() {
+	if (this.respondToEvents) {
+		var eventName = Bridge.getEventName([this.getID(), Bridge.CONSTANTS.changeEventName, 'deal']);
+		$(document).on(eventName, {"deal": this}, function(e, config) {
+			e.data.deal[config.operation](config.parameters);
+		});
+	}
 };
 
 /**

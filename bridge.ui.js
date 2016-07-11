@@ -174,3 +174,38 @@ Bridge.Auction.prototype.showBiddingBox = function showBiddingBox(config) {
   Bridge._registerClickHandler(this, config, 'auction');
 	return html;
 };
+
+/**
+ * Generate html to show card deck based on configuration options.
+ * If nothing is specified defaults are used.
+ * @param {Object} config custom configuration options.
+ * @return {string} html display of this deal's card deck using the passed template.
+ */
+Bridge.Deal.prototype.showCardDeck = function showCardDeck(config) {
+	config = Bridge._cloneConfig(config);
+	config.template = config.template || "standard";
+  var template = "deal.card-deck." + config.template;
+	var html = _.renderTemplate(template, { "deal": this, "config": config });
+	Bridge._wrapAndEmbedHTML(html, config);
+	Bridge._registerChangeHandler(this, config, 'showCardDeck');
+  Bridge._registerClickHandler(this, config, 'deal');
+	return html;
+};
+
+/**
+ * Generate html to show deal based on configuration options.
+ * If nothing is specified defaults are used.
+ * @param {Object} config custom configuration options.
+ * @return {string} html display of this deal using the passed template.
+ */
+Bridge.Deal.prototype.showDeal = function showDeal(config) {
+	config = Bridge._cloneConfig(config);
+	config.template = config.template || "standard";
+  var template = "deal." + config.template;
+	var html = _.renderTemplate(template, { "deal": this, "config": config });
+	Bridge._wrapAndEmbedHTML(html, config);
+	Bridge._registerChangeHandler(this, config, 'showDeal');
+  Bridge._registerClickHandler(this, config, 'deal');
+	return html;
+};
+Bridge.Deal.prototype.toHTML = Bridge.Deal.prototype.showDeal;

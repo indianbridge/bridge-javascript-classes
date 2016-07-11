@@ -3,8 +3,8 @@ $(function() {
 	try {
 		Bridge.options.log.DEBUG.enabled = true;
 		var config = {
-			"template": "full",
-			"wrapperClass": "bw",
+			"template": "concise",
+			"wrapperClass": "images",
 			"alternateSuitColor": false,
 			"containerID": "hand1",
 			"handlers": {
@@ -12,7 +12,8 @@ $(function() {
 			}
 		}
 		var deal = new Bridge.Deal();
-		deal.fromString( "s=hakqdakxcakqj&v=b&a=pp1dp1np2cp3hp3nppxppp" );
+		deal.setActiveHand('s');
+		deal.fromString( "s=hakqdakxcakqj&n=s234hxxdjt9&v=b&a=pp1dp1np2cp3hp3nppxppp" );
 		var deal2 = new Bridge.Deal();
 		deal2.fromString(deal.toString());
 		var hand = deal.getHand( 's' );
@@ -54,11 +55,22 @@ $(function() {
 				"change": true,
 				"click": true,
 			}
-		}
+		};
 		auction.showBiddingBox(bbConfig);
 		auction.respondToEvents = false;
 		bbConfig.containerID = "bidding-box2";
+		bbConfig.template = 'concise';
 		auction2.showBiddingBox(bbConfig);
+		var cdConfig = {
+			"template": "standard",
+			"wrapperClass": "bw",
+			"containerID": "card-deck1",
+			"handlers": {
+				"change": true,
+				"click": true,
+			}
+		};
+		deal.showDeal(cdConfig);
 		//$('#auction1').html(_.renderTemplate("auction.calls", {"auction": deal.getAuction(), "config": {}));
 		//hand.triggerEvents = false;
 		//$("#hand1").html(hand.toHTML());

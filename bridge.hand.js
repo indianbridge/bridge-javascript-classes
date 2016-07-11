@@ -85,8 +85,8 @@ Bridge.Hand = function( direction, deal ) {
 	 * The number of cards this hand has
 	 * @member {number}
 	 */
-	this.numCards = { "all": 0 };
-	for( var suit in Bridge.suits ) this.numCards[ suit ] = 0;
+	this.numCards = {"all": 0};
+	for(var suit in Bridge.suits) this.numCards[suit] = 0;
 
 	/** Is this the active hand? */
 	this._isActive = false;
@@ -98,6 +98,13 @@ Bridge.Hand = function( direction, deal ) {
 //
 // Getters and Setters
 //
+
+/** Call set active hand on the parent deal. */
+Bridge.Hand.prototype.setActiveHand = function setActiveHand() {
+	if (this.deal) {
+		this.deal.setActiveHand(this.getDirection());
+	}
+};
 
 /** Make this the active hand. */
 Bridge.Hand.prototype.makeActive = function() {
@@ -146,9 +153,9 @@ Bridge.Hand.prototype.getName = function() {
 Bridge.Hand.prototype.getCount = function( suit ) {
 	if ( suit ) {
 		Bridge._checkSuit( suit );
-		return this.numCards[ suit ];
+		return this.numCards[suit];
 	}
-	return this.numCards[ "all" ];
+	return this.numCards["all"];
 };
 
 /**
@@ -235,10 +242,10 @@ Bridge.Hand.prototype.addCard = function( suit, rank ) {
 		}
 	}
 	Bridge._checkRank( rank, prefix );
-	if ( this.numCards === 13 ) {
+	if ( this.getCount() === 13 ) {
 		Bridge._reportError( this.name + "'s Hand : already has 13 cards. Cannot add " + suit + rank, prefix );
 	}
-	if ( this.cards[ suit ][ rank ] ) {
+	if (this.cards[suit][rank]) {
 		Bridge._reportError( suit + rank + " is already assigned to " + this.direction + ". Cannot add again", prefix );
 	}
 	// If deal is specified then check if this card has been assigned
@@ -253,9 +260,9 @@ Bridge.Hand.prototype.addCard = function( suit, rank ) {
 	if ( this.deal ) {
 		this.deal.cards[ suit ][ rank ].assign( this.direction );
 	}
-	this.numCards[ "all" ]++;
-	this.numCards[ suit ]++;
-	this.onChange( "addCard", {
+	this.numCards["all"]++;
+	this.numCards[suit]++;
+	this.onChange("addCard", {
 		"suit": suit,
 		"rank": rank
 	});
@@ -267,7 +274,7 @@ Bridge.Hand.prototype.addCard = function( suit, rank ) {
  * @param {string} suit - The suit of this card
  * @param {string} rank - The rank of this card
  */
-Bridge.Hand.prototype.removeCard = function( suit, rank ) {
+Bridge.Hand.prototype.removeCard = function(suit, rank) {
 	if (_.isObject(suit)) {
 		rank = suit.rank;
 		suit = suit.suit;
@@ -286,10 +293,10 @@ Bridge.Hand.prototype.removeCard = function( suit, rank ) {
 		Bridge._reportError( suit + rank + " is not assigned to " + this.direction + ". Cannot remove", prefix );
 	}
 	this.cards[ suit ][ rank ] = false;
-	this.numCards[ "all" ]--;
-	this.numCards[ suit ]--;
+	this.numCards["all"]--;
+	this.numCards[suit]--;
 	if ( this.deal ) {
-		this.deal.cards[ suit ][ rank ].unAssign();
+		this.deal.cards[suit][rank].unAssign();
 	}
 	this.onChange( "removeCard", {
 		"suit": suit,
@@ -477,7 +484,7 @@ Bridge.Hand.prototype.fromString = function( handString ) {
  * @return {boolean} true if this hand has cards in the given suit
  */
 Bridge.Hand.prototype.hasCards = function( suit ) {
-	return this.numCards[ suit ] > 0;
+	return this.numCards[suit] > 0;
 };
 
 /**
