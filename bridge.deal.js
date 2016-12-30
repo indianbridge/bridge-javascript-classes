@@ -286,6 +286,51 @@ Bridge.Deal.prototype.removeCard = function(parameters) {
 	this.getHand(parameters.direction).removeCard(parameters.suit, parameters.rank);
 };
 
+/**
+ * Check if a direction is vulnerable.
+ */
+Bridge.Deal.prototype.isVulnerable = function(direction) {
+	Bridge._checkDirection( direction );
+	var vul = this.getVulnerability();
+  return (vul === 'b' || vul === direction || vul === Bridge.getPartner(direction));
+};
+
+/**
+ * Rotate the deal clockwise.
+ * North hand is moved to East, East to South and so on.
+ * Auction is also adjusted accordingly.
+ */
+Bridge.Deal.prototype.rotateClockwise = function() {
+	// Rotate Hands.
+	var directions = {
+		'n': 'e',
+		'e': 's',
+		's': 'w',
+		'w': 'n',
+	};
+	var hands = {};
+	for (var direction in directions) {
+		var hand = this.getHand(direction);
+		hands[direction] = hand.getHand();
+		hand.clearCards();
+	}
+	for (var direction in directions) {
+		this.getHand(directions[direction]).setHand(hands[direction]);
+	}
+	// Rotate Vulnerability.
+	var rotateVulnerabilities = {
+		'-' : '-',
+		'n' : 'e',
+		'e' : 'n',
+		'b' : 'b',
+	};
+	this.setVulnerability(rotateVulnerabilities[this.getVulnerability()]);
+	// Rotate dealer.
+	var auction = this.getAuction();
+	var newDealer = Bridge.getLHO(auction.getDealer());
+	auction.setDealer(newDealer);
+};
+
 
 /**
  * Set a property in this deal.

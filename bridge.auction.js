@@ -207,6 +207,23 @@ Bridge.Auction.prototype.getAuction = function() {
 	return this.toString();
 };
 
+/**
+ * Get the name of person sitting in this direction.
+ * @param {string} direction the direction whose name is needed.
+ * @return {string} the name of person.
+ **/
+Bridge.Auction.prototype.getName = function getName(direction) {
+	var names = {
+		'n': 'North',
+		'e': 'East',
+		's': 'South',
+		'w': 'West',
+	};
+	if (this.deal) {
+		return this.deal.getHand(direction).getName();
+	}
+	return names[direction];
+};
 
 /**
  * Get the 4 directions starting from specified start direction.

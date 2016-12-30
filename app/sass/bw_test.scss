@@ -1,0 +1,81 @@
+$ref_height: 647px;
+$ref_width: 375px;
+@mixin background-cover() {
+  background-repeat: no-repeat;
+  background-size: cover;
+}
+@mixin top($top) {
+  top: $top/$ref_height * 100vh;
+}
+
+@mixin height($height) {
+  height: $height/$ref_height * 100vh;
+}
+
+@mixin left($left) {
+  left: $left/$ref_width * 100vw;
+}
+
+@mixin width($width) {
+  width: $width/$ref_width * 100vw;
+}
+
+@mixin location($top, $height:null, $width:null, $left:null) {
+  display: block;
+  position: fixed;
+  @include top($top);
+  @if ($height) {
+    @include height($height);
+  }
+  @if ($left) {
+    @include left($left);
+  }
+  @if ($width) {
+    @include width($width);
+  }
+}
+#hand {
+  @include location(258px, 66px, 349px, 13px);
+  hand, content {
+    display: block;
+    width: 100%;
+    height: 100%;
+  }
+  cards {
+    display: inline-block;
+    height: 100%;
+  }
+  card {
+      position: absolute;
+      color: transparent;
+      text-indent: -9999px;
+      @include height(66px);
+      @include width(48px);
+      @include left(150px);
+      transform-origin: center 60vw;
+  }
+  $suits: s h d c;
+  $ranks: a k q j t 9 8 7 6 5 4 3 2;
+  [data-suit][data-rank] {
+    @include background-cover();
+  }
+  @each $suit in $suits {
+    [data-suit="#{$suit}"][data-rank="x"] {
+      background-image: url("img/#{$suit}2.png");
+    }
+    @each $rank in $ranks {
+      [data-suit="#{$suit}"][data-rank="#{$rank}"] {
+        background-image: url("img/#{$suit}#{$rank}.png");
+      }
+    }
+  }
+
+  $end_angle: 45deg;
+  $increment_angle: 7.5deg;
+  @for $i from 1 through 13 {
+    [data-card-number="#{$i}"] {
+      $angle: ($i - 1) * $increment_angle - $end_angle;
+      transform: rotate($angle);
+    }
+  }
+}

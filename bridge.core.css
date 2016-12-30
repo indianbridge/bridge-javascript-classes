@@ -147,7 +147,7 @@
 .images [data-suit=h] [data-rank=x] {
 	background-image: url(img/cards/hx.png);
 }
-.images [data-suit=s] [data-rank=a] {
+.images [data-suit="s"] [data-rank="a"] {
 	background-image: url(img/cards/sa.png);
 }
 .images [data-suit=s] [data-rank=k] {
@@ -159,28 +159,28 @@
 .images [data-suit=s] [data-rank=j] {
 	background-image: url(img/cards/sj.png);
 }
-.images [data-suit=s] [data-rank=t] {
+.images [data-suit="s"] [data-rank="t"] {
 	background-image: url(img/cards/st.png);
 }
-.images [data-suit=s] [data-rank=9] {
+.images [data-suit=s] [data-rank="9"] {
 	background-image: url(img/cards/s9.png);
 }
-.images [data-suit=s] [data-rank=8] {
+.images [data-suit=s] [data-rank="8"] {
 	background-image: url(img/cards/s8.png);
 }
-.images [data-suit=s] [data-rank=7] {
+.images [data-suit=s] [data-rank="7"] {
 	background-image: url(img/cards/s7.png);
 }
-.images [data-suit=s] [data-rank=6] {
+.images [data-suit=s] [data-rank="6"] {
 	background-image: url(img/cards/s6.png);
 }
-.images [data-suit=s] [data-rank=5] {
+.images [data-suit=s] [data-rank="5"] {
 	background-image: url(img/cards/s5.png);
 }
-.images [data-suit=s] [data-rank=4] {
+.images [data-suit=s] [data-rank="4"] {
 	background-image: url(img/cards/s4.png);
 }
-.images [data-suit=s] [data-rank=3] {
+.images [data-suit=s] [data-rank="3"] {
 	background-image: url(img/cards/s3.png);
 }
 .images [data-suit=s] [data-rank="2"] {
@@ -189,6 +189,7 @@
 .images [data-suit=s] [data-rank=x] {
 	background-image: url(img/cards/sx.png);
 }
+
 
 /**
  * Bridge Winners Styles
@@ -301,7 +302,7 @@
  .bw bidding-box.full [data-call='r'] { background-color: #000099; color: white;}
  .bw bidding-box.full [data-call='u'] { background-color: black; color: white;}
 
- .bw bidding-box.full [data-disabled] {
+ .bw bidding-box.full .disabled {
    cursor: not-allowed;
    opacity: 0.2;
  }
@@ -349,7 +350,7 @@
      border-radius: 3px;
      cursor: pointer;
  }
- .bw bidding-box.concise level[data-selected] { background: #cc0; }
+ .bw bidding-box.concise level.selected { background: #cc0; }
  .bw bidding-box.concise call { text-transform: uppercase;}
 
 
@@ -357,7 +358,7 @@
  .bw bidding-box.concise call[data-suit='x'] { background-color: #CB0000; color: white; }
  .bw bidding-box.concise call[data-suit='r'] { background-color: #000099; color: white; }
  .bw bidding-box.concise call[data-suit='h'], .bw bidding-box.concise call[data-suit='d'] { color: #CB0000; }
- .bw bidding-box.concise [data-disabled] {
+ .bw bidding-box.concise .disabled {
  	cursor: not-allowed;
  	opacity: 0.2;
  }

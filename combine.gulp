@@ -1,0 +1,13 @@
+
+// Include gulp
+var gulp = require('gulp');
+ // Include plugins
+var concat = require('gulp-concat');
+ // Concatenate JS Files
+gulp.task('scripts', function() {
+    return gulp.src(['./bridge.core.js', './bridge.deal.js', './bridge.card.js', './bridge.hand.js', './bridge.call.js', './bridge.auction.js', './bridge.contract.js', './bridge.play.js', './bridge.playedcard.js', './bridge.ui.js'])
+      .pipe(concat('bridge.all.js'))
+      .pipe(gulp.dest('./'));
+});
+ // Default Task
+gulp.task('default', ['scripts']);

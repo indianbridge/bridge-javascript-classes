@@ -32,13 +32,29 @@ _.declareTemplate( "hand.cards", `<%
 	});
 %>`);
 
+_.declareTemplate( "hand.cards.concise", `<cards><%
+	var count = 0;
+	_.each( hand.getSuits(config.alternateSuitColor), function( suit ) {
+		_.each( hand.getRanks(suit), function( item ) {
+			if (item.rank !== "-") {
+				count++;
+				%><card data-card-number="<%=count%>" data-suit="<%=suit%>" data-rank="<%=item.rank%>"><%=item.html%></card><%
+			}
+		});
+	});
+	while (count < 13) {
+		count++;
+		%><card data-card-number="<%=count%>" class="unassigned"></card><%
+	}
+%></cards>`);
+
 _.declareTemplate( "hand.concise",`<hand><content><%
-	html = _.renderTemplate("hand.cards", {"hand": hand, "config": config});
+	html = _.renderTemplate("hand.cards.concise", {"hand": hand, "config": config});
 	%><%=html%></content></hand>`);
 
 _.declareTemplate( "hand.full",`<hand<%if (hand.isActive()){%> class="active"<%}%>><header><%
 		%><direction><%= hand.getDirection() %></direction><%
-		%><name data-enabled data-direction=<%= hand.getDirection() %> data-operation=setActiveHand><%= hand.getName() %></name><%
+		%><name class="enabled" data-direction=<%= hand.getDirection() %> data-operation=setActiveHand><%= hand.getName() %></name><%
 	%></header><content><%
 	html = _.renderTemplate("hand.cards", {"hand": hand, "config": config});
 	%><%=html%></content></hand>`);
@@ -51,8 +67,9 @@ _.declareTemplate( "hand.standard",`<%
 _.declareTemplate("auction.directions", `
 	<directions><%
 		_.each(auction.getDirectionOrder(config.startDirection), function(direction) {
+			var name = auction.getName(direction);
       %><direction <% if (auction.isVulnerable(direction)) {%>data-vulnerable<%}
-      %> data-direction="<%=direction%>"><%=direction%></direction><%
+      %> data-direction="<%=direction%>"><%=name%></direction><%
 		});
 	%></directions>
 `);
@@ -106,20 +123,24 @@ _.declareTemplate("auction.bidding-box.levels", `<levels><%
   var allowedCalls = auction.getContract().allowedCalls(auction.nextToCall);
   var minimumAllowedLevel = allowedCalls["minimum_level"];
   _.each( _.range( 1, 8 ), function(level) {
-    %><level<%if (level === selectedLevel) {%> data-selected<%}
-    if (level >= minimumAllowedLevel) {%> data-enabled<%} else {%> data-disabled<%}
-    %> data-operation=setSelectedLevel data-level=<%=level%>><%=level%></level><%
+    %><level data-operation=setSelectedLevel data-level=<%=level%> class="<%
+		if (level === selectedLevel) {%> selected<%}
+		if (level >= minimumAllowedLevel) {%> enabled<%} else {%> disabled<%}
+		%>"><%=level%></level><%
   });
   %></levels>`);
 
 _.declareTemplate("auction.bidding-box.calls", `<calls><%
   var selectedLevel = auction.getSelectedLevel();
   var allowedCalls = auction.getContract().allowedCalls(auction.nextToCall);
-  var callOrder = ['p', 'x', 'r', 'c', 'd', 'h', 's', 'n'];
+	var pass = ['p'];
+	var double = allowedCalls['r'] ? ['r'] : ['x'];
+  var callOrder = pass.concat(double, ['c', 'd', 'h', 's', 'n']);
   _.each(callOrder, function(suit) {
     var call = ( Bridge.isStrain(suit) ? selectedLevel + suit : suit );
-    %><call<%if (allowedCalls[call]) {%> data-enabled<%} else {%> data-disabled<%}
-    %> data-operation=addCall data-call=<%=call%> data-suit=<%=suit%>><%=Bridge.calls[suit].html%></call><%
+    %><call data-operation=addCall data-call=<%=call%> data-suit=<%=suit%> class="<%
+		if (allowedCalls[call]) {%> enabled<%} else {%> disabled<%}
+		%>"><%=Bridge.calls[suit].html%></call><%
   });
   %></calls>`);
 
@@ -138,8 +159,9 @@ _.declareTemplate("auction.bidding-box.levels+suits", `<calls><%
     var callOrder = ['c', 'd', 'h', 's', 'n'];
     _.each(callOrder, function(suit) {
       var call = level + suit;
-      %><call<%if (allowedCalls[call]) {%> data-enabled<%} else {%> data-disabled<%}
-      %> data-operation=addCall data-call=<%=call%>><%
+      %><call data-operation=addCall data-call=<%=call%> class="<%
+			if (allowedCalls[call]) {%> enabled<%} else {%> disabled<%}
+			%>"><%
       %><level data-level="<%=level%>"><%=level%></level><%
       %><suit data-suit="<%=suit%>"><%=Bridge.calls[suit].html%></suit></call><%
     });
@@ -156,8 +178,9 @@ _.declareTemplate("auction.bidding-box.utilities", `<row><%
   _.each(callOrder, function(bid) {
     var call = bid.call;
     var text = bid.text;
-    %><call<%if (allowedCalls[call]) {%> data-enabled<%} else {%> data-disabled<%}
-    %> data-operation=<%=bid.operation%> data-call=<%=call%>><%=text%></call><%
+    %><call data-operation=<%=bid.operation%> data-call=<%=call%> class="<%
+		if (allowedCalls[call]) {%> enabled<%} else {%> disabled<%}
+		%>"><%=text%></call><%
   });
   %></row>`);
 _.declareTemplate("auction.bidding-box.special_calls", `<row><%
@@ -170,8 +193,9 @@ _.declareTemplate("auction.bidding-box.special_calls", `<row><%
   _.each(callOrder, function(bid) {
     var call = bid.call;
     var text = bid.text;
-    %><call<%if (allowedCalls[call]) {%> data-enabled<%} else {%> data-disabled<%}
-    %> data-operation=addCall data-call=<%=call%>><%=text%></call><%
+    %><call data-operation=addCall data-call=<%=call%> class="<%
+		if (allowedCalls[call]) {%> enabled<%} else {%> disabled<%}
+		%>"><%=text%></call><%
   });
   %></row>`);
 _.declareTemplate("auction.bidding-box.full", `<bidding-box class="full"><header><%
@@ -194,13 +218,13 @@ _.declareTemplate("deal.card-deck.standard", `<card-deck><%
 			var assignedTo = deal.cards[suit][rank].getDirection();
 			%><card <% if (assignedTo) {
 				if (assignedTo === activeHand) {
-					%>data-enabled data-operation=removeCard data-direction=<%=activeHand%> <%
+					%>class="enabled" data-operation=removeCard data-direction=<%=activeHand%> <%
 				} else {
 					%>data-disabled <%
 				}
 				%>data-assigned=<%=assignedTo%> <%
 			} else {
-				%> data-enabled data-operation=addCard data-direction=<%=activeHand%> <%
+				%> class="enabled" data-operation=addCard data-direction=<%=activeHand%> <%
 			}
 			%>data-suit=<%=suit%> data-rank=<%=rank%>><%
 			%><suit data-suit=<%=suit%>><%=Bridge.suits[suit].html%></suit><%
@@ -208,7 +232,7 @@ _.declareTemplate("deal.card-deck.standard", `<card-deck><%
 			%></card><%
 		});
 		var rank = 'x';
-		%><card data-enabled data-operation=addCard data-direction=<%=activeHand%> <%
+		%><card class="enabled" data-operation=addCard data-direction=<%=activeHand%> <%
 		%>data-suit=<%=suit%> data-rank=<%=rank%>><%
 		%><suit data-suit=<%=suit%>><%=Bridge.suits[suit].html%></suit><%
 		%><rank data-rank=<%=rank%>><%=rank%></rank><%
@@ -216,6 +240,36 @@ _.declareTemplate("deal.card-deck.standard", `<card-deck><%
 		%></row><%
 	});
   %></content></card-deck>`);
+
+	_.declareTemplate("deal.card-deck.rows", `<card-deck><%
+	  var activeHand = deal.getActiveHand();
+		var count = 0;
+	  %><content><%
+		_.each(Bridge.suitOrder, function(suit) {
+			%><row data-suit=<%=suit%>><%
+			_.each(Bridge.rankOrder, function(rank) {
+				var assignedTo = deal.cards[suit][rank].getDirection();
+				count++;
+				%><card data-card-number="<%=count%>" <% if (assignedTo) {
+					if (assignedTo === activeHand) {
+						%>class="enabled assigned" data-operation=removeCard data-direction=<%=activeHand%> <%
+					} else {
+						%>class="disabled assigned" <%
+					}
+					%>data-assigned=<%=assignedTo%> <%
+				} else {
+					if (deal.getHand(activeHand).getCount() < 13) {
+						%> class="enabled unassigned" data-operation=addCard data-direction=<%=activeHand%> <%
+					} else {
+						%> class="disabled unassigned" data-operation=addCard data-direction=<%=activeHand%> <%
+					}
+					%> class="enabled unassigned" data-operation=addCard data-direction=<%=activeHand%> <%
+				}
+				%>data-suit=<%=suit%> data-rank=<%=rank%>></card><%
+			});
+			%></row><%
+		});
+	  %></content></card-deck>`);
 
 _.declareTemplate("deal.standard", `<deal><%
 	%><section><%

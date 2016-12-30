@@ -506,6 +506,24 @@ Bridge.Hand.prototype.getRanks = function( suit ) {
 };
 
 /**
+ * Get the cards in this hand in suit and rank order.
+ * @return {int} the card number.
+ */
+Bridge.Hand.prototype.getCards = function() {
+	out = [];
+	_.each( Bridge.suitOrder, function( suit ) {
+		_.each( Bridge.rankOrder, function( rank ) {
+			if ( this.cards[ suit ][ rank ] ) {
+				var rank = this.showAsX[ suit ][ actualRank ] ? 'x' : actualRank;
+				var rankHTML = this.showAsX[ suit ][ actualRank ] ? 'x' : Bridge.ranks[ rank ].html;
+				out.push( { "suit": suit, "rank": rank, "html": rankHTML } );
+			}
+		}, this);
+	}, this);
+	return out;
+};
+
+/**
  * Get the suit in order for this hand.
  * @param { bool } alternating should the color suits be alternated.
  * @return {array} an array of suits in alternating color order if requested
@@ -513,13 +531,12 @@ Bridge.Hand.prototype.getRanks = function( suit ) {
 Bridge.Hand.prototype.getSuits = function( alternating ) {
 	if ( !alternating ) return Bridge.suitOrder;
 	var numSuits = 0;
-	var hasCards = {};
 	_.each( Bridge.suitOrder, function( suit ) {
 		if ( this.hasCards( suit ) ) numSuits++;
 	}, this );
 	if ( numSuits < 3 ) return Bridge.suitOrder;
 	if ( numSuits === 4 ) return [ 's', 'h', 'c', 'd' ];
-	if ( hasCards[ 's' ] && hasCards[ 'c' ] ) return Bridge.suitOrder;
+	if ( this.hasCards('s') && this.hasCards('c') ) return Bridge.suitOrder;
 	else return [ 'h', 's', 'c', 'd' ];
 };
 

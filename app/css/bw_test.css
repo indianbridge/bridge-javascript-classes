@@ -1,0 +1,311 @@
+/* line 37, ../sass/bw_test.scss */
+#hand {
+  display: block;
+  position: fixed;
+  top: 39.87635vh;
+  height: 10.20093vh;
+  left: 3.46667vw;
+  width: 93.06667vw;
+}
+/* line 39, ../sass/bw_test.scss */
+#hand hand, #hand content {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+/* line 44, ../sass/bw_test.scss */
+#hand cards {
+  display: inline-block;
+  height: 100%;
+}
+/* line 48, ../sass/bw_test.scss */
+#hand card {
+  position: absolute;
+  color: transparent;
+  text-indent: -9999px;
+  height: 10.20093vh;
+  width: 12.8vw;
+  left: 40vw;
+  transform-origin: center 60vw;
+}
+/* line 59, ../sass/bw_test.scss */
+#hand [data-suit][data-rank] {
+  background-repeat: no-repeat;
+  background-size: cover;
+}
+/* line 63, ../sass/bw_test.scss */
+#hand [data-suit="s"][data-rank="x"] {
+  background-image: url("img/s2.png");
+}
+/* line 67, ../sass/bw_test.scss */
+#hand [data-suit="s"][data-rank="a"] {
+  background-image: url("img/sa.png");
+}
+/* line 67, ../sass/bw_test.scss */
+#hand [data-suit="s"][data-rank="k"] {
+  background-image: url("img/sk.png");
+}
+/* line 67, ../sass/bw_test.scss */
+#hand [data-suit="s"][data-rank="q"] {
+  background-image: url("img/sq.png");
+}
+/* line 67, ../sass/bw_test.scss */
+#hand [data-suit="s"][data-rank="j"] {
+  background-image: url("img/sj.png");
+}
+/* line 67, ../sass/bw_test.scss */
+#hand [data-suit="s"][data-rank="t"] {
+  background-image: url("img/st.png");
+}
+/* line 67, ../sass/bw_test.scss */
+#hand [data-suit="s"][data-rank="9"] {
+  background-image: url("img/s9.png");
+}
+/* line 67, ../sass/bw_test.scss */
+#hand [data-suit="s"][data-rank="8"] {
+  background-image: url("img/s8.png");
+}
+/* line 67, ../sass/bw_test.scss */
+#hand [data-suit="s"][data-rank="7"] {
+  background-image: url("img/s7.png");
+}
+/* line 67, ../sass/bw_test.scss */
+#hand [data-suit="s"][data-rank="6"] {
+  background-image: url("img/s6.png");
+}
+/* line 67, ../sass/bw_test.scss */
+#hand [data-suit="s"][data-rank="5"] {
+  background-image: url("img/s5.png");
+}
+/* line 67, ../sass/bw_test.scss */
+#hand [data-suit="s"][data-rank="4"] {
+  background-image: url("img/s4.png");
+}
+/* line 67, ../sass/bw_test.scss */
+#hand [data-suit="s"][data-rank="3"] {
+  background-image: url("img/s3.png");
+}
+/* line 67, ../sass/bw_test.scss */
+#hand [data-suit="s"][data-rank="2"] {
+  background-image: url("img/s2.png");
+}
+/* line 63, ../sass/bw_test.scss */
+#hand [data-suit="h"][data-rank="x"] {
+  background-image: url("img/h2.png");
+}
+/* line 67, ../sass/bw_test.scss */
+#hand [data-suit="h"][data-rank="a"] {
+  background-image: url("img/ha.png");
+}
+/* line 67, ../sass/bw_test.scss */
+#hand [data-suit="h"][data-rank="k"] {
+  background-image: url("img/hk.png");
+}
+/* line 67, ../sass/bw_test.scss */
+#hand [data-suit="h"][data-rank="q"] {
+  background-image: url("img/hq.png");
+}
+/* line 67, ../sass/bw_test.scss */
+#hand [data-suit="h"][data-rank="j"] {
+  background-image: url("img/hj.png");
+}
+/* line 67, ../sass/bw_test.scss */
+#hand [data-suit="h"][data-rank="t"] {
+  background-image: url("img/ht.png");
+}
+/* line 67, ../sass/bw_test.scss */
+#hand [data-suit="h"][data-rank="9"] {
+  background-image: url("img/h9.png");
+}
+/* line 67, ../sass/bw_test.scss */
+#hand [data-suit="h"][data-rank="8"] {
+  background-image: url("img/h8.png");
+}
+/* line 67, ../sass/bw_test.scss */
+#hand [data-suit="h"][data-rank="7"] {
+  background-image: url("img/h7.png");
+}
+/* line 67, ../sass/bw_test.scss */
+#hand [data-suit="h"][data-rank="6"] {
+  background-image: url("img/h6.png");
+}
+/* line 67, ../sass/bw_test.scss */
+#hand [data-suit="h"][data-rank="5"] {
+  background-image: url("img/h5.png");
+}
+/* line 67, ../sass/bw_test.scss */
+#hand [data-suit="h"][data-rank="4"] {
+  background-image: url("img/h4.png");
+}
+/* line 67, ../sass/bw_test.scss */
+#hand [data-suit="h"][data-rank="3"] {
+  background-image: url("img/h3.png");
+}
+/* line 67, ../sass/bw_test.scss */
+#hand [data-suit="h"][data-rank="2"] {
+  background-image: url("img/h2.png");
+}
+/* line 63, ../sass/bw_test.scss */
+#hand [data-suit="d"][data-rank="x"] {
+  background-image: url("img/d2.png");
+}
+/* line 67, ../sass/bw_test.scss */
+#hand [data-suit="d"][data-rank="a"] {
+  background-image: url("img/da.png");
+}
+/* line 67, ../sass/bw_test.scss */
+#hand [data-suit="d"][data-rank="k"] {
+  background-image: url("img/dk.png");
+}
+/* line 67, ../sass/bw_test.scss */
+#hand [data-suit="d"][data-rank="q"] {
+  background-image: url("img/dq.png");
+}
+/* line 67, ../sass/bw_test.scss */
+#hand [data-suit="d"][data-rank="j"] {
+  background-image: url("img/dj.png");
+}
+/* line 67, ../sass/bw_test.scss */
+#hand [data-suit="d"][data-rank="t"] {
+  background-image: url("img/dt.png");
+}
+/* line 67, ../sass/bw_test.scss */
+#hand [data-suit="d"][data-rank="9"] {
+  background-image: url("img/d9.png");
+}
+/* line 67, ../sass/bw_test.scss */
+#hand [data-suit="d"][data-rank="8"] {
+  background-image: url("img/d8.png");
+}
+/* line 67, ../sass/bw_test.scss */
+#hand [data-suit="d"][data-rank="7"] {
+  background-image: url("img/d7.png");
+}
+/* line 67, ../sass/bw_test.scss */
+#hand [data-suit="d"][data-rank="6"] {
+  background-image: url("img/d6.png");
+}
+/* line 67, ../sass/bw_test.scss */
+#hand [data-suit="d"][data-rank="5"] {
+  background-image: url("img/d5.png");
+}
+/* line 67, ../sass/bw_test.scss */
+#hand [data-suit="d"][data-rank="4"] {
+  background-image: url("img/d4.png");
+}
+/* line 67, ../sass/bw_test.scss */
+#hand [data-suit="d"][data-rank="3"] {
+  background-image: url("img/d3.png");
+}
+/* line 67, ../sass/bw_test.scss */
+#hand [data-suit="d"][data-rank="2"] {
+  background-image: url("img/d2.png");
+}
+/* line 63, ../sass/bw_test.scss */
+#hand [data-suit="c"][data-rank="x"] {
+  background-image: url("img/c2.png");
+}
+/* line 67, ../sass/bw_test.scss */
+#hand [data-suit="c"][data-rank="a"] {
+  background-image: url("img/ca.png");
+}
+/* line 67, ../sass/bw_test.scss */
+#hand [data-suit="c"][data-rank="k"] {
+  background-image: url("img/ck.png");
+}
+/* line 67, ../sass/bw_test.scss */
+#hand [data-suit="c"][data-rank="q"] {
+  background-image: url("img/cq.png");
+}
+/* line 67, ../sass/bw_test.scss */
+#hand [data-suit="c"][data-rank="j"] {
+  background-image: url("img/cj.png");
+}
+/* line 67, ../sass/bw_test.scss */
+#hand [data-suit="c"][data-rank="t"] {
+  background-image: url("img/ct.png");
+}
+/* line 67, ../sass/bw_test.scss */
+#hand [data-suit="c"][data-rank="9"] {
+  background-image: url("img/c9.png");
+}
+/* line 67, ../sass/bw_test.scss */
+#hand [data-suit="c"][data-rank="8"] {
+  background-image: url("img/c8.png");
+}
+/* line 67, ../sass/bw_test.scss */
+#hand [data-suit="c"][data-rank="7"] {
+  background-image: url("img/c7.png");
+}
+/* line 67, ../sass/bw_test.scss */
+#hand [data-suit="c"][data-rank="6"] {
+  background-image: url("img/c6.png");
+}
+/* line 67, ../sass/bw_test.scss */
+#hand [data-suit="c"][data-rank="5"] {
+  background-image: url("img/c5.png");
+}
+/* line 67, ../sass/bw_test.scss */
+#hand [data-suit="c"][data-rank="4"] {
+  background-image: url("img/c4.png");
+}
+/* line 67, ../sass/bw_test.scss */
+#hand [data-suit="c"][data-rank="3"] {
+  background-image: url("img/c3.png");
+}
+/* line 67, ../sass/bw_test.scss */
+#hand [data-suit="c"][data-rank="2"] {
+  background-image: url("img/c2.png");
+}
+/* line 76, ../sass/bw_test.scss */
+#hand [data-card-number="1"] {
+  transform: rotate(-45deg);
+}
+/* line 76, ../sass/bw_test.scss */
+#hand [data-card-number="2"] {
+  transform: rotate(-37.5deg);
+}
+/* line 76, ../sass/bw_test.scss */
+#hand [data-card-number="3"] {
+  transform: rotate(-30deg);
+}
+/* line 76, ../sass/bw_test.scss */
+#hand [data-card-number="4"] {
+  transform: rotate(-22.5deg);
+}
+/* line 76, ../sass/bw_test.scss */
+#hand [data-card-number="5"] {
+  transform: rotate(-15deg);
+}
+/* line 76, ../sass/bw_test.scss */
+#hand [data-card-number="6"] {
+  transform: rotate(-7.5deg);
+}
+/* line 76, ../sass/bw_test.scss */
+#hand [data-card-number="7"] {
+  transform: rotate(0deg);
+}
+/* line 76, ../sass/bw_test.scss */
+#hand [data-card-number="8"] {
+  transform: rotate(7.5deg);
+}
+/* line 76, ../sass/bw_test.scss */
+#hand [data-card-number="9"] {
+  transform: rotate(15deg);
+}
+/* line 76, ../sass/bw_test.scss */
+#hand [data-card-number="10"] {
+  transform: rotate(22.5deg);
+}
+/* line 76, ../sass/bw_test.scss */
+#hand [data-card-number="11"] {
+  transform: rotate(30deg);
+}
+/* line 76, ../sass/bw_test.scss */
+#hand [data-card-number="12"] {
+  transform: rotate(37.5deg);
+}
+/* line 76, ../sass/bw_test.scss */
+#hand [data-card-number="13"] {
+  transform: rotate(45deg);
+}

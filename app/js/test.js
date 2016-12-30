@@ -3,9 +3,9 @@ $(function() {
 	try {
 		Bridge.options.log.DEBUG.enabled = true;
 		var config = {
-			"template": "concise",
+			"template": "full",
 			"wrapperClass": "images",
-			"alternateSuitColor": false,
+			"alternateSuitColor": true,
 			"containerID": "hand1",
 			"handlers": {
 				"change": true,
@@ -13,11 +13,12 @@ $(function() {
 		}
 		var deal = new Bridge.Deal();
 		deal.setActiveHand('s');
-		deal.fromString( "s=hakqdakxcakqj&n=s234hxxdjt9&v=b&a=pp1dp1np2cp3hp3nppxppp" );
+		deal.fromString( "s=st75hakqdakxcakqj&n=s234hxxdjt9&v=b&a=pp1dp1np2cp3hp3nppxppp" );
 		var deal2 = new Bridge.Deal();
 		deal2.fromString(deal.toString());
 		var hand = deal.getHand( 's' );
 		var hand2 = deal2.getHand( 's' );
+		//deal.rotateClockwise();
 		hand.toHTML(config);
 		config.containerID = "hand2";
 		hand2.toHTML(config);
@@ -25,6 +26,7 @@ $(function() {
 		var eventName = Bridge.getEventName([hand.getID(), Bridge.CONSTANTS.changeEventName, "hand", 's']);
 		$(document).trigger( eventName, { "operation" : "addCard", "parameters": {"suit":'s', "rank": 'a'}});
 		//hand.addCard('s', 'a');
+		deal.rotateClockwise();
 		var auctionConfig = {
 			"template": "full",
 			"wrapperClass": "bw",
@@ -60,9 +62,9 @@ $(function() {
 		auction.respondToEvents = false;
 		bbConfig.containerID = "bidding-box2";
 		bbConfig.template = 'concise';
-		auction2.showBiddingBox(bbConfig);
+		auction.showBiddingBox(bbConfig);
 		var cdConfig = {
-			"template": "standard",
+			"template": "rows",
 			"wrapperClass": "bw",
 			"containerID": "card-deck1",
 			"handlers": {
@@ -70,7 +72,7 @@ $(function() {
 				"click": true,
 			}
 		};
-		deal.showDeal(cdConfig);
+		deal.showCardDeck(cdConfig);
 		//$('#auction1').html(_.renderTemplate("auction.calls", {"auction": deal.getAuction(), "config": {}));
 		//hand.triggerEvents = false;
 		//$("#hand1").html(hand.toHTML());

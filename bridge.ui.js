@@ -63,7 +63,7 @@ Bridge._addWrapper = function( config, html ) {
 Bridge._registerClickHandler = function( owner, config, objectType ) {
 	// No op if flag is not set
 	if (config.handlers && config.handlers.click) {
-    var selector = '#' + config.wrapperID + ' [data-enabled]';
+    var selector = '#' + config.wrapperID + ' .enabled';
     $(selector).one("click", {owner: owner}, function(e) {
       var eventName = Bridge.getEventName([owner.getID(), Bridge.CONSTANTS.changeEventName, objectType]);
       var operation = $(this).data("operation");
