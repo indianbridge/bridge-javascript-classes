@@ -65,8 +65,8 @@ var Bridge = {
 
 	vulnerabilities : {
 		'-' : { name: 'None', index: 0, html: 'None' },
-		'n' : { name: 'NS', index: 0, html: 'North-South' },
-		'e' : { name: 'EW', index: 0, html: 'East-West' },
+		'n' : { name: 'NS', index: 0, html: 'Us' },
+		'e' : { name: 'EW', index: 0, html: 'Them' },
 		'b' : { name: 'Both', index: 0, html: 'Both' }
 	}
 };
@@ -177,11 +177,6 @@ Bridge.enums = {
 Bridge.options = {
 	// Should error message include context?
 	useContextInErrorMessage: false,
-	// Which classes of logs to enable
-	log: {
-		EVENT: { name: "events", enabled: true },
-		DEBUG: { name: "debug", enabled: false }
-	},
 	// Global flag to determine if events will be triggered or not.
 	// Setting this to false will disable all events for all deals
 	raiseEvents: true
@@ -224,73 +219,7 @@ Bridge.getEventName = function getEventName(items) {
 	return items.join(Bridge.CONSTANTS.eventNameDelimiter);
 };
 
-/**
- * Trigger events with a payload attached.
- * @param {object} raiser - the object raising the event
- * @param {string} operation - the operation (event) that is causing this trigger
- * @param {mixed} parameters - Any relevant parameters used in the operation
- */
-Bridge._raiseEvents = function( raiser, operation, parameters ) {
-	// Raise only one event based on id which should be the same for all
-	// objects (hand, auction, play etc.) in a deal.
-	if ( Bridge.options.raiseEvents && raiser.raiseEvents ) {
-		var delimiter = Bridge.CONSTANTS.eventNameDelimiter;
-		var eventName = raiser.id + delimiter + Bridge.CONSTANTS.changedEventName;
-		$( document ).trigger( eventName,  {
-			"raisedBy": raiser,
-			"action": operation,
-			"parameters": parameters
-		});
-		Bridge._logEvent( eventName + " - " + operation );
-	}
-};
 
-/**
- * Trigger one event in a set of events
- * @param {object} raiser - the object raising the event
- * @param {string} operation - the operation (event) that is causing this trigger
- * @param {mixed} parameters - Any relevant parameters used in the operation
- */
-Bridge._triggerOneEvent = function( eventName, raiser, operation, parameters ) {
-	var delimiter = Bridge.CONSTANTS.eventNameDelimiter;
-	$( document ).trigger( eventName,  {
-		"raisedBy": raiser,
-		"action": operation,
-		"parameters": parameters
-	});
-	Bridge._logEvent( eventName + " - " + operation );
-	eventName = raiser.id + delimiter + eventName;
-	$( document ).trigger( eventName,  {
-		"raisedBy": raiser,
-		"action": operation,
-		"parameters": parameters
-	});
-	Bridge._logEvent( eventName + " - " + operation );
-};
-
-
-
-/**
- * Log some information.
- * options are used to determine how the message is logged.
- * @param {string} message - the message to log
- * @param {string} logClass - the class that this log message belongs to
- */
-Bridge._log = function( message, logClass ) {
-	if ( !logClass || logClass.enabled ) {
-		if ( $.type(logClass) === "string" ) var name = logClass;
-		else var name = logClass.name || "unknown";
-		if ( console ) console.log( name + " : " + message );
-	}
-};
-
-Bridge._logEvent = function( message ) {
-	Bridge._log( message, Bridge.options.log.EVENT );
-}
-
-Bridge._logDebug = function( message ) {
-	Bridge._log( message, Bridge.options.log.DEBUG );
-}
 
 /**
  * Does the first rank beat the second rank?
@@ -366,14 +295,20 @@ Bridge.arePartners = function( direction1, direction2 ) {
 	return Bridge.getPartner( direction1 ) === direction2;
 };
 
-
 /**
- * Convert text to a valid identifier.
- * @param {string} text - the text to make an identifier
- * @return {string} the text stripped of invalid id characters
- */
-Bridge.makeIdentifier = function(text) {
-  return text.trim().replace(/[^a-zA-Z0-9]+/g,'_');
+ * Get the 4 directions starting from specified start direction.
+ * @param {string} startDirection the optional direction to start from. Defaults to w.
+ * @return {array of string} the order of directions in which bidding will/has proceed.
+ **/
+Bridge.getDirectionOrder = function getDirectionOrder(startDirection) {
+  startDirection = startDirection || 'w';
+  directions = [];
+  direction = startDirection;
+  for(var i = 0; i < 4; ++i) {
+    directions.push(direction);
+    direction = Bridge.getLHO(direction);
+  }
+  return directions;
 };
 
 /**
@@ -734,34 +669,152 @@ Bridge._checkIndex = function( items, index, context ) {
 };
 
 /**
- * Maintains a list of used IDs and generates a new one on demand.
+ * Maintains a list of unique IDs and generates a new (unique) one on demand.
  */
-Bridge.IDManager = {
-	usedIDs: {}
+Bridge.IDManager = new function() {
+	this.IDs = {};
+	/**
+	 * Generate a new ID.
+	 * Check if an id exists and throw an exception if it does
+	 * @param {string} id - a string identifier.
+	 * @return {string} a new id if none already specified.
+	 * @throws id already exists
+	 */
+	this.generateID = function(id) {
+		if ( !id ) {
+			var date = new Date();
+			var base_id = date.toJSON();
+			id = this.makeIdentifier_(base_id);
+			var counter = 1;
+			while (id in this.IDs) {
+				id = base_id + '-' + counter;
+			}
+			this.IDs[id] = true;
+			return id;
+		}
+		var prefix = "In Bridge.IDManager.generateID";
+		if ( id in this.IDs ) {
+			Bridge._reportError( id + " is an already existing ID.", prefix );
+		}
+		return id;
+	};
+
+	/**
+	 * Convert text to a valid identifier.
+	 * @param {string} text - the text to make an identifier
+	 * @return {string} the text stripped of invalid id characters
+	 */
+	this.makeIdentifier_ = function(text) {
+	  return text.trim().replace(/[^a-zA-Z0-9]+/g,'_');
+	};
 };
 
 /**
- * Generate a new ID.
- * Check if an id exists and throw an exception if it does
- * @param {string} id - a string identifier.
- * @return {string} a new id if none already specified.
- * @throws id already exists
+ * Rudimentary logging mechanism.
  */
-Bridge.IDManager.getID = function( id ) {
-	if ( !id ) {
-		var date = new Date();
-		var base_id = date.toJSON();
-		id = Bridge.makeIdentifier( base_id );
-		var counter = 1;
-		while ( id in Bridge.IDManager.usedIDs ) {
-			id = base_id + '-' + counter;
+Bridge.logging = new function() {
+	this.enabled = {
+		"event": true,
+		"debug": true,
+		"info": true,
+		"error": true,
+		"warn": true,
+	};
+	this.enable = function(logClass) {
+		this[logClass] = true;
+	};
+	this.disable = function() {
+		this[logClass] = false;
+	};
+	this.log = function(message, logClass) {
+		if (logClass in this.enabled && this.enabled[logClass]) {
+			var fullMessage = logClass ? logClass + " : " + message : message;
+			if (window.console) console.log(fullMessage);
 		}
-		return id;
-	}
-	var prefix = "In Bridge.IDManager.getID";
-	if ( id in Bridge.IDManager.usedIDs ) {
-		Bridge._reportError( id + " is an already existing ID.", prefix );
-	}
-	return id;
+	};
+	this.event = function(message) {
+		var logClass = "event";
+		if (logClass in this.enabled && this.enabled[logClass]) {
+			if (window.console) console.debug("Event - " + message);
+		}
+	};
+	this.debug = function(message) {
+		var logClass = "debug";
+		if (logClass in this.enabled && this.enabled[logClass]) {
+			if (window.console) console.debug(message);
+		}
+	};
+	this.info = function(message) {
+		var logClass = "info";
+		if (logClass in this.enabled && this.enabled[logClass]) {
+			if (window.console) console.info(message);
+		}
+	};
+	this.error = function(message) {
+		var logClass = "error";
+		if (logClass in this.enabled && this.enabled[logClass]) {
+			if (window.console) console.error(message);
+		}
+	};
+	this.warn = function(message) {
+		var logClass = "warn";
+		if (logClass in this.enabled && this.enabled[logClass]) {
+			if (window.console) console.warn(message);
+		}
+	};
+};
 
+/**
+ * Event raising helpers.
+ */
+Bridge.events = new function() {
+	// The delimiter used in event names
+	this.eventNameDelimiter = ':';
+	// Name of event raised by all objects when something changes.
+	this.changedEventName = "changed";
+	// Globally enable or disable events
+	this.triggersEnabled = true;
+
+	this.enableTriggers = function() {
+		this.triggersEnabled = true;
+	};
+	this.disableTriggers = function() {
+		this.triggersEnabled = false;
+	};
+	/**
+	 * Get the change event name for an object.
+	 * Use the event delimiter to create event name.
+	 * @param {object} raiser - the object raising the event
+	 * @return {string} the event name with delimiters added.
+	 */
+	this.getEventName = function(raiser, operation) {
+		var items = [
+			raiser.getID(),
+			raiser.type
+		];
+		if (operation) {
+			items.push(operation);
+		}
+		items.push(this.changedEventName);
+		return items.join(this.eventNameDelimiter);
+	};
+	/**
+	 * Trigger events with a payload attached.
+	 * @param {object} raiser - the object raising the event
+	 * @param {string} operation - the operation (event) that is causing this trigger
+	 * @param {mixed} parameters - Any relevant parameters used in the operation
+	 */
+	this.trigger = function(raiser, operation, parameters) {
+		if (!this.triggersEnabled) return;
+		while(raiser) {
+			// Event name with operation
+			var eventName = this.getEventName(raiser, operation);
+			$(document).trigger(eventName);
+			Bridge.logging.event(eventName);
+			eventName = this.getEventName(raiser);
+			$(document).trigger(eventName);
+			Bridge.logging.event(eventName);
+			raiser = raiser.parent;
+		}
+	};
 };

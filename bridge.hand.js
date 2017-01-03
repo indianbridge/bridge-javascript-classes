@@ -26,7 +26,7 @@ Bridge.Hand = function( direction, deal ) {
 	 * Optional Unique id to identify this hand.
 	 * @member {string}
 	 */
-	this.id = deal ? deal.id : Bridge.IDManager.getID();
+	this.id = deal ? deal.id : Bridge.IDManager.generateID();
 
 	/**
 	 * The type of this object.
@@ -38,7 +38,7 @@ Bridge.Hand = function( direction, deal ) {
 	 * Should events be raised for this object?
 	 * @member {bool}
 	 */
-	this.raiseEvents = true;
+	this.eventTriggersEnabled = true;
 
 	/**
 	 * Should this object respond to events?
@@ -91,8 +91,19 @@ Bridge.Hand = function( direction, deal ) {
 	/** Is this the active hand? */
 	this._isActive = false;
 
-	/** Setup event responder handlers. */
-	this.onChanged();
+	// callbacks to called when things change.
+	this.callbacks = {
+		"": [],
+	};
+};
+
+// Register a callback.
+Bridge.Hand.prototype.registerCallback = function(callback, operation) {
+	operation = operation || "";
+	if (!(operation in this.callbacks)) {
+		this.callbacks[operation] = [];
+	}
+	this.callbacks[operation].push(callback);
 };
 
 //
@@ -564,21 +575,22 @@ Bridge.Hand.prototype.fromJSON = function( handString ) {
 };
 
 /**
- * A event requesting a change has been raised. Respond if response is enabled.
- */
-Bridge.Hand.prototype.onChanged = function() {
-	if (this.respondToEvents) {
-		var eventName = Bridge.getEventName([this.getID(), Bridge.CONSTANTS.changeEventName, 'hand', this.getDirection()]);
-		$( document ).on(eventName, {"hand": this}, function(e, config) {
-			e.data.hand[config.operation](config.parameters);
-		});
-	}
-};
-
-/**
  * Something in this hand has changed.
  * Raise an event
  */
 Bridge.Hand.prototype.onChange = function( operation, parameter ) {
-	Bridge._raiseEvents( this, operation, parameter );
+	if (operation in this.callbacks) {
+		_.each(this.callbacks[operation], function(callback) {
+			callback(operation, parameter);
+		});
+	}
+	_.each(this.callbacks[""], function(callback) {
+		callback(operation, parameter);
+	});
+	if (this.deal) {
+		this.deal.runCallbacks(operation, parameter);
+	}
+	// if (this.eventTriggersEnabled && (!this.deal || this.deal.eventTriggersEnabled)) {
+	// 	Bridge.events.trigger(this, operation, parameter);
+	// }
 };

@@ -24,7 +24,7 @@ Bridge.Auction = function( deal ) {
 	 * A unique id to identify this auction.
 	 * @member {string}
 	 */
-	this.id = deal ? deal.id : Bridge.IDManager.getID();
+	this.id = deal ? deal.id : Bridge.IDManager.generateID();
 
 	/**
 	 * The type of this object.
@@ -37,13 +37,7 @@ Bridge.Auction = function( deal ) {
 	 * Should events be triggered for this object.
 	 * @member {bool}
 	 */
-	this.raiseEvents = true;
-
-	/**
-	 * Should this object respond to events?
-	 * @member {bool}
-	 */
-	this.respondToEvents = true;
+	this.eventTriggersEnabled = true;
 
 	/**
 	 * The dealer for this auction.
@@ -90,8 +84,19 @@ Bridge.Auction = function( deal ) {
 	 */
 	this.currentAuctionIndex = -1;
 
-	/** Setup event responder handlers. */
-	this.onChanged();
+	// callbacks to called when things change.
+	this.callbacks = {
+		"": [],
+	};
+};
+
+// Register a callback.
+Bridge.Auction.prototype.registerCallback = function(callback, operation) {
+	operation = operation || "";
+	if (!(operation in this.callbacks)) {
+		this.callbacks[operation] = [];
+	}
+	this.callbacks[operation].push(callback);
 };
 
 //
@@ -226,28 +231,12 @@ Bridge.Auction.prototype.getName = function getName(direction) {
 };
 
 /**
- * Get the 4 directions starting from specified start direction.
- * @param {string} startDirection the optional direction to start from. Defaults to w.
- * @return {array of string} the order of directions in which bidding will/has proceed.
- **/
-Bridge.Auction.prototype.getDirectionOrder = function getDirectionOrder(startDirection) {
-  startDirection = startDirection || 'w';
-  directions = [];
-  direction = startDirection;
-  for(var i = 0; i < 4; ++i) {
-    directions.push(direction);
-    direction = Bridge.getLHO(direction);
-  }
-  return directions;
-};
-
-/**
  * Get the calls in this auction.
  * @param {string} startDirection the optional direction to start from. Defaults to w.
  * @param {bool} addQuestionMark should a question mark be added at the end if the auction is not complete.
  * @return {array of Bridge.Call} the calls.
  **/
-Bridge.Auction.prototype.getCalls = function getDirectionOrder(startDirection, addQuestionMark) {
+Bridge.Auction.prototype.getCalls = function getCalls(startDirection, addQuestionMark) {
   startDirection = startDirection || 'w';
   addQuestionMark = addQuestionMark || false;
   calls = [];
@@ -634,21 +623,22 @@ Bridge.Auction.prototype.toJSON = function( ) {
 };
 
 /**
- * A event requesting a change has been raised. Respond if response is enabled.
- */
-Bridge.Auction.prototype.onChanged = function() {
-	if (this.respondToEvents) {
-		var eventName = Bridge.getEventName([this.getID(), Bridge.CONSTANTS.changeEventName, 'auction']);
-		$(document).on(eventName, {"auction": this}, function(e, config) {
-			e.data.auction[config.operation](config.parameters);
-		});
-	}
-};
-
-/**
  * Something in this auction has changed.
  * Raise an event
  */
 Bridge.Auction.prototype.onChange = function( operation, parameter ) {
-	Bridge._raiseEvents( this, operation, parameter );
+	if (operation in this.callbacks) {
+		_.each(this.callbacks[operation], function(callback) {
+			callback(operation, parameter);
+		});
+	}
+	_.each(this.callbacks[""], function(callback) {
+		callback(operation, parameter);
+	});
+	if (this.deal) {
+		this.deal.runCallbacks(operation, parameter);
+	}
+	// if (this.eventTriggersEnabled && (!this.deal || this.deal.eventTriggersEnabled)) {
+	// 	Bridge.events.trigger(this, operation, parameter);
+	// }
 };

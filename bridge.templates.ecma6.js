@@ -66,7 +66,7 @@ _.declareTemplate( "hand.standard",`<%
 /** AUCTION TEMPLATES */
 _.declareTemplate("auction.directions", `
 	<directions><%
-		_.each(auction.getDirectionOrder(config.startDirection), function(direction) {
+		_.each(Bridge.getDirectionOrder(config.startDirection), function(direction) {
 			var name = auction.getName(direction);
       %><direction <% if (auction.isVulnerable(direction)) {%>data-vulnerable<%}
       %> data-direction="<%=direction%>"><%=name%></direction><%

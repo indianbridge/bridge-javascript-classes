@@ -23,7 +23,7 @@ Bridge.Play = function( deal ) {
 	 * A unique id to identify this play.
 	 * @member {string}
 	 */
-	this.id = Bridge._generateID( deal );
+	this.id = deal ? deal.id : Bridge.IDManager.generateID();
 
 	/**
 	 * The type of this object.
@@ -35,13 +35,7 @@ Bridge.Play = function( deal ) {
 	 * Should events be triggered for this object.
 	 * @member {bool}
 	 */
-	this.raiseEvents = true;
-
-	/**
-	 * Should this object respond to events?
-	 * @member {bool}
-	 */
-	this.respondToEvents = true;
+	this.eventTriggersEnabled = true;
 
 	/**
 	 * The cards that are in this play
@@ -100,6 +94,19 @@ Bridge.Play = function( deal ) {
 
 	this.initialize();
 
+	// callbacks to called when things change.
+	this.callbacks = {
+		"": [],
+	};
+};
+
+// Register a callback.
+Bridge.Play.prototype.registerCallback = function(callback, operation) {
+	operation = operation || "";
+	if (!(operation in this.callbacks)) {
+		this.callbacks[operation] = [];
+	}
+	this.callbacks[operation].push(callback);
 };
 
 /**
@@ -500,5 +507,18 @@ Bridge.Play.prototype.toJSON = function( ) {
  * Raise an event
  */
 Bridge.Play.prototype.onChange = function( operation, parameter ) {
-	Bridge._raiseEvents( this, operation, parameter );
+	if (operation in this.callbacks) {
+		_.each(this.callbacks[operation], function(callback) {
+			callback(operation, parameter);
+		});
+	}
+	_.each(this.callbacks[""], function(callback) {
+		callback(operation, parameter);
+	});
+	if (this.deal) {
+		this.deal.runCallbacks(operation, parameter);
+	}
+	// if (this.eventTriggersEnabled && (!this.deal || this.deal.eventTriggersEnabled)) {
+	// 	Bridge.events.trigger(this, operation, parameter);
+	// }
 };

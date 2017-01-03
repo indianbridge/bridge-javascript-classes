@@ -8,6 +8,14 @@ $(function() {
 			"alternateSuitColor": true,
 			"containerID": "hand",
 		});
+    deal.showVulnerability({
+			"wrapperClass": "images",
+			"containerID": "vulnerability",
+      "handlers": {
+				"change": true,
+				"click": true,
+			}
+		});
   }
   catch ( err ) {
     alert(err.message);

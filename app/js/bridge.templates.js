@@ -1,5 +1,4 @@
-
-_.declareTemplate("deal.vulnerability", `<vulnerabilities><%
+_.declareTemplate("deal.vulnerability.standard", `<vulnerabilities><%
   var currentVulnerability = deal.getVulnerability();
   var names = {
     '-': "None",
@@ -21,26 +20,6 @@ _.declareTemplate("deal.vulnerability", `<vulnerabilities><%
     %>><%=names[vulnerability]%></vulnerability><%
   });
   %></vulnerabilities>`);
-
-_.declareTemplate("deal.dealer", `<directions><%
-  var currentDealer = deal.getDealer();
-  var activeHand = deal.getActiveHand();
-  var dealers = {};
-  dealers[activeHand] = "Me";
-  dealers[Bridge.getLHO(activeHand)] = "LHO";
-  dealers[Bridge.getRHO(activeHand)] = "RHO";
-  dealers[Bridge.getPartner(activeHand)] = "Partner";
-  _.each(Bridge.getDirectionOrder(Bridge.getLHO(activeHand)), function(direction) {
-    %><direction data-operation="setDealer" data-dealer=<%=direction%> <%
-    if (direction != currentDealer) {
-      %>class="enabled" <%
-    } else {
-      %>class="disabled current" <%
-    }
-    %>><%=dealers[direction]%></direction><%
-  });
-  %></directions>`);
-
 _.declareTemplate("deal.card-deck.rows", `<card-deck><%
   var activeHand = deal.getActiveHand();
   var count = 0;
