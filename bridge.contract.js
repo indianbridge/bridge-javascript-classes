@@ -1,7 +1,7 @@
 /**
  * Defines Contract class and all methods associated with it.
  */
- 
+
 // Get Namespace.
 var Bridge = Bridge || {};
 
@@ -25,11 +25,27 @@ Bridge.Contract = function() {
 			this.firstToBid[ call ] = {};
 			for ( var direction in Bridge.directions) {
 				this.firstToBid[ call ][ direction ] = null;
-			}		
+			}
 		}
 	}
 	this.numPasses = 0;
 	this.isComplete = false;
+};
+
+Bridge.Contract.prototype.rotateClockwise = function() {
+  if (this.getDeclarer()) {
+    this.declarer = Bridge.getLHO(this.getDeclarer());
+  }
+  for( var call in Bridge.calls ) {
+		if ( Bridge.isStrain( call ) ) {
+			for ( var direction in Bridge.directions) {
+        if (this.firstToBid[ call ][ direction ]) {
+          this.firstToBid[ call ][ direction ] = Bridge.getLHO(this.firstToBid[ call ][ direction ]);
+        }
+				this.firstToBid[ call ][ direction ] = null;
+			}
+		}
+	}
 };
 
 
@@ -84,7 +100,7 @@ Bridge.Contract.prototype.allowedCalls = function( direction ) {
 		if ( !this.isComplete ) output[ "minimum_level" ] = 1;
 		return output;
 	}
-	
+
 	for( var i = 1; i <= 7; ++i ) {
 		for( var call in Bridge.calls ) {
 			if ( Bridge.isStrain( call ) ) {
@@ -97,7 +113,7 @@ Bridge.Contract.prototype.allowedCalls = function( direction ) {
 				}
 			}
 		}
-	}		
+	}
 	output[ "p" ] = true;
 	output[ "x" ] = !this.doubled && !this.redoubled && Bridge.areOpponents( direction, this.declarer );
 	output[ "r" ] = this.doubled && !this.redoubled && !Bridge.areOpponents( direction, this.declarer );
@@ -114,7 +130,7 @@ Bridge.Contract.prototype.clone = function() {
 	_.each( fields, function( field ) {
 		contract[ field ] = this[ field ];
 	}, this);
-	contract.firstToBid = _.cloneDeep( this.firstToBid );	
+	contract.firstToBid = _.cloneDeep( this.firstToBid );
 	return contract;
 };
 
@@ -148,8 +164,8 @@ Bridge.Contract.prototype.update = function( call ) {
 				Bridge._reportError( 'ReDouble is not allowed at this point in the auction' );
 			}
 			this.redoubled = true;
-			this.numPasses = 0;	
-			break;	
+			this.numPasses = 0;
+			break;
 		default:
 
 			if ( level < this.level || ( level === this.level && Bridge.calls[ suit ].index >= Bridge.calls[ this.suit ].index ) ) {

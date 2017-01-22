@@ -177,49 +177,7 @@ Bridge.enums = {
 Bridge.options = {
 	// Should error message include context?
 	useContextInErrorMessage: false,
-	// Global flag to determine if events will be triggered or not.
-	// Setting this to false will disable all events for all deals
-	raiseEvents: true
 };
-
-/**
- * Convenience function to enable all event triggers.
- */
-Bridge.enableAllEventTriggers = function() {
-	Bridge.options.raiseEvents = true;
-};
-
-/**
- * Convenience function to disable all event triggers.
- */
-Bridge.disableAllEventTriggers = function() {
-	Bridge.options.raiseEvents = false;
-};
-
-/**
- * Constants used all over the code.
- * Use this instead of "magic" numbers/strings etc.
- */
-Bridge.CONSTANTS = {
-	// The delimiter used in event names
-	eventNameDelimiter: ':',
-	// Name of event raised by all objects when something changes.
-	changedEventName: "changed",
-	// Name of event raised when something needs to be changed in an object.
-	changeEventName: "change",
-};
-
-
-/**
- * Use the event delimiter to create event name.
- * @param {Array of string} items the items to join to construct event name.
- * @return {string} the event name with delimiters added.
- */
-Bridge.getEventName = function getEventName(items) {
-	return items.join(Bridge.CONSTANTS.eventNameDelimiter);
-};
-
-
 
 /**
  * Does the first rank beat the second rank?
@@ -687,7 +645,8 @@ Bridge.IDManager = new function() {
 			id = this.makeIdentifier_(base_id);
 			var counter = 1;
 			while (id in this.IDs) {
-				id = base_id + '-' + counter;
+				id = this.makeIdentifier_(base_id + '-' + counter);
+				counter++;
 			}
 			this.IDs[id] = true;
 			return id;
@@ -760,61 +719,6 @@ Bridge.logging = new function() {
 		var logClass = "warn";
 		if (logClass in this.enabled && this.enabled[logClass]) {
 			if (window.console) console.warn(message);
-		}
-	};
-};
-
-/**
- * Event raising helpers.
- */
-Bridge.events = new function() {
-	// The delimiter used in event names
-	this.eventNameDelimiter = ':';
-	// Name of event raised by all objects when something changes.
-	this.changedEventName = "changed";
-	// Globally enable or disable events
-	this.triggersEnabled = true;
-
-	this.enableTriggers = function() {
-		this.triggersEnabled = true;
-	};
-	this.disableTriggers = function() {
-		this.triggersEnabled = false;
-	};
-	/**
-	 * Get the change event name for an object.
-	 * Use the event delimiter to create event name.
-	 * @param {object} raiser - the object raising the event
-	 * @return {string} the event name with delimiters added.
-	 */
-	this.getEventName = function(raiser, operation) {
-		var items = [
-			raiser.getID(),
-			raiser.type
-		];
-		if (operation) {
-			items.push(operation);
-		}
-		items.push(this.changedEventName);
-		return items.join(this.eventNameDelimiter);
-	};
-	/**
-	 * Trigger events with a payload attached.
-	 * @param {object} raiser - the object raising the event
-	 * @param {string} operation - the operation (event) that is causing this trigger
-	 * @param {mixed} parameters - Any relevant parameters used in the operation
-	 */
-	this.trigger = function(raiser, operation, parameters) {
-		if (!this.triggersEnabled) return;
-		while(raiser) {
-			// Event name with operation
-			var eventName = this.getEventName(raiser, operation);
-			$(document).trigger(eventName);
-			Bridge.logging.event(eventName);
-			eventName = this.getEventName(raiser);
-			$(document).trigger(eventName);
-			Bridge.logging.event(eventName);
-			raiser = raiser.parent;
 		}
 	};
 };

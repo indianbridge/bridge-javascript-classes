@@ -31,12 +31,6 @@ Bridge.Play = function( deal ) {
 	 */
 	this.type = "Play";
 
-  /**
-	 * Should events be triggered for this object.
-	 * @member {bool}
-	 */
-	this.eventTriggersEnabled = true;
-
 	/**
 	 * The cards that are in this play
 	 * @member {array}
@@ -504,7 +498,7 @@ Bridge.Play.prototype.toJSON = function( ) {
 
 /**
  * Something in this play has changed.
- * Raise an event
+ * run callbacks.
  */
 Bridge.Play.prototype.onChange = function( operation, parameter ) {
 	if (operation in this.callbacks) {
@@ -518,7 +512,4 @@ Bridge.Play.prototype.onChange = function( operation, parameter ) {
 	if (this.deal) {
 		this.deal.runCallbacks(operation, parameter);
 	}
-	// if (this.eventTriggersEnabled && (!this.deal || this.deal.eventTriggersEnabled)) {
-	// 	Bridge.events.trigger(this, operation, parameter);
-	// }
 };

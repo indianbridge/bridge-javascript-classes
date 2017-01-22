@@ -35,18 +35,6 @@ Bridge.Hand = function( direction, deal ) {
 	this.type = "Hand";
 
 	/**
-	 * Should events be raised for this object?
-	 * @member {bool}
-	 */
-	this.eventTriggersEnabled = true;
-
-	/**
-	 * Should this object respond to events?
-	 * @member {bool}
-	 */
-	this.respondToEvents = true;
-
-	/**
 	 * The direction of this hand
 	 * @member {string}
 	 */
@@ -91,6 +79,9 @@ Bridge.Hand = function( direction, deal ) {
 	/** Is this the active hand? */
 	this._isActive = false;
 
+	/** A card that has been selected to be played if any. */
+	this.selectedCard = null;
+
 	// callbacks to called when things change.
 	this.callbacks = {
 		"": [],
@@ -104,6 +95,36 @@ Bridge.Hand.prototype.registerCallback = function(callback, operation) {
 		this.callbacks[operation] = [];
 	}
 	this.callbacks[operation].push(callback);
+};
+
+Bridge.Hand.prototype.setSelectedCard = function selectCard(suit, rank) {
+	if (_.isObject(suit)) {
+		rank = suit.rank;
+		suit = suit.suit;
+	}
+	Bridge._checkSuit(suit);
+	var prefix = "In Hand.selectCard";
+	if (rank.toLowerCase !== 'x') {
+		Bridge._checkRank(rank);
+		if ( !this.cards[ suit ][ rank ] ) {
+			Bridge._reportError( suit + rank + " is not assigned to " + this.direction + ". Cannot select", prefix );
+		}
+	} else {
+		if ( !this.hasX(suit) ) {
+			Bridge._reportError( suit + " does not have an " + rank + " in " + this.direction + ". Cannot select", prefix );
+		}
+	}
+
+	this.selectedCard = suit + rank;
+	this.onChange("setSelectedCard", this.selectedCard);
+};
+
+Bridge.Hand.prototype.isSelectedCard = function isSelectedCard(suit, rank) {
+	return (suit + rank === this.getSelectedCard());
+};
+
+Bridge.Hand.prototype.getSelectedCard = function getSelectedCard() {
+	return this.selectedCard;
 };
 
 //
@@ -207,7 +228,7 @@ Bridge.Hand.prototype.isActive = function() {
  * Get the cards in a specific suit
  * @return {string} the cards in string format
  */
-Bridge.Hand.prototype.getCards = function( suit ) {
+Bridge.Hand.prototype.getCardsInSuit = function( suit ) {
 	Bridge._checkSuit( suit );
 	var output = "";
 	_.each( Bridge.rankOrder, function( rank ) {
@@ -217,6 +238,16 @@ Bridge.Hand.prototype.getCards = function( suit ) {
 		}
 	}, this);
 	return output;
+};
+
+Bridge.Hand.prototype.hasX = function(suit) {
+	Bridge._checkSuit( suit );
+	for( var rank in Bridge.ranks ) {
+		if (this.showAsX[suit][rank]) {
+			return true;
+		}
+	}
+	return false;
 };
 
 /**
@@ -522,9 +553,9 @@ Bridge.Hand.prototype.getRanks = function( suit ) {
  */
 Bridge.Hand.prototype.getCards = function() {
 	out = [];
-	_.each( Bridge.suitOrder, function( suit ) {
-		_.each( Bridge.rankOrder, function( rank ) {
-			if ( this.cards[ suit ][ rank ] ) {
+	_.each( this.getSuits(/*alternating=*/true), function( suit ) {
+		_.each( Bridge.rankOrder, function( actualRank ) {
+			if ( this.cards[ suit ][ actualRank ] ) {
 				var rank = this.showAsX[ suit ][ actualRank ] ? 'x' : actualRank;
 				var rankHTML = this.showAsX[ suit ][ actualRank ] ? 'x' : Bridge.ranks[ rank ].html;
 				out.push( { "suit": suit, "rank": rank, "html": rankHTML } );
@@ -576,7 +607,7 @@ Bridge.Hand.prototype.fromJSON = function( handString ) {
 
 /**
  * Something in this hand has changed.
- * Raise an event
+ * Run all callbacks.
  */
 Bridge.Hand.prototype.onChange = function( operation, parameter ) {
 	if (operation in this.callbacks) {
@@ -590,7 +621,4 @@ Bridge.Hand.prototype.onChange = function( operation, parameter ) {
 	if (this.deal) {
 		this.deal.runCallbacks(operation, parameter);
 	}
-	// if (this.eventTriggersEnabled && (!this.deal || this.deal.eventTriggersEnabled)) {
-	// 	Bridge.events.trigger(this, operation, parameter);
-	// }
 };

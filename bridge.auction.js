@@ -32,13 +32,6 @@ Bridge.Auction = function( deal ) {
 	 */
 	this.type = "Auction";
 
-
-	/**
-	 * Should events be triggered for this object.
-	 * @member {bool}
-	 */
-	this.eventTriggersEnabled = true;
-
 	/**
 	 * The dealer for this auction.
 	 * @member {string}
@@ -77,6 +70,8 @@ Bridge.Auction = function( deal ) {
 	 * @todo This probably does not belong in this class.
 	 */
 	this.selectedLevel = 0;
+	this.selectedBid = '';
+	this.selectedCall = '';
 
 	/**
 	 * The current call index when trying to step through the auction.
@@ -119,6 +114,21 @@ Bridge.Auction.prototype.getDealer = function() {
 	return this.dealer;
 };
 
+Bridge.Auction.prototype.rotateClockwise = function() {
+	var newDealer = Bridge.getLHO(this.getDealer());
+	this.dealer = newDealer;
+	var direction = newDealer;
+	_.each( this.calls, function( call ) {
+		call.setDirection( direction );
+		direction = Bridge.getLHO( direction );
+	}, this);
+	this.nextToCall = direction;
+	_.each( this.contracts, function( contract ) {
+		contract.rotateClockwise();
+	});
+	this.onChange( "setDealer", newDealer );
+};
+
 /**
  * Set the dealer for this auction.
  * If calls exist then propagate the change.
@@ -127,14 +137,9 @@ Bridge.Auction.prototype.getDealer = function() {
 Bridge.Auction.prototype.setDealer = function( dealer ) {
 	if (_.isObject(dealer)) dealer = dealer.dealer;
 	Bridge._checkDirection( dealer );
-	this.dealer = dealer;
-	var direction = dealer;
-	_.each( this.calls, function( call ) {
-		call.setDirection( direction );
-		direction = Bridge.getLHO( direction );
-	}, this);
-	this.nextToCall = direction;
-	this.onChange( "setDealer", dealer );
+	while (this.getDealer() !== dealer.toLowerCase()) {
+		this.rotateClockwise();
+	}
 };
 
 /**
@@ -182,7 +187,32 @@ Bridge.Auction.prototype.setSelectedLevel = function(level) {
 	if (_.isObject(level)) level = level.level;
 	Bridge._checkLevel( level );
 	this.selectedLevel = level;
+	this.selectedCall = '';
+	this.selectedBid = '';
 	this.onChange( "setSelectedLevel", level );
+};
+
+Bridge.Auction.prototype.setSelectedCall = function setSelectedCall(call, bid) {
+	if (_.isObject(call)) {
+		bid = call.bid;
+		call = call.call;
+	}
+	Bridge._checkCall(call);
+	Bridge._checkBid(bid);
+	if (bid === call) {
+		this.selectedLevel = 0;
+	}
+	this.selectedBid = bid;
+	this.selectedCall = call;
+	this.onChange("setSelectedCall", call);
+};
+
+Bridge.Auction.prototype.getSelectedBid = function() {
+	return this.selectedBid;
+};
+
+Bridge.Auction.prototype.getSelectedCall = function() {
+	return this.selectedCall;
 };
 
 /**
@@ -313,6 +343,13 @@ Bridge.Auction.prototype.getContract = function() {
 	var numCalls = this.calls.length;
 	if ( numCalls === 0 ) return new Bridge.Contract();
 	return this.contracts[ numCalls - 1 ];
+};
+
+/**
+ * Is the auction complete?
+ */
+Bridge.Auction.prototype.isComplete = function() {
+	this.getContract().isComplete;
 };
 
 /**
@@ -624,7 +661,7 @@ Bridge.Auction.prototype.toJSON = function( ) {
 
 /**
  * Something in this auction has changed.
- * Raise an event
+ * Run callbacks.
  */
 Bridge.Auction.prototype.onChange = function( operation, parameter ) {
 	if (operation in this.callbacks) {
@@ -638,7 +675,4 @@ Bridge.Auction.prototype.onChange = function( operation, parameter ) {
 	if (this.deal) {
 		this.deal.runCallbacks(operation, parameter);
 	}
-	// if (this.eventTriggersEnabled && (!this.deal || this.deal.eventTriggersEnabled)) {
-	// 	Bridge.events.trigger(this, operation, parameter);
-	// }
 };
