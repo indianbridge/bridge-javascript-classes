@@ -35,7 +35,7 @@ var Bridge = {
 	suitOrder: [],
 
 	calls : {
-		'n' : { name : 'No Trump', index : 0, isStrain: true, bid: true, text: "notrump", html : 'nt' },
+		'n' : { name : 'No Trump', index : 0, isStrain: true, bid: true, text: "notrump", html : 'NT' },
 		's' : { name : 'Spades', index : 1, isStrain: true, bid: true, text: "spades", html : '&spades;' },
 		'h' : { name : 'Hearts', index : 2, isStrain: true, bid: true, text: "hearts", html : '&hearts;' },
 		'd' : { name : 'Diamonds', index : 3, isStrain: true, bid: true, text: "diamonds", html : '&diams;' },

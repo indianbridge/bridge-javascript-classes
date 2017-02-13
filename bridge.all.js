@@ -35,7 +35,7 @@ var Bridge = {
 	suitOrder: [],
 
 	calls : {
-		'n' : { name : 'No Trump', index : 0, isStrain: true, bid: true, text: "notrump", html : 'nt' },
+		'n' : { name : 'No Trump', index : 0, isStrain: true, bid: true, text: "notrump", html : 'NT' },
 		's' : { name : 'Spades', index : 1, isStrain: true, bid: true, text: "spades", html : '&spades;' },
 		'h' : { name : 'Hearts', index : 2, isStrain: true, bid: true, text: "hearts", html : '&hearts;' },
 		'd' : { name : 'Diamonds', index : 3, isStrain: true, bid: true, text: "diamonds", html : '&diams;' },
@@ -823,6 +823,12 @@ Bridge.Deal.prototype.init = function init() {
 	this.setScoring("KO");
 
 	/**
+	 * The type of problem (if any) this deal is about.
+	 * @member {string}
+	 */
+	this.setProblemType("Bidding");
+
+	/**
 	 * Any notes associated with this deal.
 	 * @member {string}
 	 */
@@ -833,6 +839,18 @@ Bridge.Deal.prototype.init = function init() {
 // Register a callback.
 Bridge.Deal.prototype.registerCallback = function(callback, operation) {
 	operation = operation || "";
+	if ($.isArray(operation)) {
+		var self = this;
+		_.each(operation, function(op) {
+			self.addCallback(callback, op);
+		});
+		return;
+	}
+	this.addCallback(callback, operation);
+};
+
+// Add a callback.
+Bridge.Deal.prototype.addCallback = function addCallback(callback, operation) {
 	if (!(operation in this.callbacks)) {
 		this.callbacks[operation] = [];
 	}
@@ -943,7 +961,9 @@ Bridge.Deal.prototype.setVulnerability = function( vulnerability ) {
  * Get the scoring of this deal.
  * @return {string} the scoring.
  */
-Bridge.Deal.prototype.getScoring = function() { return this.scoring; }
+Bridge.Deal.prototype.getScoring = function() {
+	return this.scoring;
+}
 
 /**
  * Set the scoring for this deal.
@@ -956,6 +976,27 @@ Bridge.Deal.prototype.setScoring = function( scoring ) {
 	Bridge._checkRequiredArgument( scoring );
 	this.scoring = scoring;
 	this.onChange( "setScoring", scoring );
+};
+
+/**
+ * Get the problem type of this deal.
+ * @return {string} the problem type.
+ */
+Bridge.Deal.prototype.getProblemType = function() {
+	return this.problemType;
+}
+
+/**
+ * Set the problem type for this deal.
+ * @param {string} problemType - the problem type
+ */
+Bridge.Deal.prototype.setProblemType = function( problemType ) {
+	if (_.isObject(problemType)) {
+		problemType = problemType.type;
+	}
+	Bridge._checkRequiredArgument( problemType );
+	this.problemType = problemType;
+	this.onChange( "setProblemType", problemType );
 };
 
 
@@ -1046,23 +1087,24 @@ Bridge.Deal.prototype.rotateClockwise = function() {
 		's': 'w',
 		'w': 'n',
 	};
-	var hands = {};
-	for (var direction in directions) {
-		var hand = this.getHand(direction);
-		hands[direction] = hand.getHand();
-		hand.clearCards();
-	}
-	for (var direction in directions) {
-		this.getHand(directions[direction]).setHand(hands[direction]);
-	}
-	// Rotate Vulnerability.
-	var rotateVulnerabilities = {
-		'-' : '-',
-		'n' : 'e',
-		'e' : 'n',
-		'b' : 'b',
-	};
-	this.setVulnerability(rotateVulnerabilities[this.getVulnerability()]);
+	// Dont rotate hands.
+	// var hands = {};
+	// for (var direction in directions) {
+	// 	var hand = this.getHand(direction);
+	// 	hands[direction] = hand.getHand();
+	// 	hand.clearCards();
+	// }
+	// for (var direction in directions) {
+	// 	this.getHand(directions[direction]).setHand(hands[direction]);
+	// }
+	// Don't Rotate Vulnerability.
+	// var rotateVulnerabilities = {
+	// 	'-' : '-',
+	// 	'n' : 'e',
+	// 	'e' : 'n',
+	// 	'b' : 'b',
+	// };
+	// this.setVulnerability(rotateVulnerabilities[this.getVulnerability()]);
 	// Rotate dealer.
 	var auction = this.getAuction();
 	var newDealer = Bridge.getLHO(this.getDealer());
@@ -1099,6 +1141,9 @@ Bridge.Deal.prototype.set = function( property, value ) {
 		case "scoring" :
 			this.setScoring( value );
 			break;
+		case "problemType" :
+			this.setProblemType( value );
+			break;
 		case "notes" :
 			this.setNotes( value );
 			break;
@@ -1127,6 +1172,8 @@ Bridge.Deal.prototype.get = function( property ) {
 			return this.getDealer();
 		case "scoring" :
 			return this.getScoring();
+		case "problemType" :
+			return this.getProblemType();
 		case "notes" :
 			return this.getNotes();
 		case "auction" :
@@ -1280,7 +1327,7 @@ Bridge.Deal.prototype.toString = function( expandedFormat ) {
 Bridge.Deal.prototype.toJSON = function() {
 	var output = {};
 	output.version = "1.0";
-	var fields = [ 'board', 'dealer', 'vulnerability', 'scoring', 'notes' ];
+	var fields = [ 'board', 'dealer', 'vulnerability', 'scoring', 'problemType', 'notes' ];
 	_.each( fields, function( field ) {
 		output[ field ] = this.get( field );
 	}, this);
@@ -1299,7 +1346,7 @@ Bridge.Deal.prototype.toJSON = function() {
  * @param {object} the json representation of this deal.
  */
 Bridge.Deal.prototype.fromJSON = function( json ) {
-	var fields = [ 'board', 'dealer', 'vulnerability', 'scoring', 'notes' ];
+	var fields = [ 'board', 'dealer', 'vulnerability', 'scoring', 'problemType', 'notes' ];
 	_.each( fields, function( field ) {
 		if ( _.has( json, field ) ) this.set( field, json[ field ] );
 	}, this);
@@ -3521,14 +3568,11 @@ Bridge.Play.prototype.set = function( property, value ) {
  */
 Bridge.Play.prototype.initialize = function() {
 	var prefix = "Bridge.Play initialize";
-	if ( this.deal && this.deal.getAuction().getContract().isComplete ) {
-		var contract = this.deal.getAuction().getContract();
-		if ( !contract.isComplete ) {
-			Bridge._reportError( "Cannot initialize play unless auction is complete", prefix );
-		}
-		this.trump = contract.getSuit();
-		this.leader = contract.getLeader();
-	}
+	if (!this.deal) return;
+	var contract = this.deal.getAuction().getContract();
+	if (!contract.isComplete || contract.numPasses === 4) return;
+	this.trump = contract.getSuit();
+	this.leader = contract.getLeader();
 	this.plays[0] = new Bridge.PlayedCard( 0, this.trump, this.leader );
 	this.lastPlayIndex = 0;
 };
@@ -4221,6 +4265,19 @@ Bridge.getBidHTML = function(bid) {
   return bid[0] + "<suit data-suit='" + bid[1].toLowerCase() + "'>" + Bridge.calls[bid[1].toLowerCase()].html + "</suit>";
 };
 
+Bridge.getSuitHTML = function(suit) {
+  suit = suit.toLowerCase();
+  return "<suit data-suit='" + suit + "'>" + Bridge.suits[suit].html + "</suit>";
+};
+
+Bridge.replaceSuitSymbolsHTML = function(text) {
+  _.each(Bridge.suits, function(suitData, suit) {
+    var re = new RegExp('!' + suit, "gi");
+    text = text.replace(re, Bridge.getSuitHTML(suit));
+  });
+  return text;
+};
+
 /**
  * Render a template.
  */
@@ -4233,8 +4290,8 @@ Bridge.toHTML = function toHTML(self, config, parameters, operation) {
 	var html = _.renderTemplate(config.template, parameters);
   var wrapperID = Bridge.IDManager.generateID();
   html = "<section id='" + wrapperID + "'>" + html + "</section>";
-  if (config.containerID) {
-    var container = $('#' + config.containerID);
+  if (config.container) {
+    var container = $(config.container);
     if (container.length) {
       container.empty().append(html);
       if (config.registerChangeHandlers) {
@@ -4266,16 +4323,32 @@ Bridge.Deal.prototype.toHTML = function toHTML(config, operation) {
 };
 
 /**
- * Generate html to show card deck based on configuration options.
+ * Generate html to show dealer and vulnerability based on configuration options.
  * If nothing is specified defaults are used.
- * @param {string} containerID the id of the container to embed html in
+ * @param {string} container the container css selector to embed html in
  * @param {object} config the configuration options to use
  * @return {string} html display of this deal's card deck using the passed template.
  */
- Bridge.Deal.prototype.showCardDeck = function showCardDeck(containerID, config) {
+ Bridge.Deal.prototype.showDealerAndVulnerability = function showDealerAndVulnerability(container, config) {
    config = config || {};
    _.defaults(config, {
-     containerID: containerID,
+     container: container,
+     template: "deal.dealer_and_vulnerability",
+   });
+   return this.toHTML(config, ["setVulnerability", "setDealer"]);
+ };
+
+/**
+ * Generate html to show card deck based on configuration options.
+ * If nothing is specified defaults are used.
+ * @param {string} container the container css selector to embed html in
+ * @param {object} config the configuration options to use
+ * @return {string} html display of this deal's card deck using the passed template.
+ */
+ Bridge.Deal.prototype.showCardDeck = function showCardDeck(container, config) {
+   config = config || {};
+   _.defaults(config, {
+     container: container,
      template: "deal.card-deck.rows",
    });
    return this.toHTML(config);
@@ -4284,14 +4357,14 @@ Bridge.Deal.prototype.toHTML = function toHTML(config, operation) {
 /**
  * Generate html to show vulnerability info based on configuration options.
  * If nothing is specified defaults are used.
- * @param {string} containerID the id of the container to embed html in
+ * @param {string} container the container css selector to embed html in
  * @param {object} config the configuration options to use
  * @return {string} html display of this deal's vulnerability using the passed template.
  */
-Bridge.Deal.prototype.showVulnerability = function showVulnerability(containerID, config) {
+Bridge.Deal.prototype.showVulnerability = function showVulnerability(container, config) {
   config = config || {};
   _.defaults(config, {
-    containerID: containerID,
+    container: container,
     template: "deal.vulnerability",
   });
   return this.toHTML(config, "setVulnerability");
@@ -4300,14 +4373,14 @@ Bridge.Deal.prototype.showVulnerability = function showVulnerability(containerID
 /*
  * Generate html to show dealer info based on configuration options.
  * If nothing is specified defaults are used.
- * @param {string} containerID the id of the container to embed html in
+ * @param {string} container the container css selector to embed html in
  * @param {object} config the configuration options to use
  * @return {string} html display of this deal's dealer using the passed template.
  */
-Bridge.Deal.prototype.showDealer = function showDealer(containerID, config) {
+Bridge.Deal.prototype.showDealer = function showDealer(container, config) {
   config = config || {};
   _.defaults(config, {
-    containerID: containerID,
+    container: container,
     template: "deal.dealer",
   });
   return this.toHTML(config, "setDealer");
@@ -4316,14 +4389,14 @@ Bridge.Deal.prototype.showDealer = function showDealer(containerID, config) {
 /*
  * Generate html to show scoring info based on configuration options.
  * If nothing is specified defaults are used.
- * @param {string} containerID the id of the container to embed html in
+ * @param {string} container the container css selector to embed html in
  * @param {object} config the configuration options to use
  * @return {string} html display of this deal's scoring type using the passed template.
  */
-Bridge.Deal.prototype.showScoring = function showScoring(containerID, config) {
+Bridge.Deal.prototype.showScoring = function showScoring(container, config) {
   config = config || {};
   _.defaults(config, {
-    containerID: containerID,
+    container: container,
     template: "deal.scoring",
     scoringTypes: [
       "MPs",
@@ -4333,6 +4406,26 @@ Bridge.Deal.prototype.showScoring = function showScoring(containerID, config) {
     ],
   });
   return this.toHTML(config, "setScoring");
+};
+
+/*
+ * Generate html to show problem type info based on configuration options.
+ * If nothing is specified defaults are used.
+ * @param {string} container the container css selector to embed html in
+ * @param {object} config the configuration options to use
+ * @return {string} html display of this deal's problem type using the passed template.
+ */
+Bridge.Deal.prototype.showProblemType = function showProblemType(container, config) {
+  config = config || {};
+  _.defaults(config, {
+    container: container,
+    template: "deal.problemType",
+    problemTypes: [
+      "Bidding",
+      "Lead",
+    ],
+  });
+  return this.toHTML(config, "setProblemType");
 };
 
 
@@ -4346,14 +4439,14 @@ Bridge.Hand.prototype.toHTML = function toHTML(config, operation) {
 /**
  * Generate html to show hand based on passed template name (which should be registered) and config.
  * If nothing is specified defaults are used.
- * @param {string} containerID the id of the container to embed html in
+ * @param {string} container the container css selector to embed html in
  * @param {object} config the configuration options to use
  * @return {string} html display of this hand using the passed template.
  */
-Bridge.Hand.prototype.showHand = function showHand(containerID, config) {
+Bridge.Hand.prototype.showHand = function showHand(container, config) {
   config = config || {};
   _.defaults(config, {
-    containerID: containerID,
+    container: container,
     template: "hand.cards",
   });
   return this.toHTML(config);
@@ -4362,14 +4455,14 @@ Bridge.Hand.prototype.showHand = function showHand(containerID, config) {
 /**
  * Generate html to show hand that is on leadbased on passed template name (which should be registered) and config.
  * If nothing is specified defaults are used.
- * @param {string} containerID the id of the container to embed html in
+ * @param {string} container the container css selector to embed html in
  * @param {object} config the configuration options to use
  * @return {string} html display of this hand using the passed template.
  */
-Bridge.Hand.prototype.showLead = function showHand(containerID, config) {
+Bridge.Hand.prototype.showLead = function showHand(container, config) {
   config = config || {};
   _.defaults(config, {
-    containerID: containerID,
+    container: container,
     template: "hand.lead",
   });
   return this.toHTML(config);
@@ -4385,14 +4478,14 @@ Bridge.Auction.prototype.toHTML = function toHTML(config, operation) {
 /**
  * Generate html to show auction based on passed template name (which should be registered) and config.
  * If nothing is specified defaults are used.
- * @param {string} containerID the id of the container to embed html in
+ * @param {string} container the container css selector to embed html in
  * @param {object} config the configuration options to use
  * @return {string} html display of this auction using the passed template.
  */
-Bridge.Auction.prototype.showAuction = function showAuction(containerID, config) {
+Bridge.Auction.prototype.showAuction = function showAuction(container, config) {
   config = config || {};
   _.defaults(config, {
-    containerID: containerID,
+    container: container,
     template: "auction.full",
     "addQuestionMark": true,
   });
@@ -4402,14 +4495,14 @@ Bridge.Auction.prototype.showAuction = function showAuction(containerID, config)
 /**
  * Generate html to show bidding box based on configuration options.
  * If nothing is specified defaults are used.
- * @param {string} containerID the id of the container to embed html in
+ * @param {string} container the container css selector to embed html in
  * @param {object} config the configuration options to use
  * @return {string} html display of this auction's bidding box using the passed template.
  */
- Bridge.Auction.prototype.showBiddingBox = function showBiddingBox(containerID, config) {
+ Bridge.Auction.prototype.showBiddingBox = function showBiddingBox(container, config) {
    config = config || {};
    _.defaults(config, {
-     containerID: containerID,
+     container: container,
      template: "auction.bidding-box.concise",
    });
    return this.toHTML(config);
@@ -4426,6 +4519,29 @@ Bridge._cloneConfig = function _cloneConfig(config) {
 };
 
 /** HAND TEMPLATES */
+
+_.declareTemplate("deal.dealer_and_vulnerability", `<vulnerabilities><%
+  var currentVulnerability = deal.getVulnerability();
+  var names = {
+    '-': "None",
+    'n': "Us",
+    'e': "Them",
+    'b': "Both",
+  };
+  if (Bridge.isEastWest(deal.getActiveHand())) {
+    names['n'] = "Them";
+    names['e'] = "Us";
+  }
+  _.each(Bridge.vulnerabilities, function(item, vulnerability) {
+    %><vulnerability data-operation="setVulnerability" data-vulnerability=<%=vulnerability%> <%
+    if (vulnerability != currentVulnerability) {
+      %>class="enabled" <%
+    } else {
+      %>class="disabled current" <%
+    }
+    %>><%=names[vulnerability]%></vulnerability><%
+  });
+  %></vulnerabilities>`);
 
 _.declareTemplate("deal.vulnerability", `<vulnerabilities><%
   var currentVulnerability = deal.getVulnerability();
@@ -4453,7 +4569,7 @@ _.declareTemplate("deal.vulnerability", `<vulnerabilities><%
 _.declareTemplate("deal.scoring", `<scoringtypes><%
   var currentScoring = deal.getScoring();
   _.each(config.scoringTypes, function(scoringType) {
-    %><scoringtype data-operation="setScoring" data-scoring=<%=scoringType%> <%
+    %><scoringtype data-operation="setScoring" data-scoring="<%=scoringType%>" <%
     if (scoringType != currentScoring) {
       %>class="enabled" <%
     } else {
@@ -4462,6 +4578,19 @@ _.declareTemplate("deal.scoring", `<scoringtypes><%
     %>><%=scoringType%></scoringtype><%
   });
   %></scoringtypes>`);
+
+  _.declareTemplate("deal.problemType", `<problemtypes><%
+    var currentProblemType = deal.getProblemType();
+    _.each(config.problemTypes, function(problemType) {
+      %><problemtype data-operation="setProblemType" data-type="<%=problemType%>" <%
+      if (problemType != currentProblemType) {
+        %>class="enabled" <%
+      } else {
+        %>class="disabled current" <%
+      }
+      %>><%=problemType%></problemtype><%
+    });
+    %></problemtypes>`);
 
 _.declareTemplate("deal.dealer", `<directions><%
   var currentDealer = deal.getDealer();

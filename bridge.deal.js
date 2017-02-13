@@ -98,6 +98,12 @@ Bridge.Deal.prototype.init = function init() {
 	this.setScoring("KO");
 
 	/**
+	 * The type of problem (if any) this deal is about.
+	 * @member {string}
+	 */
+	this.setProblemType("Bidding");
+
+	/**
 	 * Any notes associated with this deal.
 	 * @member {string}
 	 */
@@ -108,6 +114,18 @@ Bridge.Deal.prototype.init = function init() {
 // Register a callback.
 Bridge.Deal.prototype.registerCallback = function(callback, operation) {
 	operation = operation || "";
+	if ($.isArray(operation)) {
+		var self = this;
+		_.each(operation, function(op) {
+			self.addCallback(callback, op);
+		});
+		return;
+	}
+	this.addCallback(callback, operation);
+};
+
+// Add a callback.
+Bridge.Deal.prototype.addCallback = function addCallback(callback, operation) {
 	if (!(operation in this.callbacks)) {
 		this.callbacks[operation] = [];
 	}
@@ -218,7 +236,9 @@ Bridge.Deal.prototype.setVulnerability = function( vulnerability ) {
  * Get the scoring of this deal.
  * @return {string} the scoring.
  */
-Bridge.Deal.prototype.getScoring = function() { return this.scoring; }
+Bridge.Deal.prototype.getScoring = function() {
+	return this.scoring;
+}
 
 /**
  * Set the scoring for this deal.
@@ -231,6 +251,27 @@ Bridge.Deal.prototype.setScoring = function( scoring ) {
 	Bridge._checkRequiredArgument( scoring );
 	this.scoring = scoring;
 	this.onChange( "setScoring", scoring );
+};
+
+/**
+ * Get the problem type of this deal.
+ * @return {string} the problem type.
+ */
+Bridge.Deal.prototype.getProblemType = function() {
+	return this.problemType;
+}
+
+/**
+ * Set the problem type for this deal.
+ * @param {string} problemType - the problem type
+ */
+Bridge.Deal.prototype.setProblemType = function( problemType ) {
+	if (_.isObject(problemType)) {
+		problemType = problemType.type;
+	}
+	Bridge._checkRequiredArgument( problemType );
+	this.problemType = problemType;
+	this.onChange( "setProblemType", problemType );
 };
 
 
@@ -321,23 +362,24 @@ Bridge.Deal.prototype.rotateClockwise = function() {
 		's': 'w',
 		'w': 'n',
 	};
-	var hands = {};
-	for (var direction in directions) {
-		var hand = this.getHand(direction);
-		hands[direction] = hand.getHand();
-		hand.clearCards();
-	}
-	for (var direction in directions) {
-		this.getHand(directions[direction]).setHand(hands[direction]);
-	}
-	// Rotate Vulnerability.
-	var rotateVulnerabilities = {
-		'-' : '-',
-		'n' : 'e',
-		'e' : 'n',
-		'b' : 'b',
-	};
-	this.setVulnerability(rotateVulnerabilities[this.getVulnerability()]);
+	// Dont rotate hands.
+	// var hands = {};
+	// for (var direction in directions) {
+	// 	var hand = this.getHand(direction);
+	// 	hands[direction] = hand.getHand();
+	// 	hand.clearCards();
+	// }
+	// for (var direction in directions) {
+	// 	this.getHand(directions[direction]).setHand(hands[direction]);
+	// }
+	// Don't Rotate Vulnerability.
+	// var rotateVulnerabilities = {
+	// 	'-' : '-',
+	// 	'n' : 'e',
+	// 	'e' : 'n',
+	// 	'b' : 'b',
+	// };
+	// this.setVulnerability(rotateVulnerabilities[this.getVulnerability()]);
 	// Rotate dealer.
 	var auction = this.getAuction();
 	var newDealer = Bridge.getLHO(this.getDealer());
@@ -374,6 +416,9 @@ Bridge.Deal.prototype.set = function( property, value ) {
 		case "scoring" :
 			this.setScoring( value );
 			break;
+		case "problemType" :
+			this.setProblemType( value );
+			break;
 		case "notes" :
 			this.setNotes( value );
 			break;
@@ -402,6 +447,8 @@ Bridge.Deal.prototype.get = function( property ) {
 			return this.getDealer();
 		case "scoring" :
 			return this.getScoring();
+		case "problemType" :
+			return this.getProblemType();
 		case "notes" :
 			return this.getNotes();
 		case "auction" :
@@ -555,7 +602,7 @@ Bridge.Deal.prototype.toString = function( expandedFormat ) {
 Bridge.Deal.prototype.toJSON = function() {
 	var output = {};
 	output.version = "1.0";
-	var fields = [ 'board', 'dealer', 'vulnerability', 'scoring', 'notes' ];
+	var fields = [ 'board', 'dealer', 'vulnerability', 'scoring', 'problemType', 'notes' ];
 	_.each( fields, function( field ) {
 		output[ field ] = this.get( field );
 	}, this);
@@ -574,7 +621,7 @@ Bridge.Deal.prototype.toJSON = function() {
  * @param {object} the json representation of this deal.
  */
 Bridge.Deal.prototype.fromJSON = function( json ) {
-	var fields = [ 'board', 'dealer', 'vulnerability', 'scoring', 'notes' ];
+	var fields = [ 'board', 'dealer', 'vulnerability', 'scoring', 'problemType', 'notes' ];
 	_.each( fields, function( field ) {
 		if ( _.has( json, field ) ) this.set( field, json[ field ] );
 	}, this);

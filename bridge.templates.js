@@ -1,5 +1,28 @@
 /** HAND TEMPLATES */
 
+_.declareTemplate("deal.dealer_and_vulnerability", `<vulnerabilities><%
+  var currentVulnerability = deal.getVulnerability();
+  var names = {
+    '-': "None",
+    'n': "Us",
+    'e': "Them",
+    'b': "Both",
+  };
+  if (Bridge.isEastWest(deal.getActiveHand())) {
+    names['n'] = "Them";
+    names['e'] = "Us";
+  }
+  _.each(Bridge.vulnerabilities, function(item, vulnerability) {
+    %><vulnerability data-operation="setVulnerability" data-vulnerability=<%=vulnerability%> <%
+    if (vulnerability != currentVulnerability) {
+      %>class="enabled" <%
+    } else {
+      %>class="disabled current" <%
+    }
+    %>><%=names[vulnerability]%></vulnerability><%
+  });
+  %></vulnerabilities>`);
+
 _.declareTemplate("deal.vulnerability", `<vulnerabilities><%
   var currentVulnerability = deal.getVulnerability();
   var names = {
@@ -26,7 +49,7 @@ _.declareTemplate("deal.vulnerability", `<vulnerabilities><%
 _.declareTemplate("deal.scoring", `<scoringtypes><%
   var currentScoring = deal.getScoring();
   _.each(config.scoringTypes, function(scoringType) {
-    %><scoringtype data-operation="setScoring" data-scoring=<%=scoringType%> <%
+    %><scoringtype data-operation="setScoring" data-scoring="<%=scoringType%>" <%
     if (scoringType != currentScoring) {
       %>class="enabled" <%
     } else {
@@ -35,6 +58,19 @@ _.declareTemplate("deal.scoring", `<scoringtypes><%
     %>><%=scoringType%></scoringtype><%
   });
   %></scoringtypes>`);
+
+  _.declareTemplate("deal.problemType", `<problemtypes><%
+    var currentProblemType = deal.getProblemType();
+    _.each(config.problemTypes, function(problemType) {
+      %><problemtype data-operation="setProblemType" data-type="<%=problemType%>" <%
+      if (problemType != currentProblemType) {
+        %>class="enabled" <%
+      } else {
+        %>class="disabled current" <%
+      }
+      %>><%=problemType%></problemtype><%
+    });
+    %></problemtypes>`);
 
 _.declareTemplate("deal.dealer", `<directions><%
   var currentDealer = deal.getDealer();
