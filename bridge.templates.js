@@ -117,7 +117,8 @@ _.declareTemplate("deal.card-deck.rows", `<card-deck><%
       }
       %>data-suit=<%=suit%> data-rank=<%=rank%>></card><%
     });
-    %></row><%
+    count++;
+    %><card data-card-number="<%=count%>" class="enabled unassigned" data-operation=addCard data-direction=<%=activeHand%> data-suit=<%=suit%> data-rank=x></card></row><%
   });
   %></content></card-deck>`);
 
@@ -140,7 +141,7 @@ _.declareTemplate( "hand.cards",`<hand><content><%
       if (hand.isSelectedCard(card.suit, card.rank)) {
         %> selected<%
       }
-      %>" data-operation="removeCard" data-card-number="<%=count%>" data-suit="<%=card.suit%>" data-rank="<%=card.rank%>"></card><%
+      %>" data-operation="removeCard" data-card-number="<%=count%>" data-suit="<%=card.suit%>" data-concrete-rank="<%=card.concreteRank%>" data-rank="<%=card.rank%>"></card><%
     });
     while (count < 13) {
   		count++;

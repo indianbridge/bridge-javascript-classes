@@ -319,6 +319,9 @@ Bridge.Hand.prototype.addCard = function( suit, rank ) {
 Bridge.Hand.prototype.removeCard = function(suit, rank) {
 	if (_.isObject(suit)) {
 		rank = suit.rank;
+		if (rank == 'x' || rank == 'X') {
+			rank = suit.concreteRank;
+		}
 		suit = suit.suit;
 	}
 	var prefix = "In removeCard";
@@ -558,7 +561,7 @@ Bridge.Hand.prototype.getCards = function() {
 			if ( this.cards[ suit ][ actualRank ] ) {
 				var rank = this.showAsX[ suit ][ actualRank ] ? 'x' : actualRank;
 				var rankHTML = this.showAsX[ suit ][ actualRank ] ? 'x' : Bridge.ranks[ rank ].html;
-				out.push( { "suit": suit, "rank": rank, "html": rankHTML } );
+				out.push( { "suit": suit, "rank": rank, "html": rankHTML, "concreteRank": actualRank } );
 			}
 		}, this);
 	}, this);
